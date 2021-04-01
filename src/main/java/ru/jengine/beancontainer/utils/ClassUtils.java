@@ -1,0 +1,34 @@
+package ru.jengine.beancontainer.utils;
+
+import ru.jengine.beancontainer.exceptions.ContainerException;
+
+import java.lang.reflect.*;
+import java.util.function.Predicate;
+
+public class ClassUtils {
+    public static final Predicate<Class<?>> IS_CLASS_PREDICATE = cls -> !cls.isAnnotation() && !cls.isInterface();
+
+    public static Class<?> getFirstGenericType(AnnotatedElement element)
+    {
+        Type type = null;
+
+        if (element instanceof Field)
+        {
+            type = ((Field)element).getGenericType();
+        }
+        else if (element instanceof Method)
+        {
+            type = ((Method)element).getGenericReturnType();
+        }
+
+        if (type instanceof ParameterizedType)
+        {
+            ParameterizedType pType = (ParameterizedType)type;
+            return (Class<?>)pType.getActualTypeArguments()[0];
+        }
+        else
+        {
+            throw new ContainerException("Element [" + element + "] type is not generic");
+        }
+    }
+}

@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ContainerContext {
     void initialize(List<Module> modules, BeanFactory factory);
+    void preProcessBeans(List<ContextPreProcessor> contextPreProcessors);
     void prepareBeans();
 
     BeanContext getBean(Class<?> beanClass);

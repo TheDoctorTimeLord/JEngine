@@ -1,9 +1,6 @@
-package ru.jengine.beancontainer.implementation;
+package ru.jengine.beancontainer.implementation.contexts;
 
-import ru.jengine.beancontainer.BeanFactory;
-import ru.jengine.beancontainer.ContainerContext;
-import ru.jengine.beancontainer.ContainerMultiContext;
-import ru.jengine.beancontainer.Module;
+import ru.jengine.beancontainer.*;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
@@ -31,6 +28,11 @@ public class ContainerContextFacade implements ContainerMultiContext {
 
         Map<String, List<Module>> modulesByContext = groupByContext(modules);
         modulesByContext.forEach(this::registerContext);
+    }
+
+    @Override
+    public void preProcessBeans(List<ContextPreProcessor> contextPreProcessors) {
+        internalContexts.forEach((key, value) -> value.preProcessBeans(contextPreProcessors));
     }
 
     @Override

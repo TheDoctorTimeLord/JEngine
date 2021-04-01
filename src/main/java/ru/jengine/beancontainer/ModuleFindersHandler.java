@@ -1,50 +1,53 @@
 package ru.jengine.beancontainer;
 
-import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
-import ru.jengine.beancontainer.dataclasses.ModuleFindContext;
+import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ModuleFindersHandler {
-    private final ClassFinder classFinder;
+    public List<Module> findAllModules(ModuleFinder mainModuleFinder, ContainerConfiguration configuration) {
+        Queue<ModuleFinder> moduleFinders = new LinkedList<>();
+        List<Module> result = new LinkedList<>();
+        Set<Class<?>> allFoundedModules = new HashSet<>();
 
-    public ModuleFindersHandler(ClassFinder classFinder) {
-        this.classFinder = classFinder;
-    }
+        moduleFinders.add(mainModuleFinder);
 
-    public List<Module> findAllModules(Class<?> mainModule) {
-        List<Module> modulesInProject = ContainerModuleUtils.scanClassPathAndFindModules(mainModule, classFinder);
-        List<Module> externalModules = findExternalModules();
-        return concatModules(modulesInProject, externalModules);
-    }
+        while (!moduleFinders.isEmpty()) {
+            ModuleFinder moduleFinder = moduleFinders.poll();
 
-    private List<Module> findExternalModules() {
-        Set<Class<?>> moduleFinderClasses = classFinder.getAnnotatedClasses(ModuleFinderMarker.class);
-        List<Module> result = new ArrayList<>();
-        for (Class<?> cls : moduleFinderClasses) {
-            ModuleFinder finder = BeanUtils.createComponentWithDefaultConstructor(cls);
-            List<Module> foundedModules = finder.find(new ModuleFindContext(classFinder));
-            result.addAll(foundedModules);
+            List<Module> foundedModules = moduleFinder.find(configuration);
+            Queue<Module> mainModules = new LinkedList<>(foundedModules);
+
+            while (!mainModules.isEmpty()) {
+                Module mainModule = mainModules.poll();
+
+                List<Module> submodules = ContainerModuleUtils.getAllSubmodules(mainModule);
+                List<Module> uniqueModules = Stream.concat(Stream.of(mainModule), submodules.stream())
+                        .filter(module -> !allFoundedModules.contains(module.getClass()))
+                        .collect(Collectors.toList()); //TODO исправить возможные проблемы с фильтрацией
+
+                Set<Class<?>> moduleFinderClasses = ContainerModuleUtils.getAllModuleFinders(uniqueModules);
+                moduleFinderClasses.stream()
+                        .map(ModuleFindersHandler::createModuleFinder)
+                        .forEach(moduleFinders::add);
+
+                uniqueModules.stream()
+                        .filter(module -> !moduleFinderClasses.contains(module.getClass()))
+                        .forEach(module -> {
+                            result.add(module);
+                            allFoundedModules.add(module.getClass());
+                        });
+            }
         }
+
         return result;
     }
 
-    private static List<Module> concatModules(List<Module> first, List<Module> second) {
-        Set<Class<?>> firstModuleClasses = first.stream()
-                .map(Object::getClass)
-                .collect(Collectors.toSet());
-
-        List<Module> result = new ArrayList<>(first);
-
-        second.stream()
-                .filter(module -> !firstModuleClasses.contains(module.getClass()))
-                .forEach(result::add);
-
-        return result;
+    private static ModuleFinder createModuleFinder(Class<?> moduleFinderCls) {
+        return BeanUtils.createComponentWithDefaultConstructor(moduleFinderCls);
     }
 }

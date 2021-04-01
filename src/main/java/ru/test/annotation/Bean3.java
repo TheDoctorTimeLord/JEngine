@@ -14,7 +14,7 @@ public class Bean3 {
         this.bean2 = bean2;
     }
 
-    public boolean result() {
+    public boolean isF() {
         return bean1.isF() && bean2.isF();
     }
 }

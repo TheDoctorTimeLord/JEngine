@@ -1,7 +1,15 @@
 package ru.jengine.beancontainer.implementation;
 
 import ru.jengine.beancontainer.*;
+import ru.jengine.beancontainer.dataclasses.BeanContext;
+import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
+import ru.jengine.beancontainer.implementation.contexts.ContainerContextFacade;
+import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
+import ru.jengine.beancontainer.implementation.factories.AutowireBeanFactory;
+import ru.jengine.beancontainer.implementation.factories.AutowireConfigurableBeanFactory;
+import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
 import java.util.List;
@@ -11,17 +19,19 @@ public class BeanContainerImpl implements BeanContainer {
     private ContainerMultiContext beanContainerContext;
 
     @Override
-    public void initialize(Class<?> mainModule, ClassFinder classFinder, Object... additionalBeans) {
-        classFinder.scan("ru.jengine.beancontainer");
-
-        List<Module> modules = findModules(mainModule, classFinder);
-
+    public void initialize(Class<?> mainModule, Object... additionalBeans) {
+        List<Module> modules = findModules(mainModule);
         prepareContext(modules);
     }
 
-    private static List<Module> findModules(Class<?> mainModule, ClassFinder classFinder) {
-        ModuleFindersHandler moduleFindersHandler = new ModuleFindersHandler(classFinder);
-        return moduleFindersHandler.findAllModules(mainModule);
+    private static List<Module> findModules(Class<?> mainModule) {
+        ModuleFindersHandler moduleFindersHandler = new ModuleFindersHandler();
+        SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
+
+        syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_MODULE);
+        syntheticModuleFinder.addModuleClass(mainModule);
+
+        return moduleFindersHandler.findAllModules(syntheticModuleFinder, new ContainerConfiguration());
     }
 
     private void prepareContext(List<Module> modules) {
@@ -34,11 +44,14 @@ public class BeanContainerImpl implements BeanContainer {
                 .filter(module -> !isInfrastructureModule(module))
                 .collect(Collectors.toList());
 
+        BeanContext postProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
+
         beanContainerContext = new ContainerContextFacade();
         beanContainerContext.registerContext(Constants.INFRASTRUCTURE_CONTEXT, infrastructureContext);
 
         BeanFactory factory = createBeanFactory(beanContainerContext, infrastructureContext);
         beanContainerContext.initialize(otherModules, factory);
+        beanContainerContext.preProcessBeans(BeanUtils.getBeanAsList(postProcessors));
         beanContainerContext.prepareBeans();
     }
 

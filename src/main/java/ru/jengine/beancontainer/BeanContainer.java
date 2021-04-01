@@ -1,5 +1,5 @@
 package ru.jengine.beancontainer;
 
 public interface BeanContainer {
-    void initialize(Class<?> mainModule, ClassFinder classFinder, Object... additionalBeans);
+    void initialize(Class<?> mainModule, Object... additionalBeans);
 }

@@ -1,10 +1,11 @@
-package ru.jengine.beancontainer.implementation;
+package ru.jengine.beancontainer.implementation.beandefinitions;
 
 import ru.jengine.beancontainer.BeanDefinition;
 
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;
     private final boolean isSingleton;
+    private boolean mustRemovedAfterPreProcess = false;
 
     public JavaClassBeanDefinition(Class<?> beanClass, boolean isSingleton) {
         this.beanClass = beanClass;
@@ -19,5 +20,15 @@ public class JavaClassBeanDefinition implements BeanDefinition {
     @Override
     public boolean isSingleton() {
         return isSingleton;
+    }
+
+    @Override
+    public boolean mustRemovedAfterPreProcess() {
+        return mustRemovedAfterPreProcess;
+    }
+
+    @Override
+    public void setMustRemovedAfterPreProcess(boolean flag) {
+        this.mustRemovedAfterPreProcess = flag;
     }
 }

@@ -1,44 +1,83 @@
 package ru.jengine.beancontainer.utils;
 
-import ru.jengine.beancontainer.BeanDefinition;
-import ru.jengine.beancontainer.ClassFinder;
-import ru.jengine.beancontainer.Module;
+import ru.jengine.beancontainer.*;
 import ru.jengine.beancontainer.annotations.ComponentScan;
-import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.Context;
+import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.implementation.classfinders.ClassPathScanner;
+import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
 import ru.jengine.beancontainer.service.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ContainerModuleUtils {
-    public static List<Module> scanClassPathAndFindModules(Class<?> mainModule, ClassFinder classFinder) {
+    public static List<Module> getAllSubmodules(Module mainModule) {
         List<Module> result = new ArrayList<>();
         Set<Class<?>> moduleClasses = new HashSet<>();
-        Queue<Class<?>> notHandledModules = new LinkedList<>();
-        ModuleContext context = new ModuleContext(classFinder);
+        Queue<Module> notHandledModules = new LinkedList<>();
 
         notHandledModules.add(mainModule);
+        moduleClasses.add(mainModule.getClass());
 
         while (!notHandledModules.isEmpty()) {
-            Class<?> moduleClass = notHandledModules.remove();
+            Module module = notHandledModules.remove();
 
-            moduleClasses.add(moduleClass);
-            Module module = ContainerModuleUtils.createModule(moduleClass, context);
-            result.add(module);
-
-            if (moduleClass.isAnnotationPresent(ComponentScan.class)) {
-                String packageToScan = moduleClass.getAnnotation(ComponentScan.class).value();
-                classFinder.scan(packageToScan);
-                notHandledModules.addAll(classFinder.getAnnotatedClasses(ContainerModule.class).stream()
-                        .filter(cls -> !moduleClasses.contains(cls))
-                        .collect(Collectors.toList()));
-            }
+            List<Class<?>> submodules = module.getSubmodules().stream()
+                    .filter(cls -> !moduleClasses.contains(cls))
+                    .collect(Collectors.toList());
+            moduleClasses.addAll(submodules);
+            submodules.stream()
+                    .map(ContainerModuleUtils::createModule)
+                    .forEach(submodule -> {
+                        notHandledModules.add(submodule);
+                        result.add(submodule);
+                    });
         }
 
         return result;
+    }
+
+    private static ModuleContext createModuleContext(Class<?> moduleClass) {
+        ClassFinder classFinder;
+        if (moduleClass.isAnnotationPresent(ComponentScan.class)) {
+            String packageToScan = moduleClass.getAnnotation(ComponentScan.class).value();
+            classFinder = new ClassPathScanner();
+            classFinder.scan(packageToScan);
+        } else {
+            classFinder = new EmptyClassFinder();
+        }
+
+        return new ModuleContext(classFinder);
+    }
+
+    private static Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
+        Module module;
+        try {
+            module = (Module) BeanUtils.createObjectWithDefaultConstructor(moduleClass);
+        } catch (ContainerException e) {
+            throw new ContainerException("Module [" + moduleClass + "] must have default constructor", e);
+        } catch (ClassCastException e) {
+            throw new ContainerException("Module [" + moduleClass + "] must implement interface Module", e);
+        }
+
+        module.configure(moduleContext);
+        return module;
+    }
+
+    public static Module createModule(Class<?> moduleClass) {
+        ModuleContext context = createModuleContext(moduleClass);
+        return createModule(moduleClass, context);
+    }
+
+    public static Set<Class<?>> getAllModuleFinders(List<Module> foundedModules) {
+        return foundedModules.stream()
+                .flatMap(module -> module.getImplementations(ModuleFinder.class).stream())
+                .filter(ClassUtils.IS_CLASS_PREDICATE)
+                .filter(cls -> cls.isAnnotationPresent(ModuleFinderMarker.class))
+                .collect(Collectors.toSet());
     }
 
     public static List<BeanDefinition> extractAllBeanDefinition(List<Module> modules) {
@@ -55,19 +94,5 @@ public class ContainerModuleUtils {
             return Constants.DEFAULT_CONTEXT;
         }
         return annotation.value();
-    }
-
-    public static Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
-        Module module;
-        try {
-            module = (Module) BeanUtils.createObjectWithDefaultConstructor(moduleClass);
-        } catch (ContainerException e) {
-            throw new ContainerException(String.format("Module '%s' must have default constructor", moduleClass), e);
-        } catch (ClassCastException e) {
-            throw new ContainerException(String.format("Module '%s' must implement interface Module", moduleClass), e);
-        }
-
-        module.configure(moduleContext);
-        return module;
     }
 }
