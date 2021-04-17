@@ -1,17 +1,20 @@
 package ru.jengine.beancontainer.utils;
 
 import ru.jengine.beancontainer.*;
-import ru.jengine.beancontainer.annotations.ComponentScan;
+import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
+import ru.jengine.beancontainer.annotations.PackagesScan;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.classfinders.ClassPathScanner;
+import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
 import ru.jengine.beancontainer.service.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ContainerModuleUtils {
     public static List<Module> getAllSubmodules(Module mainModule) {
@@ -42,15 +45,24 @@ public class ContainerModuleUtils {
 
     private static ModuleContext createModuleContext(Class<?> moduleClass) {
         ClassFinder classFinder;
-        if (moduleClass.isAnnotationPresent(ComponentScan.class)) {
-            String packageToScan = moduleClass.getAnnotation(ComponentScan.class).value();
-            classFinder = new ClassPathScanner();
-            classFinder.scan(packageToScan);
+        if (moduleClass.isAnnotationPresent(PackageScan.class)) {
+            String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
+            classFinder = scanPackage(packageToScan);
+        } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
+            classFinder = new CompositeClassFinder(Stream.of(moduleClass.getAnnotation(PackagesScan.class).value())
+                    .map(packageScan -> scanPackage(packageScan.value()))
+                    .collect(Collectors.toList()));
         } else {
             classFinder = new EmptyClassFinder();
         }
 
         return new ModuleContext(classFinder);
+    }
+
+    private static ClassFinder scanPackage(String packageToScan) {
+        ClassFinder classFinder = new ClassPathScanner();
+        classFinder.scan(packageToScan);
+        return classFinder;
     }
 
     private static Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
