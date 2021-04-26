@@ -1,6 +1,15 @@
 package ru.jengine.beancontainer.implementation;
 
-import ru.jengine.beancontainer.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import ru.jengine.beancontainer.BeanContainer;
+import ru.jengine.beancontainer.BeanFactory;
+import ru.jengine.beancontainer.ContainerContext;
+import ru.jengine.beancontainer.ContainerMultiContext;
+import ru.jengine.beancontainer.ContextPreProcessor;
+import ru.jengine.beancontainer.Module;
+import ru.jengine.beancontainer.ModuleFindersHandler;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.implementation.contexts.ContainerContextFacade;
@@ -11,9 +20,6 @@ import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFind
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class BeanContainerImpl implements BeanContainer {
     private ContainerMultiContext beanContainerContext;
@@ -28,6 +34,7 @@ public class BeanContainerImpl implements BeanContainer {
         ModuleFindersHandler moduleFindersHandler = new ModuleFindersHandler();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 
+        syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE);
         syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_MODULE);
         syntheticModuleFinder.addModuleClass(mainModule);
 
@@ -70,5 +77,10 @@ public class BeanContainerImpl implements BeanContainer {
         AutowireConfigurableBeanFactory factory = new AutowireConfigurableBeanFactory(mainContext);
         factory.configure(infrastructureContext);
         return factory;
+    }
+
+    @Override
+    public <T> T getBean(Class<?> beanClass) {
+        return beanContainerContext.getBean(beanClass).getBean();
     }
 }

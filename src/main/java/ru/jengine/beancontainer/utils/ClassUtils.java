@@ -1,9 +1,13 @@
 package ru.jengine.beancontainer.utils;
 
-import ru.jengine.beancontainer.exceptions.ContainerException;
-
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.function.Predicate;
+
+import ru.jengine.beancontainer.exceptions.ContainerException;
 
 public class ClassUtils {
     public static final Predicate<Class<?>> IS_CLASS_PREDICATE = cls -> !cls.isAnnotation() && !cls.isInterface();

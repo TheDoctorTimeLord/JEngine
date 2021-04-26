@@ -1,17 +1,21 @@
 package ru.jengine.beancontainer.utils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import ru.jengine.beancontainer.annotations.Inject;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.exceptions.InvocationMethodException;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BeanUtils {
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
@@ -54,7 +58,7 @@ public class BeanUtils {
     public static Object createObject(Constructor<?> constructor, Object[] args) {
         try {
             return constructor.newInstance(args);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             throw new ContainerException("Exception during create object [" + constructor.getDeclaringClass() + "]", e);
         }
     }
