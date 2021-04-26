@@ -1,7 +1,7 @@
 package ru.test.annotation;
 
-import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.ContainerModule;
+import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.implementation.BeanContainerImpl;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
 

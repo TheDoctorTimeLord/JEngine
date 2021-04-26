@@ -1,2 +1,6 @@
-package ru.jengine.eventqueue;public interface EventPoolHandler {
+package ru.jengine.eventqueue;
+
+public interface EventPoolHandler {
+    EventPool initialize(EventHandlingContext context);
+    void handle();
 }
