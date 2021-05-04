@@ -1,4 +1,4 @@
-package ru.jengine.eventqueue;
+package ru.jengine.eventqueue.exceptions;
 
 public class EventQueueException extends RuntimeException {
     public EventQueueException(String message) {

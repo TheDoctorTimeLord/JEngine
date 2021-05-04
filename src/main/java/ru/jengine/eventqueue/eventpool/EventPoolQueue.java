@@ -1,7 +1,9 @@
-package ru.jengine.eventqueue;
+package ru.jengine.eventqueue.eventpool;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import ru.jengine.eventqueue.event.Event;
 
 public class EventPoolQueue implements EventPool {
     private final Queue<Event> eventQueue = new ArrayDeque<>();

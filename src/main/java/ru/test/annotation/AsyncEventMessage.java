@@ -1,6 +1,6 @@
 package ru.test.annotation;
 
-import ru.jengine.eventqueue.Event;
+import ru.jengine.eventqueue.event.Event;
 
 public class AsyncEventMessage implements Event {
     private final String message;

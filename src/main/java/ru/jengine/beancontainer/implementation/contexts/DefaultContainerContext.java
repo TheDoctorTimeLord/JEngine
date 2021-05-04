@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
@@ -54,6 +56,7 @@ public class DefaultContainerContext implements ContainerContext {
     }
 
     @Override
+    @Nullable
     public BeanContext getBean(Class<?> beanClass) {
         return beanClass.isInterface()
                 ? getImplementationsInterface(beanClass)

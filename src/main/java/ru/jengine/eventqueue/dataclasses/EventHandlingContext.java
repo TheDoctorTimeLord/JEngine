@@ -1,6 +1,8 @@
-package ru.jengine.eventqueue;
+package ru.jengine.eventqueue.dataclasses;
 
 import java.util.function.Consumer;
+
+import ru.jengine.eventqueue.event.Event;
 
 public class EventHandlingContext {
     private final Consumer<Event> eventProcessor;

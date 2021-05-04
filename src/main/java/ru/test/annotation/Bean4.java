@@ -1,7 +1,7 @@
 package ru.test.annotation;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.annotations.PostConstruct;
+import ru.jengine.beancontainer.annotations.Inject;
 
 @Bean
 public class Bean4 {
@@ -12,9 +12,9 @@ public class Bean4 {
         this.bean3 = bean3;
     }
 
-    @PostConstruct
-    private void init() {
-        f = true;
+    @Inject
+    private void init(Bean1 bean1) {
+        f = bean1.isF();
     }
 
     public boolean result() {

@@ -1,7 +1,7 @@
 package ru.test.annotation;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.eventqueue.PreHandler;
+import ru.jengine.eventqueue.event.PreHandler;
 
 @Bean
 public class EventMessagePreHandler implements PreHandler<EventMessage> {

@@ -26,8 +26,12 @@ public class AutowireUtils {
 
         BeanContext beanContext = context.getBean(resultType);
 
+        if (beanContext == null) {
+            throw new ContainerException("Bean for [" + resultType + "] did not found");
+        }
+
         if (collectionClass != null) {
-            return  convertCollection(beanContext.getBean(), collectionClass);
+            return convertCollection(beanContext.getBean(), collectionClass);
         }
         return beanContext.getBean();
     }

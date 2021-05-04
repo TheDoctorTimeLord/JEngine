@@ -3,13 +3,13 @@ package ru.test.annotation;
 import java.util.function.Consumer;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.eventqueue.Event;
-import ru.jengine.eventqueue.EventHandlingContext;
+import ru.jengine.eventqueue.event.Event;
+import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.EventInterceptor;
-import ru.jengine.eventqueue.EventPool;
-import ru.jengine.eventqueue.EventPoolHandler;
-import ru.jengine.eventqueue.EventPoolProvider;
-import ru.jengine.eventqueue.EventPoolQueue;
+import ru.jengine.eventqueue.eventpool.EventPool;
+import ru.jengine.eventqueue.eventpool.EventPoolHandler;
+import ru.jengine.eventqueue.eventpool.EventPoolProvider;
+import ru.jengine.eventqueue.eventpool.EventPoolQueue;
 
 @Bean
 public class EventPoolHandlerSync implements EventPoolHandler, EventInterceptor {

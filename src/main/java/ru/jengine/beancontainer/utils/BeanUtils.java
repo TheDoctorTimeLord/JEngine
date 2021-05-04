@@ -63,6 +63,18 @@ public class BeanUtils {
         }
     }
 
+    public static void invokeSetterBeanMethod(MethodMeta methodMeta) {
+        Method invokedMethod = methodMeta.getMethod();
+        if (!invokedMethod.isAnnotationPresent(Inject.class)) {
+            throw new InvocationMethodException("Method [" + invokedMethod + "] is not setter");
+        }
+        if (!Void.TYPE.equals(invokedMethod.getReturnType())) {
+            throw new InvocationMethodException("Method [" + invokedMethod + "] must not return any objects");
+        }
+
+        methodMeta.invokeWithInnerParameters();
+    }
+
     public static void invokePostConstructBeanMethod(MethodMeta methodMeta) {
         Method invokedMethod = methodMeta.getMethod();
         if (!invokedMethod.isAnnotationPresent(PostConstruct.class)) {

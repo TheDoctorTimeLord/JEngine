@@ -8,6 +8,7 @@ import org.reflections.ReflectionUtils;
 
 import ru.jengine.beancontainer.BeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
+import ru.jengine.beancontainer.annotations.Inject;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
@@ -26,17 +27,21 @@ public class AutowireBeanFactory implements BeanFactory {
         Object bean = createObject(beanClass);
         BeanContext beanContext = new BeanContext(bean);
 
+        injectSetters(beanClass, beanContext);
         postConstruct(beanClass, beanContext);
 
         return beanContext;
     }
 
-    private void postConstruct(Class<?> beanClass, BeanContext beanContext) {
-        for (Method method : ReflectionUtils.getMethods(beanClass)) {
-            if (!method.isAnnotationPresent(PostConstruct.class)) {
-                continue;
-            }
+    private void injectSetters(Class<?> beanClass, BeanContext beanContext) {
+        for (Method method : ReflectionUtils.getAllMethods(beanClass, method -> method.isAnnotationPresent(Inject.class))) {
+            Object[] args = findArgs(method);
+            BeanUtils.invokeSetterBeanMethod(new MethodMeta(method, beanContext.getBean(), args));
+        }
+    }
 
+    private void postConstruct(Class<?> beanClass, BeanContext beanContext) {
+        for (Method method : ReflectionUtils.getAllMethods(beanClass, method -> method.isAnnotationPresent(PostConstruct.class))) {
             BeanUtils.invokePostConstructBeanMethod(new MethodMeta(method, beanContext.getBean()));
         }
     }

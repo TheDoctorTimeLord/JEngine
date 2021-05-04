@@ -13,6 +13,17 @@ import java.util.stream.Stream;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.utils.CollectionUtils.IterableStream;
+import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
+import ru.jengine.eventqueue.event.Event;
+import ru.jengine.eventqueue.event.EventHandler;
+import ru.jengine.eventqueue.event.EventRegistrar;
+import ru.jengine.eventqueue.event.PostHandler;
+import ru.jengine.eventqueue.event.PreHandler;
+import ru.jengine.eventqueue.eventpool.AsyncEventPoolHandler;
+import ru.jengine.eventqueue.eventpool.EventPool;
+import ru.jengine.eventqueue.eventpool.EventPoolHandler;
+import ru.jengine.eventqueue.eventpool.EventPoolProvider;
+import ru.jengine.eventqueue.exceptions.EventQueueException;
 
 @Bean
 public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, EventRegistrar, SynchronousEventHandler {
@@ -114,8 +125,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public <E extends Event> void registerEvent(E event) {
         for (EventInterceptor interceptor : interceptors) {
             if (interceptor.isValid(event)) {
-                interceptor.intercept(event, this);
-                break;
+                interceptor.intercept(event, this); //TODO стоит ли пропускать синхронные интерсептеры при обработке асинхронных событий?
             }
         }
     }
@@ -169,7 +179,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
                 }
 
                 try {
-                    Thread.sleep(2); //TODO подумать на счёт остановки
+                    Thread.sleep(1); //TODO подумать на счёт остановки
                 } catch (InterruptedException e) {
                     isRunning = false;
                 }
