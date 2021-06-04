@@ -7,7 +7,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.function.Predicate;
 
-import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.exceptions.UtilsException;
 
 public class ClassUtils {
     public static final Predicate<Class<?>> IS_CLASS_PREDICATE = cls -> !cls.isAnnotation() && !cls.isInterface();
@@ -32,7 +32,7 @@ public class ClassUtils {
         }
         else
         {
-            throw new ContainerException("Element [" + element + "] type is not generic");
+            throw new UtilsException("Element [" + element + "] type is not generic");
         }
     }
 }

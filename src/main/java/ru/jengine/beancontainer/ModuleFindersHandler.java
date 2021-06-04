@@ -1,12 +1,16 @@
 package ru.jengine.beancontainer;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ModuleFindersHandler {
     public List<Module> findAllModules(ModuleFinder mainModuleFinder, ContainerConfiguration configuration) {
@@ -28,7 +32,7 @@ public class ModuleFindersHandler {
                 List<Module> submodules = ContainerModuleUtils.getAllSubmodules(mainModule);
                 List<Module> uniqueModules = Stream.concat(Stream.of(mainModule), submodules.stream())
                         .filter(module -> !allFoundedModules.contains(module.getClass()))
-                        .collect(Collectors.toList()); //TODO исправить возможные проблемы с фильтрацией
+                        .collect(Collectors.toList());
 
                 Set<Class<?>> moduleFinderClasses = ContainerModuleUtils.getAllModuleFinders(uniqueModules);
                 moduleFinderClasses.stream()

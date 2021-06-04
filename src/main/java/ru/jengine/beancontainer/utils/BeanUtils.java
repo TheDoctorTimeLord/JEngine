@@ -38,7 +38,7 @@ public class BeanUtils {
     }
 
     public static Constructor<?> findAppropriateConstructor(Class<?> cls) {
-        List<Constructor<?>> constructors = Arrays.asList(cls.getConstructors());
+        List<Constructor<?>> constructors = Arrays.asList(cls.getDeclaredConstructors());
 
         if (constructors.size() > 1) {
             constructors = constructors.stream()
@@ -50,7 +50,9 @@ public class BeanUtils {
             }
         }
         if (constructors.size() == 1) {
-            return constructors.get(0);
+            Constructor<?> constructor = constructors.get(0);
+            constructor.setAccessible(true);
+            return constructor;
         }
         throw new ContainerException("[" + cls + "] has no available constructor");
     }

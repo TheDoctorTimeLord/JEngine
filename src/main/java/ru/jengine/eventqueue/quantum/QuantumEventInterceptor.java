@@ -7,7 +7,7 @@ import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 
-public abstract class QuantumEventInterceptor implements EventInterceptor, QuantumEventPoolRegistrar {
+public class QuantumEventInterceptor implements EventInterceptor, QuantumEventPoolRegistrar {
     private final List<QuantaEventPool> quantaEventPools = new CopyOnWriteArrayList<>();
 
     @Override

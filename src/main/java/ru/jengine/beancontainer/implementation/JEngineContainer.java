@@ -21,7 +21,7 @@ import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
-public class BeanContainerImpl implements BeanContainer {
+public class JEngineContainer implements BeanContainer {
     private ContainerMultiContext beanContainerContext;
 
     @Override
@@ -43,7 +43,7 @@ public class BeanContainerImpl implements BeanContainer {
 
     private void prepareContext(List<Module> modules) {
         List<Module> infrastructureModules = modules.stream()
-                .filter(BeanContainerImpl::isInfrastructureModule)
+                .filter(JEngineContainer::isInfrastructureModule)
                 .collect(Collectors.toList());
         ContainerContext infrastructureContext = createInfrastructureContext(infrastructureModules);
 

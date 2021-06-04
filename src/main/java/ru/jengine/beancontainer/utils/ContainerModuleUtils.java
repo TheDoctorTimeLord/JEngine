@@ -1,9 +1,21 @@
 package ru.jengine.beancontainer.utils;
 
-import ru.jengine.beancontainer.*;
-import ru.jengine.beancontainer.annotations.PackageScan;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import ru.jengine.beancontainer.BeanDefinition;
+import ru.jengine.beancontainer.ClassFinder;
+import ru.jengine.beancontainer.Module;
+import ru.jengine.beancontainer.ModuleFinder;
 import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
+import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.PackagesScan;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
@@ -11,10 +23,6 @@ import ru.jengine.beancontainer.implementation.classfinders.ClassPathScanner;
 import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
 import ru.jengine.beancontainer.service.Constants;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ContainerModuleUtils {
     public static List<Module> getAllSubmodules(Module mainModule) {
@@ -44,22 +52,23 @@ public class ContainerModuleUtils {
     }
 
     private static ModuleContext createModuleContext(Class<?> moduleClass) {
-        ClassFinder classFinder;
-        if (moduleClass.isAnnotationPresent(PackageScan.class)) {
-            String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
-            classFinder = scanPackage(packageToScan);
-        } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
-            classFinder = new CompositeClassFinder(Stream.of(moduleClass.getAnnotation(PackagesScan.class).value())
-                    .map(packageScan -> scanPackage(packageScan.value()))
-                    .collect(Collectors.toList()));
-        } else {
-            classFinder = new EmptyClassFinder();
-        }
-
-        return new ModuleContext(classFinder);
+        ClassFinder classFinder = extractClassFinderFromModule(moduleClass);
+        return new ModuleContext(classFinder, moduleClass);
     }
 
-    private static ClassFinder scanPackage(String packageToScan) {
+    private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass) {
+        if (moduleClass.isAnnotationPresent(PackageScan.class)) {
+            String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
+            return scanPackage(packageToScan);
+        } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
+            return new CompositeClassFinder(Stream.of(moduleClass.getAnnotation(PackagesScan.class).value())
+                    .map(packageScan -> scanPackage(packageScan.value()))
+                    .collect(Collectors.toList()));
+        }
+        return new EmptyClassFinder();
+    }
+
+    private static ClassFinder scanPackage(String packageToScan) { //TODO в дальнейшем вынести в конфигурации контейнера
         ClassFinder classFinder = new ClassPathScanner();
         classFinder.scan(packageToScan);
         return classFinder;

@@ -125,7 +125,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public <E extends Event> void registerEvent(E event) {
         for (EventInterceptor interceptor : interceptors) {
             if (interceptor.isValid(event)) {
-                interceptor.intercept(event, this); //TODO стоит ли пропускать синхронные интерсептеры при обработке асинхронных событий?
+                interceptor.intercept(event, this);
             }
         }
     }

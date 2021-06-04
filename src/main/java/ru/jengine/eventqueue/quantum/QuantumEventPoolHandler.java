@@ -8,21 +8,17 @@ import ru.jengine.eventqueue.eventpool.AsyncEventPoolHandler;
 import ru.jengine.eventqueue.eventpool.EventPool;
 
 public abstract class QuantumEventPoolHandler implements AsyncEventPoolHandler {
-    private final String eventPoolCode;
-    private QuantaEventPool eventPool;
+    private final QuantaEventPool eventPool;
     private Consumer<Event> eventProcessor;
-    private final QuantumEventPoolRegistrar quantumEventPoolRegistrar; //TODO спорный момент что делать с регистратором
 
     protected QuantumEventPoolHandler(QuantumEventPoolRegistrar quantumEventPoolRegistrar, String eventPoolCode) {
-        this.eventPoolCode = eventPoolCode;
-        this.quantumEventPoolRegistrar = quantumEventPoolRegistrar;
+        this.eventPool = new EventPoolQueueWithQuanta(eventPoolCode);
+        quantumEventPoolRegistrar.registerQuantumEventPool(eventPool);
     }
 
     @Override
     public EventPool initialize(EventHandlingContext context) {
         eventProcessor = context.getEventProcessor();
-        eventPool = new EventPoolQueueWithQuanta(eventPoolCode);
-        quantumEventPoolRegistrar.registerQuantumEventPool(eventPool);
         return eventPool;
     }
 
@@ -32,12 +28,20 @@ public abstract class QuantumEventPoolHandler implements AsyncEventPoolHandler {
             return;
         }
 
-        Event event;
-        do {
-            event = eventPool.pool();
+        Event event = eventPool.pool();
+        while (event != null && !(event instanceof QuantumEvent)) {
             handle(event, eventProcessor);
-        } while (!(event instanceof QuantumEvent));
+            event = eventPool.pool();
+        }
     }
 
     protected abstract void handle(Event event, Consumer<Event> eventProcessor);
+
+    protected QuantaEventPool getEventPool() {
+        return eventPool;
+    }
+
+    protected Consumer<Event> getEventProcessor() {
+        return eventProcessor;
+    }
 }
