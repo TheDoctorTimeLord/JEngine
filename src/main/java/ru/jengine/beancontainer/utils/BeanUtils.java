@@ -93,6 +93,9 @@ public class BeanUtils {
     }
 
     public static <T> List<T> getBeanAsList(BeanContext context) {
+        if (context == null) {
+            return new ArrayList<>();
+        }
         if (context.isCollectionBean()) {
             Collection<T> collection = context.getBean();
             return collection instanceof List ? (List<T>) collection : new ArrayList<>(collection);

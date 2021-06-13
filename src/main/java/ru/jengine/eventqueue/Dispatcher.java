@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PostConstruct;
+import ru.jengine.beancontainer.annotations.PreDestroy;
+import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.CollectionUtils.IterableStream;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
@@ -156,6 +158,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
         }
     }
 
+    @PreDestroy
     public void stopDispatcher() {
         asyncDispatcher.stopDispatcher();
     }
@@ -166,6 +169,8 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
         public AsyncDispatcher(List<AsyncEventPoolHandler> asyncEventPoolHandlers) {
             this.asyncEventPoolHandlers = asyncEventPoolHandlers;
+
+            setName(Constants.DISPATCHER_ASYNC_NAME);
         }
 
         @Override

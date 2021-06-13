@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanFactory;
+import ru.jengine.beancontainer.ConfigurableBeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContextPreProcessor;
 import ru.jengine.beancontainer.InterfaceLocator;
@@ -47,6 +48,21 @@ public class DefaultContainerContext implements ContainerContext {
     @Override
     public void prepareBeans() {
         prepareSingletons();
+    }
+
+    @Override
+    public void reload() {
+        prepareToRemove();
+        prepareBeans();
+    }
+
+    @Override
+    public void prepareToRemove() {
+        if (beanFactory instanceof ConfigurableBeanFactory) {
+            ConfigurableBeanFactory factory = (ConfigurableBeanFactory)beanFactory;
+            beans.values().forEach(factory::beforeRemove);
+        }
+        beans.values().forEach(beanContext -> beanContext.setInstance(null));
     }
 
     private void prepareSingletons() {

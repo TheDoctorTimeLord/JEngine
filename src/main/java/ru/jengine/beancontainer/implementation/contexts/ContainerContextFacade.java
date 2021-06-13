@@ -1,9 +1,5 @@
 package ru.jengine.beancontainer.implementation.contexts;
 
-import ru.jengine.beancontainer.*;
-import ru.jengine.beancontainer.dataclasses.BeanContext;
-import ru.jengine.beancontainer.utils.ContainerModuleUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +7,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import ru.jengine.beancontainer.BeanFactory;
+import ru.jengine.beancontainer.ContainerContext;
+import ru.jengine.beancontainer.ContainerMultiContext;
+import ru.jengine.beancontainer.ContextPreProcessor;
+import ru.jengine.beancontainer.Module;
+import ru.jengine.beancontainer.dataclasses.BeanContext;
+import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
 public class ContainerContextFacade implements ContainerMultiContext {
     private final Map<String, ContainerContext> internalContexts = new ConcurrentHashMap<>();
@@ -38,6 +44,18 @@ public class ContainerContextFacade implements ContainerMultiContext {
     @Override
     public void prepareBeans() {
         internalContexts.forEach((key, value) -> value.prepareBeans());
+    }
+
+    @Override
+    public void reload() {
+        Stream.concat(externalContexts.values().stream(), internalContexts.values().stream())
+                .forEach(ContainerContext::reload);
+    }
+
+    @Override
+    public void prepareToRemove() {
+        Stream.concat(externalContexts.values().stream(), internalContexts.values().stream())
+                .forEach(ContainerContextFacade::prepareToRemove);
     }
 
     private static Map<String, List<Module>> groupByContext(List<Module> modules) {
@@ -118,6 +136,40 @@ public class ContainerContextFacade implements ContainerMultiContext {
     @Override
     public void registerContext(String name, ContainerContext context) {
         externalContexts.put(name, context);
+    }
+
+    @Override
+    public void removeContext(String name) {
+        if (Constants.INFRASTRUCTURE_CONTEXT.equals(name)) {
+            throw new ContainerException("Can not remove infrastructure context");
+        }
+
+        ContainerContext removedFromInternal = internalContexts.remove(name);
+        ContainerContext removedFromExternal = externalContexts.remove(name);
+
+        prepareToRemove(removedFromInternal);
+        prepareToRemove(removedFromExternal);
+    }
+
+    @Override
+    public void reloadContext(String name) {
+        ContainerContext reloadedFromInternal = internalContexts.get(name);
+        ContainerContext reloadedFromExternal = externalContexts.get(name);
+
+        if (reloadedFromInternal != null) {
+            reloadedFromInternal.reload();
+        }
+        if (reloadedFromExternal != null) {
+            reloadedFromExternal.reload();
+        }
+    }
+
+    private static void prepareToRemove(ContainerContext context) {
+        if (context == null) {
+            return;
+        }
+
+        context.prepareToRemove();
     }
 
     private void registerContext(String contextName, List<Module> initializedModules) {

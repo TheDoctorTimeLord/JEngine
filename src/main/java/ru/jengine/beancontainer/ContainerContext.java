@@ -11,6 +11,9 @@ public interface ContainerContext {
     void preProcessBeans(List<ContextPreProcessor> contextPreProcessors);
     void prepareBeans();
 
+    void reload();
+    void prepareToRemove();
+
     @Nullable
     BeanContext getBean(Class<?> beanClass);
     boolean containsBean(Class<?> beanClass);

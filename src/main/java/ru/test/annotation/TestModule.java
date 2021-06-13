@@ -10,6 +10,7 @@ import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.implementation.JEngineContainer;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
+import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.eventqueue.Dispatcher;
 import ru.jengine.eventqueue.quantum.EnableQuantumModel;
 import ru.jengine.eventqueue.quantum.QuantumEvent;
@@ -23,6 +24,7 @@ public class TestModule extends AnnotationModule {
         JEngineContainer beanContainer = new JEngineContainer();
         beanContainer.initialize(TestModule.class);
 
+        beanContainer.reloadContext(Constants.DEFAULT_CONTEXT);
         Dispatcher dispatcher = beanContainer.getBean(Dispatcher.class);
 
         dispatcher.registerEvent(new AsyncEventMessage("message 1"));
@@ -39,7 +41,7 @@ public class TestModule extends AnnotationModule {
         dispatcher.registerEvent(new SpecialAsyncMessageEvent("message 5"));
 
         Thread.sleep(6);
-        dispatcher.stopDispatcher();
+        beanContainer.stop();
     }
 }
 

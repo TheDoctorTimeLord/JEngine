@@ -25,8 +25,8 @@ public class JEngineContainer implements BeanContainer {
     private ContainerMultiContext beanContainerContext;
 
     @Override
-    public void initialize(Class<?> mainModule, Object... additionalBeans) {
-        List<Module> modules = findModules(mainModule);
+    public void initialize(Class<?> mainModule, Object... additionalBeans) { //TODO вынести всё лишнее в конфигурацию
+        List<Module> modules = findModules(mainModule); //TODO добавить работу с additionalBeans
         prepareContext(modules);
     }
 
@@ -82,5 +82,25 @@ public class JEngineContainer implements BeanContainer {
     @Override
     public <T> T getBean(Class<?> beanClass) {
         return beanContainerContext.getBean(beanClass).getBean();
+    }
+
+    @Override
+    public void stop() {
+        beanContainerContext.prepareToRemove();
+    }
+
+    @Override
+    public void registerContext(String name, ContainerContext context) {
+        beanContainerContext.registerContext(name, context);
+    }
+
+    @Override
+    public void reloadContext(String name) {
+        beanContainerContext.reloadContext(name);
+    }
+
+    @Override
+    public void removeContext(String name) {
+        beanContainerContext.removeContext(name);
     }
 }

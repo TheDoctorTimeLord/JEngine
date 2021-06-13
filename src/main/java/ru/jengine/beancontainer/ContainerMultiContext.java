@@ -8,4 +8,6 @@ public interface ContainerMultiContext extends ContainerContext {
     void deleteBean(String contextName, Object bean);
 
     void registerContext(String name, ContainerContext context);
+    void removeContext(String name);
+    void reloadContext(String name);
 }
