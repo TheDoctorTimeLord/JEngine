@@ -1,10 +1,8 @@
 package ru.test.annotation;
 
-import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.annotations.Configurators;
 import ru.jengine.beancontainer.annotations.Configurator;
+import ru.jengine.beancontainer.annotations.Configurators;
 
-@Bean
 @Configurators
 public class Bean2Configurator {
     @Configurator(forClass = Bean2.class)

@@ -31,4 +31,9 @@ public class JavaClassBeanDefinition implements BeanDefinition {
     public void setMustRemovedAfterPreProcess(boolean flag) {
         this.mustRemovedAfterPreProcess = flag;
     }
+
+    @Override
+    public String toString() {
+        return "beanClass=" + beanClass.getSimpleName();
+    }
 }

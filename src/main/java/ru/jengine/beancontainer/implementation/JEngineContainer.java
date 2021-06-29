@@ -51,14 +51,14 @@ public class JEngineContainer implements BeanContainer {
                 .filter(module -> !isInfrastructureModule(module))
                 .collect(Collectors.toList());
 
-        BeanContext postProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
+        BeanContext preProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
 
         beanContainerContext = new ContainerContextFacade();
         beanContainerContext.registerContext(Constants.INFRASTRUCTURE_CONTEXT, infrastructureContext);
 
         BeanFactory factory = createBeanFactory(beanContainerContext, infrastructureContext);
         beanContainerContext.initialize(otherModules, factory);
-        beanContainerContext.preProcessBeans(BeanUtils.getBeanAsList(postProcessors));
+        beanContainerContext.preProcessBeans(BeanUtils.getBeanAsList(preProcessors));
         beanContainerContext.prepareBeans();
     }
 
