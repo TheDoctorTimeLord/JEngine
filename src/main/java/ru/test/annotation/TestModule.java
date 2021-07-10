@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.PackageScan;
+import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.implementation.JEngineContainer;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
 import ru.jengine.eventqueue.Dispatcher;
@@ -21,7 +22,7 @@ import ru.test.annotation.quantum.SpecialAsyncMessageEvent;
 public class TestModule extends AnnotationModule {
     public static void main(String[] arg) throws InterruptedException {
         JEngineContainer beanContainer = new JEngineContainer();
-        beanContainer.initialize(TestModule.class);
+        beanContainer.initialize(ContainerConfiguration.build(TestModule.class));
 
         Dispatcher dispatcher = beanContainer.getBean(Dispatcher.class);
 

@@ -1,7 +1,6 @@
 package ru.jengine.beancontainer.implementation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -29,21 +28,21 @@ public class JEngineContainer implements BeanContainer {
     private ContainerMultiContext beanContainerContext;
 
     @Override
-    public void initialize(Class<?> mainModule, Object... additionalBeans) { //TODO вынести всё лишнее в конфигурацию
-        List<Module> modules = findModules(mainModule, Arrays.asList(additionalBeans));
+    public void initialize(ContainerConfiguration configuration) {
+        List<Module> modules = findModules(configuration);
         prepareContext(modules);
     }
 
-    private static List<Module> findModules(Class<?> mainModule, List<Object> additionalBeans) {
+    private static List<Module> findModules(ContainerConfiguration configuration) {
         ModuleFindersHandler moduleFindersHandler = new ModuleFindersHandler();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 
         syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE);
         syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_MODULE);
-        syntheticModuleFinder.addModuleClass(mainModule);
+        syntheticModuleFinder.addModuleClass(configuration.getMainModuleClass());
 
-        List<Module> result = moduleFindersHandler.findAllModules(syntheticModuleFinder, new ContainerConfiguration());
-        result.add(new ExistBeansModule(additionalBeans));
+        List<Module> result = moduleFindersHandler.findAllModules(syntheticModuleFinder, configuration);
+        result.add(new ExistBeansModule(configuration.getAdditionalBeans()));
 
         return result;
     }

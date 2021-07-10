@@ -1,7 +1,9 @@
 package ru.jengine.beancontainer;
 
+import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
+
 public interface BeanContainer {
-    void initialize(Class<?> mainModule, Object... additionalBeans);
+    void initialize(ContainerConfiguration configuration);
     void stop();
 
     <T> T getBean(Class<?> beanClass);

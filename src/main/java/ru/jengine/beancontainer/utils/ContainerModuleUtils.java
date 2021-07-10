@@ -17,15 +17,15 @@ import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.PackagesScan;
+import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.implementation.classfinders.ClassPathScanner;
 import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
 import ru.jengine.beancontainer.service.Constants;
 
 public class ContainerModuleUtils {
-    public static List<Module> getAllSubmodules(Module mainModule) {
+    public static List<Module> getAllSubmodules(Module mainModule, ContainerConfiguration configuration) {
         List<Module> result = new ArrayList<>();
         Set<Class<?>> moduleClasses = new HashSet<>();
         Queue<Module> notHandledModules = new LinkedList<>();
@@ -41,7 +41,7 @@ public class ContainerModuleUtils {
                     .collect(Collectors.toList());
             moduleClasses.addAll(submodules);
             submodules.stream()
-                    .map(ContainerModuleUtils::createModule)
+                    .map(moduleClass -> createModule(moduleClass, configuration))
                     .forEach(submodule -> {
                         notHandledModules.add(submodule);
                         result.add(submodule);
@@ -51,25 +51,30 @@ public class ContainerModuleUtils {
         return result;
     }
 
-    private static ModuleContext createModuleContext(Class<?> moduleClass) {
-        ClassFinder classFinder = extractClassFinderFromModule(moduleClass);
+    public static Module createModule(Class<?> moduleClass, ContainerConfiguration configuration) {
+        ModuleContext context = createModuleContext(moduleClass, configuration);
+        return createModule(moduleClass, context);
+    }
+
+    private static ModuleContext createModuleContext(Class<?> moduleClass, ContainerConfiguration configuration) {
+        ClassFinder classFinder = extractClassFinderFromModule(moduleClass, configuration);
         return new ModuleContext(classFinder, moduleClass);
     }
 
-    private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass) {
+    private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass, ContainerConfiguration configuration) {
         if (moduleClass.isAnnotationPresent(PackageScan.class)) { //TODO исправить на AnnotationUtils
             String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
-            return scanPackage(packageToScan);
+            return scanPackage(packageToScan, configuration);
         } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
             return new CompositeClassFinder(Stream.of(moduleClass.getAnnotation(PackagesScan.class).value())
-                    .map(packageScan -> scanPackage(packageScan.value()))
+                    .map(packageScan -> scanPackage(packageScan.value(), configuration))
                     .collect(Collectors.toList()));
         }
         return new EmptyClassFinder();
     }
 
-    private static ClassFinder scanPackage(String packageToScan) { //TODO в дальнейшем вынести в конфигурации контейнера
-        ClassFinder classFinder = new ClassPathScanner();
+    private static ClassFinder scanPackage(String packageToScan, ContainerConfiguration configuration) {
+        ClassFinder classFinder = configuration.getClassFinderConsumer().get();
         classFinder.scan(packageToScan);
         return classFinder;
     }
@@ -86,11 +91,6 @@ public class ContainerModuleUtils {
 
         module.configure(moduleContext);
         return module;
-    }
-
-    public static Module createModule(Class<?> moduleClass) {
-        ModuleContext context = createModuleContext(moduleClass);
-        return createModule(moduleClass, context);
     }
 
     public static Set<Class<?>> getAllModuleFinders(List<Module> foundedModules) {

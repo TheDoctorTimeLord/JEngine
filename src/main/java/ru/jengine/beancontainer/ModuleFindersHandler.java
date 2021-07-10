@@ -29,7 +29,7 @@ public class ModuleFindersHandler {
             while (!mainModules.isEmpty()) {
                 Module mainModule = mainModules.poll();
 
-                List<Module> submodules = ContainerModuleUtils.getAllSubmodules(mainModule);
+                List<Module> submodules = ContainerModuleUtils.getAllSubmodules(mainModule, configuration);
                 List<Module> uniqueModules = Stream.concat(Stream.of(mainModule), submodules.stream())
                         .filter(module -> !allFoundedModules.contains(module.getClass()))
                         .collect(Collectors.toList());
