@@ -95,4 +95,14 @@ public class AnnotationUtils {
 
         return result;
     }
+
+    public static boolean isAnnotationPresent(Class<?> owner, Class<?> annotation) {
+        List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
+        for (Annotation innerAnnotation : allAnnotations) {
+            if (innerAnnotation.annotationType().equals(annotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -95,11 +95,6 @@ public class ContainerContextFacade implements ContainerMultiContext {
     }
 
     @Override
-    public void deleteBean(Object bean) {
-        getAllContextsWithoutNames().forEach(context -> context.deleteBean(bean));
-    }
-
-    @Override
     public BeanContext getBean(String contextName, Class<?> beanClass) {
         ContainerContext context = internalContexts.get(contextName);
         if (context == null) {
@@ -118,19 +113,6 @@ public class ContainerContextFacade implements ContainerMultiContext {
             return context != null && context.containsBean(beanClass);
         }
         return context.containsBean(beanClass);
-    }
-
-    @Override
-    public void deleteBean(String contextName, Object bean) {
-        ContainerContext context = internalContexts.get(contextName);
-        if (context != null) {
-            context.deleteBean(bean);
-        } else {
-            context = externalContexts.get(contextName);
-            if (context != null) {
-                context.deleteBean(bean);
-            }
-        }
     }
 
     @Override

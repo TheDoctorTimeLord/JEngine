@@ -62,11 +62,11 @@ public class ContainerModuleUtils {
     }
 
     private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass, ContainerConfiguration configuration) {
-        if (moduleClass.isAnnotationPresent(PackageScan.class)) { //TODO исправить на AnnotationUtils
-            String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
+        if (AnnotationUtils.isAnnotationPresent(moduleClass, PackageScan.class)) {
+            String packageToScan = AnnotationUtils.getAnnotation(moduleClass, PackageScan.class).value();
             return scanPackage(packageToScan, configuration);
-        } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
-            return new CompositeClassFinder(Stream.of(moduleClass.getAnnotation(PackagesScan.class).value())
+        } else if (AnnotationUtils.isAnnotationPresent(moduleClass, PackagesScan.class)) {
+            return new CompositeClassFinder(Stream.of(AnnotationUtils.getAnnotation(moduleClass, PackagesScan.class).value())
                     .map(packageScan -> scanPackage(packageScan.value(), configuration))
                     .collect(Collectors.toList()));
         }

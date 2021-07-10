@@ -103,9 +103,4 @@ public class DefaultContainerContext implements ContainerContext {
     public boolean containsBean(Class<?> beanClass) {
         return beanDefinitions.containsKey(beanClass);
     }
-
-    @Override
-    public void deleteBean(Object bean) {
-
-    }
 }

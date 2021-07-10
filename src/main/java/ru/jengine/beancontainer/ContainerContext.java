@@ -17,5 +17,4 @@ public interface ContainerContext {
     @Nullable
     BeanContext getBean(Class<?> beanClass);
     boolean containsBean(Class<?> beanClass);
-    void deleteBean(Object bean); //TODO Убрать удаление бина
 }
