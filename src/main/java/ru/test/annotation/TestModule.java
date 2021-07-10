@@ -58,5 +58,5 @@ public class TestModule extends AnnotationModule {
 @Bean
 @interface Anno3 {}
 
-//@Anno3
+@Anno3
 class Sas {}

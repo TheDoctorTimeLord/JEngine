@@ -1,7 +1,9 @@
 package ru.jengine.beancontainer.implementation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import ru.jengine.beancontainer.BeanContainer;
 import ru.jengine.beancontainer.BeanFactory;
@@ -16,7 +18,9 @@ import ru.jengine.beancontainer.implementation.contexts.ContainerContextFacade;
 import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
 import ru.jengine.beancontainer.implementation.factories.AutowireBeanFactory;
 import ru.jengine.beancontainer.implementation.factories.AutowireConfigurableBeanFactory;
+import ru.jengine.beancontainer.implementation.factories.StubBeanFactory;
 import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFinder;
+import ru.jengine.beancontainer.implementation.moduleimpls.ExistBeansModule;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
@@ -26,11 +30,11 @@ public class JEngineContainer implements BeanContainer {
 
     @Override
     public void initialize(Class<?> mainModule, Object... additionalBeans) { //TODO вынести всё лишнее в конфигурацию
-        List<Module> modules = findModules(mainModule); //TODO добавить работу с additionalBeans
+        List<Module> modules = findModules(mainModule, Arrays.asList(additionalBeans));
         prepareContext(modules);
     }
 
-    private static List<Module> findModules(Class<?> mainModule) {
+    private static List<Module> findModules(Class<?> mainModule, List<Object> additionalBeans) {
         ModuleFindersHandler moduleFindersHandler = new ModuleFindersHandler();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 
@@ -38,28 +42,43 @@ public class JEngineContainer implements BeanContainer {
         syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_MODULE);
         syntheticModuleFinder.addModuleClass(mainModule);
 
-        return moduleFindersHandler.findAllModules(syntheticModuleFinder, new ContainerConfiguration());
+        List<Module> result = moduleFindersHandler.findAllModules(syntheticModuleFinder, new ContainerConfiguration());
+        result.add(new ExistBeansModule(additionalBeans));
+
+        return result;
     }
 
     private void prepareContext(List<Module> modules) {
-        List<Module> infrastructureModules = modules.stream()
-                .filter(JEngineContainer::isInfrastructureModule)
-                .collect(Collectors.toList());
+        List<Module> infrastructureModules = filter(modules, JEngineContainer::isInfrastructureModule);
         ContainerContext infrastructureContext = createInfrastructureContext(infrastructureModules);
 
-        List<Module> otherModules = modules.stream()
-                .filter(module -> !isInfrastructureModule(module))
-                .collect(Collectors.toList());
-
-        BeanContext preProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
+        List<Module> existingModules = filter(modules, JEngineContainer::isExistingModule);
+        ContainerContext existingContext = createExistingContext(existingModules);
 
         beanContainerContext = new ContainerContextFacade();
         beanContainerContext.registerContext(Constants.INFRASTRUCTURE_CONTEXT, infrastructureContext);
+        beanContainerContext.registerContext(Constants.EXISTING_CONTEXT, existingContext);
+
+        BeanContext preProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
 
         BeanFactory factory = createBeanFactory(beanContainerContext, infrastructureContext);
-        beanContainerContext.initialize(otherModules, factory);
+        beanContainerContext.initialize(modules, factory);
         beanContainerContext.preProcessBeans(BeanUtils.getBeanAsList(preProcessors));
         beanContainerContext.prepareBeans();
+    }
+
+    private static List<Module> filter(List<Module> modules, Predicate<Module> filter) {
+        List<Module> filtered = new ArrayList<>();
+
+        modules.removeIf(module -> {
+            if (filter.test(module)) {
+                filtered.add(module);
+                return true;
+            }
+            return false;
+        });
+
+        return filtered;
     }
 
     private static ContainerContext createInfrastructureContext(List<Module> modules) {
@@ -71,6 +90,17 @@ public class JEngineContainer implements BeanContainer {
 
     private static boolean isInfrastructureModule(Module module) {
         return Constants.INFRASTRUCTURE_CONTEXT.equals(ContainerModuleUtils.extractContextForModule(module));
+    }
+
+    private static ContainerContext createExistingContext(List<Module> modules) {
+        ContainerContext existingContext = new DefaultContainerContext();
+        existingContext.initialize(modules, new StubBeanFactory());
+        existingContext.prepareBeans();
+        return existingContext;
+    }
+
+    private static boolean isExistingModule(Module module) {
+        return module instanceof ExistBeansModule;
     }
 
     private static BeanFactory createBeanFactory(ContainerContext mainContext, ContainerContext infrastructureContext) {

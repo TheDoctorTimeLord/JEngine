@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.exceptions.UtilsException;
 
@@ -34,5 +35,9 @@ public class ClassUtils {
         {
             throw new UtilsException("Element [" + element + "] type is not generic");
         }
+    }
+
+    public static boolean hasInterface(Class<?> cls, Class<?> presentInterface) {
+        return Stream.of(cls.getInterfaces()).anyMatch(presentInterface::isAssignableFrom);
     }
 }
