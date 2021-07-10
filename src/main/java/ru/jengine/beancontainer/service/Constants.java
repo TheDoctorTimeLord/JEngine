@@ -10,4 +10,8 @@ public interface Constants {
     Class<?> BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE = MainInfrastructureModule.class;
     String QUANTA_NOTIFICATION_QUEUE_CODE = "quantaNotificationQueueCode";
     String DISPATCHER_ASYNC_NAME = "dispatcherAsync";
+
+    interface BeanStrategy {
+        String SINGLETON = "singleton";
+    }
 }

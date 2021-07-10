@@ -1,6 +1,16 @@
 package ru.jengine.beancontainer.implementation.infrastructure;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.reflections.ReflectionUtils;
+
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanPostProcessor;
 import ru.jengine.beancontainer.ContainerContext;
@@ -12,10 +22,6 @@ import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.utils.BeanUtils;
-
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Stream;
 
 @Bean(isInfrastructure = true)
 public class ConfiguratorsHandler implements ContextPreProcessor, BeanPostProcessor {
@@ -69,7 +75,7 @@ public class ConfiguratorsHandler implements ContextPreProcessor, BeanPostProces
         public void configure(Object configurable, ContainerContext context) {
             Object[] parameters = Stream.concat(Stream.of(configurable), neededParameters.stream()
                     .map(context::getBean)
-                    .map(BeanContext::getBean))
+                    .map(beanContext -> beanContext == null ? null : beanContext.getBean()))
                     .toArray();
 
             configurator.invoke(parameters);

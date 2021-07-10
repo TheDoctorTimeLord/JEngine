@@ -8,6 +8,7 @@ import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.annotations.Import;
 import ru.jengine.beancontainer.implementation.beandefinitions.JavaClassBeanDefinition;
+import ru.jengine.beancontainer.implementation.factories.SingletonBeanFactoryStrategy;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 public class ImportingBeanDefinitionReader implements BeanDefinitionReader {
@@ -21,9 +22,9 @@ public class ImportingBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     @Override
-    public List<BeanDefinition> readBeanDefinition() {
+    public List<BeanDefinition> readBeanDefinitions() {
         return importingClasses.stream()
-                .map(cls -> new JavaClassBeanDefinition(cls, true))
+                .map(cls -> new JavaClassBeanDefinition(cls, new SingletonBeanFactoryStrategy(cls)))
                 .collect(Collectors.toList());
     }
 }

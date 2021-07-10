@@ -1,13 +1,16 @@
 package ru.jengine.beancontainer.implementation.contexts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanFactory;
+import ru.jengine.beancontainer.BeanFactoryStrategy;
 import ru.jengine.beancontainer.ConfigurableBeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContextPreProcessor;
@@ -19,35 +22,44 @@ import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
 public class DefaultContainerContext implements ContainerContext {
     private BeanFactory beanFactory;
-    private List<BeanDefinition> beanDefinitions;
-    private final Map<Class<?>, BeanContext> beans = new ConcurrentHashMap<>();
+    private Map<Class<?>, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>();
     private final InterfaceLocator interfaceLocator = new InterfaceLocatorByResolver(cls -> getBean(cls).getBean());
 
     @Override
     public void initialize(List<Module> modules, BeanFactory factory) {
         this.beanFactory = factory;
-        this.beanDefinitions = ContainerModuleUtils.extractAllBeanDefinition(modules);
-        beanDefinitions.forEach(this::registerDefinition);
+        this.beanDefinitions = ContainerModuleUtils.extractAllBeanDefinition(modules).stream()
+                .collect(Collectors.toMap(BeanDefinition::getBeanClass, definition -> definition));
+        beanDefinitions.values().forEach(this::registerDefinition);
     }
 
     private void registerDefinition(BeanDefinition definition) {
         Class<?> beanClass = definition.getBeanClass();
-
-        beans.put(beanClass, new BeanContext(beanClass));
         interfaceLocator.registerClassInterfaces(beanClass);
     }
 
     @Override
     public void preProcessBeans(List<ContextPreProcessor> contextPreProcessors) {
-        beanDefinitions.removeIf(beanDefinition -> {
-            contextPreProcessors.forEach(preProcessor -> preProcessor.preProcess(beanDefinition));
-            return beanDefinition.mustRemovedAfterPreProcess();
-        });
+        List<Class<?>> removingBeanDefinitions = new ArrayList<>();
+
+        for (BeanDefinition definition : beanDefinitions.values()) {
+            contextPreProcessors.forEach(preProcessor -> preProcessor.preProcess(definition));
+            if (definition.mustRemovedAfterPreProcess()) {
+                removingBeanDefinitions.add(definition.getBeanClass());
+            }
+        }
+
+        for (Class<?> beanClass : removingBeanDefinitions) {
+            beanDefinitions.remove(beanClass);
+        }
     }
 
     @Override
     public void prepareBeans() {
-        prepareSingletons();
+        beanDefinitions.values().stream()
+                .map(BeanDefinition::getBeanFactoryStrategy)
+                .filter(BeanFactoryStrategy::needPrepare)
+                .forEach(strategy -> strategy.getBean(beanFactory));
     }
 
     @Override
@@ -60,15 +72,11 @@ public class DefaultContainerContext implements ContainerContext {
     public void prepareToRemove() {
         if (beanFactory instanceof ConfigurableBeanFactory) {
             ConfigurableBeanFactory factory = (ConfigurableBeanFactory)beanFactory;
-            beans.values().forEach(factory::beforeRemove);
+            beanDefinitions.values().stream()
+                    .map(bd -> bd.getBeanFactoryStrategy().getBean(beanFactory)) //TODO разобраться со стратегиями, которые не синглтон
+                    .forEach(factory::beforeRemove);
         }
-        beans.values().forEach(beanContext -> beanContext.setInstance(null));
-    }
-
-    private void prepareSingletons() {
-        beanDefinitions.stream()
-                .filter(BeanDefinition::isSingleton)
-                .forEach(beanDefinition -> getBean(beanDefinition.getBeanClass()));
+        beanDefinitions.values().forEach(bd -> bd.getBeanFactoryStrategy().clear());
     }
 
     @Override
@@ -87,22 +95,13 @@ public class DefaultContainerContext implements ContainerContext {
     }
 
     private BeanContext getCommonBean(Class<?> beanClass) {
-        BeanContext context = beans.get(beanClass);
-        if (context == null) {
-            return null;
-        }
-        if (context.getBean() != null) {
-            return context;
-        }
-        BeanContext beanContext = beanFactory.buildBean(beanClass);
-        context.setInstance(beanContext.getBean());
-
-        return context;
+        BeanDefinition definition = beanDefinitions.get(beanClass);
+        return definition == null ? null : definition.getBeanFactoryStrategy().getBean(beanFactory);
     }
 
     @Override
     public boolean containsBean(Class<?> beanClass) {
-        return beans.containsKey(beanClass);
+        return beanDefinitions.containsKey(beanClass);
     }
 
     @Override

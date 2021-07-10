@@ -1,15 +1,16 @@
 package ru.jengine.beancontainer.implementation.beandefinitions;
 
 import ru.jengine.beancontainer.BeanDefinition;
+import ru.jengine.beancontainer.BeanFactoryStrategy;
 
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;
-    private final boolean isSingleton;
+    private final BeanFactoryStrategy beanFactoryStrategy;
     private boolean mustRemovedAfterPreProcess = false;
 
-    public JavaClassBeanDefinition(Class<?> beanClass, boolean isSingleton) {
+    public JavaClassBeanDefinition(Class<?> beanClass, BeanFactoryStrategy beanFactoryStrategy) {
         this.beanClass = beanClass;
-        this.isSingleton = isSingleton;
+        this.beanFactoryStrategy = beanFactoryStrategy;
     }
 
     @Override
@@ -18,8 +19,8 @@ public class JavaClassBeanDefinition implements BeanDefinition {
     }
 
     @Override
-    public boolean isSingleton() {
-        return isSingleton;
+    public BeanFactoryStrategy getBeanFactoryStrategy() {
+        return beanFactoryStrategy;
     }
 
     @Override

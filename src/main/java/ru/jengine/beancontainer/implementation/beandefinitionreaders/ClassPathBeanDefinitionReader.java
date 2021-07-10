@@ -6,10 +6,14 @@ import java.util.stream.Collectors;
 
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanDefinitionReader;
+import ru.jengine.beancontainer.BeanFactoryStrategy;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.implementation.beandefinitions.JavaClassBeanDefinition;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.beancontainer.utils.BeanUtils;
+
+import javafx.util.Pair;
 
 public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
     private final ClassFinder classFinder;
@@ -25,11 +29,16 @@ public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     @Override
-    public List<BeanDefinition> readBeanDefinition() {
+    public List<BeanDefinition> readBeanDefinitions() {
         Set<Class<?>> beanClasses = classFinder.getAnnotatedClasses(Bean.class);
         return beanClasses.stream()
-                .filter(cls -> findInfrastructureBeans.equals(AnnotationUtils.getAnnotation(cls, Bean.class).isInfrastructure()))
-                .map(cls -> new JavaClassBeanDefinition(cls, true)) //TODO исправить синглтоны
+                .map(cls -> new Pair<>(cls, AnnotationUtils.getAnnotation(cls, Bean.class)))
+                .filter(pair -> findInfrastructureBeans.equals(pair.getValue().isInfrastructure()))
+                .map(pair -> {
+                    Class<?> cls = pair.getKey();
+                    BeanFactoryStrategy strategy = BeanUtils.createStrategy(cls, pair.getValue().strategyCode());
+                    return new JavaClassBeanDefinition(cls, strategy);
+                })
                 .collect(Collectors.toList());
     }
 }

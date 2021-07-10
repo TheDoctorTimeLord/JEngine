@@ -10,12 +10,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ru.jengine.beancontainer.BeanFactoryStrategy;
 import ru.jengine.beancontainer.annotations.Inject;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.exceptions.InvocationMethodException;
+import ru.jengine.beancontainer.implementation.factories.SingletonBeanFactoryStrategy;
+import ru.jengine.beancontainer.service.Constants.BeanStrategy;
 
 public class BeanUtils {
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
@@ -102,5 +105,12 @@ public class BeanUtils {
         } else {
             return Collections.singletonList(context.getBean());
         }
+    }
+
+    public static BeanFactoryStrategy createStrategy(Class<?> cls, String strategyCode) { //TODO подумать о том, как ещё можно создать стратегию
+        if (BeanStrategy.SINGLETON.equals(strategyCode)) {
+            return new SingletonBeanFactoryStrategy(cls);
+        }
+        throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
     }
 }

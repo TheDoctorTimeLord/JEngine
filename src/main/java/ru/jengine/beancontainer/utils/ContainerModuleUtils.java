@@ -57,7 +57,7 @@ public class ContainerModuleUtils {
     }
 
     private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass) {
-        if (moduleClass.isAnnotationPresent(PackageScan.class)) {
+        if (moduleClass.isAnnotationPresent(PackageScan.class)) { //TODO исправить на AnnotationUtils
             String packageToScan = moduleClass.getAnnotation(PackageScan.class).value();
             return scanPackage(packageToScan);
         } else if (moduleClass.isAnnotationPresent(PackagesScan.class)) {
@@ -104,7 +104,7 @@ public class ContainerModuleUtils {
     public static List<BeanDefinition> extractAllBeanDefinition(List<Module> modules) {
         return modules.stream()
                 .flatMap(module -> module.getBeanDefinitionReaders().stream()
-                        .flatMap(reader -> reader.readBeanDefinition().stream())
+                        .flatMap(reader -> reader.readBeanDefinitions().stream())
                 )
                 .collect(Collectors.toList());
     }
