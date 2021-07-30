@@ -27,3 +27,6 @@ target/
 out/
 venv/
 GameBeanContainer.iml
+
+# Test environment
+src/main/java/ru/test/annotation

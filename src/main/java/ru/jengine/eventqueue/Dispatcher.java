@@ -165,7 +165,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
     private static class AsyncDispatcher extends Thread {
         private final List<AsyncEventPoolHandler> asyncEventPoolHandlers;
-        private boolean isRunning = true;
+        private volatile boolean isRunning = true;
 
         public AsyncDispatcher(List<AsyncEventPoolHandler> asyncEventPoolHandlers) {
             this.asyncEventPoolHandlers = asyncEventPoolHandlers;

@@ -73,14 +73,24 @@ public class AnnotationUtils {
         }
     }
 
-    public static <T extends Annotation> T getAnnotation(Class<?> owner, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotationSafe(Class<?> owner, Class<T> annotation) {
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
         for (Annotation innerAnnotation : allAnnotations) {
             if (innerAnnotation.annotationType().equals(annotation)) {
                 return (T) innerAnnotation;
             }
         }
-        throw new UtilsException("Class [" + owner + "] has not annotation [" + annotation + "]");
+        return null;
+    }
+
+    public static <T extends Annotation> T getAnnotation(Class<?> owner, Class<T> annotation) {
+        T resultAnnotation = getAnnotationSafe(owner, annotation);
+
+        if (resultAnnotation == null) {
+            throw new UtilsException("Class [" + owner + "] has not annotation [" + annotation + "]");
+        }
+
+        return resultAnnotation;
     }
 
     public static <T extends Annotation> List<T> getAnnotations(Class<?> owner, Class<T> annotation) {

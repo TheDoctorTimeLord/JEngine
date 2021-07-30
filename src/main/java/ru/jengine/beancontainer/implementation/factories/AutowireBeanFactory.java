@@ -56,9 +56,13 @@ public class AutowireBeanFactory implements BeanFactory {
         Object[] result = new Object[parameterOwner.getParameterTypes().length];
         for (int i = 0; i < result.length; i++) {
             MethodParameter methodParameter = new MethodParameter(parameterOwner, i);
-            result[i] = AutowireUtils.autowire(methodParameter, getContext());
+            result[i] = autowire(methodParameter);
         }
         return result;
+    }
+
+    protected Object autowire(MethodParameter methodParameter) {
+        return AutowireUtils.autowire(methodParameter, getContext());
     }
 
     protected ContainerContext getContext() {

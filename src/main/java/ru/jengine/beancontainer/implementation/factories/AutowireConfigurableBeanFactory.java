@@ -17,6 +17,7 @@ public class AutowireConfigurableBeanFactory extends AutowireBeanFactory impleme
         super(context);
     }
 
+    @Override
     public void configure(ContainerContext infrastructureContext) {
         beanPostProcessors = BeanUtils.getBeanAsList(infrastructureContext.getBean(BeanPostProcessor.class));
         beanPreRemoveProcessors = BeanUtils.getBeanAsList(infrastructureContext.getBean(BeanPreRemoveProcessor.class));

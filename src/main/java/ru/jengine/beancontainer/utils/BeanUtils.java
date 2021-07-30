@@ -17,7 +17,7 @@ import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.exceptions.InvocationMethodException;
-import ru.jengine.beancontainer.implementation.factories.SingletonBeanFactoryStrategy;
+import ru.jengine.beancontainer.implementation.factories.beanstrategies.SingletonBeanFactoryStrategy;
 import ru.jengine.beancontainer.service.Constants.BeanStrategy;
 
 public class BeanUtils {

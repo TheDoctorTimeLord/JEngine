@@ -1,18 +1,24 @@
 package ru.jengine.beancontainer.implementation.moduleimpls;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.annotations.ContainerModule;
+import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 public abstract class AnnotationModuleBase implements Module {
     private ClassFinder classFinder;
     private final List<BeanDefinitionReader> beanDefinitionReaders = new ArrayList<>();
+    private Context contextAnnotation;
 
     @Override
     public List<BeanDefinitionReader> getBeanDefinitionReaders() {
@@ -22,6 +28,8 @@ public abstract class AnnotationModuleBase implements Module {
     @Override
     public void configure(ModuleContext context) {
         this.classFinder = context.getClassFinder();
+        this.contextAnnotation = AnnotationUtils.getAnnotationSafe(getClass(), Context.class);
+
         beanDefinitionReadersInit(context);
     }
 
@@ -29,6 +37,21 @@ public abstract class AnnotationModuleBase implements Module {
 
     protected void addBeanDefinitionReader(BeanDefinitionReader reader) {
         beanDefinitionReaders.add(reader);
+    }
+
+    @Override
+    public String getContextName() {
+        return contextAnnotation == null ? Constants.DEFAULT_CONTEXT : contextAnnotation.value();
+    }
+
+    @Override
+    public List<String> getBeanSources() {
+        return contextAnnotation == null ? Collections.emptyList() : Arrays.asList(contextAnnotation.beanSources());
+    }
+
+    @Override
+    public boolean needLoadOnContainerInitialize() {
+        return contextAnnotation != null && contextAnnotation.needLoadOnContextInitialize();
     }
 
     @Override
@@ -42,5 +65,4 @@ public abstract class AnnotationModuleBase implements Module {
     public List<Class<?>> getImplementations(Class<?> interfaceCls) {
         return new ArrayList<>(classFinder.getSubclasses(interfaceCls));
     }
-
 }

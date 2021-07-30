@@ -8,14 +8,20 @@ import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.implementation.beandefinitionreaders.ExistBeanDefinitionsReader;
+import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.ClassUtils;
 
 public class ExistBeansModule implements Module {
     private final List<Object> beans;
-    private List<BeanDefinitionReader> readers;
+    private final String contextName;
 
     public ExistBeansModule(List<Object> beans) {
+        this(beans, Constants.DEFAULT_CONTEXT);
+    }
+
+    public ExistBeansModule(List<Object> beans, String contextName) {
         this.beans = beans;
+        this.contextName = contextName;
     }
 
     @Override
@@ -25,6 +31,21 @@ public class ExistBeansModule implements Module {
 
     @Override
     public void configure(ModuleContext context) { }
+
+    @Override
+    public String getContextName() {
+        return contextName;
+    }
+
+    @Override
+    public List<String> getBeanSources() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean needLoadOnContainerInitialize() {
+        return true;
+    }
 
     @Override
     public List<Class<?>> getSubmodules() {

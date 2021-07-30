@@ -1,11 +1,5 @@
 package ru.test.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
@@ -22,7 +16,7 @@ import ru.test.annotation.quantum.SpecialAsyncMessageEvent;
 public class TestModule extends AnnotationModule {
     public static void main(String[] arg) throws InterruptedException {
         JEngineContainer beanContainer = new JEngineContainer();
-        beanContainer.initialize(ContainerConfiguration.build(TestModule.class));
+        beanContainer.initializeCommonContexts(ContainerConfiguration.build(TestModule.class));
 
         Dispatcher dispatcher = beanContainer.getBean(Dispatcher.class);
 
@@ -43,21 +37,3 @@ public class TestModule extends AnnotationModule {
         beanContainer.stop();
     }
 }
-
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@interface Anno1 {}
-
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Anno1
-@interface Anno2 {}
-
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Anno2
-@Bean
-@interface Anno3 {}
-
-@Anno3
-class Sas {}

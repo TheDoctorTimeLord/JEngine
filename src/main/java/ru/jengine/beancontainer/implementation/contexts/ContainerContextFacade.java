@@ -1,12 +1,14 @@
 package ru.jengine.beancontainer.implementation.contexts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import static ru.jengine.beancontainer.utils.CollectionUtils.groupBy;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import ru.jengine.beancontainer.BeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
@@ -16,7 +18,6 @@ import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.service.Constants;
-import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
 public class ContainerContextFacade implements ContainerMultiContext {
     private final Map<String, ContainerContext> internalContexts = new ConcurrentHashMap<>();
@@ -32,7 +33,7 @@ public class ContainerContextFacade implements ContainerMultiContext {
     public void initialize(List<Module> modules, BeanFactory factory) {
         this.beanFactory = factory;
 
-        Map<String, List<Module>> modulesByContext = groupByContext(modules);
+        Map<String, List<Module>> modulesByContext = groupBy(modules, Module::getContextName);
         modulesByContext.forEach(this::registerContext);
     }
 
@@ -56,20 +57,6 @@ public class ContainerContextFacade implements ContainerMultiContext {
     public void prepareToRemove() {
         Stream.concat(externalContexts.values().stream(), internalContexts.values().stream())
                 .forEach(ContainerContextFacade::prepareToRemove);
-    }
-
-    private static Map<String, List<Module>> groupByContext(List<Module> modules) {
-        Map<String, List<Module>> result = new HashMap<>();
-
-        for (Module module : modules) {
-            String contextName = ContainerModuleUtils.extractContextForModule(module);
-            if (!result.containsKey(contextName)) {
-                result.put(contextName, new ArrayList<>());
-            }
-            result.get(contextName).add(module);
-        }
-
-        return result;
     }
 
     @Override
@@ -96,13 +83,8 @@ public class ContainerContextFacade implements ContainerMultiContext {
 
     @Override
     public BeanContext getBean(String contextName, Class<?> beanClass) {
-        ContainerContext context = internalContexts.get(contextName);
-        if (context == null) {
-            context = externalContexts.get(contextName);
-            return context == null ? null : context.getBean(beanClass);
-        }
-
-        return context.getBean(beanClass);
+        ContainerContext context = getContext(contextName);
+        return context == null ? null : context.getBean(beanClass);
     }
 
     @Override
@@ -113,6 +95,13 @@ public class ContainerContextFacade implements ContainerMultiContext {
             return context != null && context.containsBean(beanClass);
         }
         return context.containsBean(beanClass);
+    }
+
+    @Override
+    @Nullable
+    public ContainerContext getContext(String name) {
+        ContainerContext context = externalContexts.get(name);
+        return context == null ? internalContexts.get(name) : context;
     }
 
     @Override

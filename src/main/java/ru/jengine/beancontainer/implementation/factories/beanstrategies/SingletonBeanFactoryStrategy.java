@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.implementation.factories;
+package ru.jengine.beancontainer.implementation.factories.beanstrategies;
 
 import ru.jengine.beancontainer.BeanFactory;
 import ru.jengine.beancontainer.BeanFactoryStrategy;

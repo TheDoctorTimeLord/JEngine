@@ -13,7 +13,6 @@ import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.ModuleFinder;
-import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.PackagesScan;
@@ -22,7 +21,6 @@ import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
-import ru.jengine.beancontainer.service.Constants;
 
 public class ContainerModuleUtils {
     public static List<Module> getAllSubmodules(Module mainModule, ContainerConfiguration configuration) {
@@ -107,13 +105,5 @@ public class ContainerModuleUtils {
                         .flatMap(reader -> reader.readBeanDefinitions().stream())
                 )
                 .collect(Collectors.toList());
-    }
-
-    public static String extractContextForModule(Module module) {
-        Context annotation = module.getClass().getAnnotation(Context.class);
-        if (annotation == null) {
-            return Constants.DEFAULT_CONTEXT;
-        }
-        return annotation.value();
     }
 }

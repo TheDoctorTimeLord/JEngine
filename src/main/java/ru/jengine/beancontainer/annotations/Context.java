@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Context {
     String value();
+    String[] beanSources() default {};
+    boolean needLoadOnContextInitialize() default true;
 }

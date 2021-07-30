@@ -8,7 +8,7 @@ import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.annotations.Import;
 import ru.jengine.beancontainer.implementation.beandefinitions.JavaClassBeanDefinition;
-import ru.jengine.beancontainer.implementation.factories.SingletonBeanFactoryStrategy;
+import ru.jengine.beancontainer.implementation.factories.beanstrategies.SingletonBeanFactoryStrategy;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 public class ImportingBeanDefinitionReader implements BeanDefinitionReader {

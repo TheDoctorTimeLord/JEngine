@@ -1,36 +1,46 @@
 package ru.jengine.beancontainer.implementation;
 
-import java.util.ArrayList;
+import static ru.jengine.beancontainer.utils.CollectionUtils.filter;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Map;
 
 import ru.jengine.beancontainer.BeanContainer;
 import ru.jengine.beancontainer.BeanFactory;
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContainerMultiContext;
+import ru.jengine.beancontainer.ContextPattern;
 import ru.jengine.beancontainer.ContextPreProcessor;
+import ru.jengine.beancontainer.InitializableContextPatternHandler;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.ModuleFindersHandler;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
+import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.contexts.ContainerContextFacade;
 import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
+import ru.jengine.beancontainer.implementation.contexts.patterns.DefaultContextPatternsHandler;
+import ru.jengine.beancontainer.implementation.contexts.patterns.ModuleBasedContextPattern;
 import ru.jengine.beancontainer.implementation.factories.AutowireBeanFactory;
 import ru.jengine.beancontainer.implementation.factories.AutowireConfigurableBeanFactory;
-import ru.jengine.beancontainer.implementation.factories.StubBeanFactory;
 import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer.implementation.moduleimpls.ExistBeansModule;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
-import ru.jengine.beancontainer.utils.ContainerModuleUtils;
+import ru.jengine.beancontainer.utils.CollectionUtils;
 
 public class JEngineContainer implements BeanContainer {
-    private ContainerMultiContext beanContainerContext;
+    private final ContainerMultiContext beanContainerContext = new ContainerContextFacade();
+    private final InitializableContextPatternHandler patternsHandler =
+            new DefaultContextPatternsHandler(beanContainerContext);
 
     @Override
-    public void initialize(ContainerConfiguration configuration) {
+    public void initializeCommonContexts(ContainerConfiguration configuration) {
         List<Module> modules = findModules(configuration);
-        prepareContext(modules);
+        prepareContext(createInfrastructureContext(filter(modules, JEngineContainer::isInfrastructureModule)));
+        loadFoundedContexts(modules);
     }
 
     private static List<Module> findModules(ContainerConfiguration configuration) {
@@ -47,37 +57,15 @@ public class JEngineContainer implements BeanContainer {
         return result;
     }
 
-    private void prepareContext(List<Module> modules) {
-        List<Module> infrastructureModules = filter(modules, JEngineContainer::isInfrastructureModule);
-        ContainerContext infrastructureContext = createInfrastructureContext(infrastructureModules);
-
-        List<Module> existingModules = filter(modules, JEngineContainer::isExistingModule);
-        ContainerContext existingContext = createExistingContext(existingModules);
-
-        beanContainerContext = new ContainerContextFacade();
+    private void prepareContext(ContainerContext infrastructureContext) {
         beanContainerContext.registerContext(Constants.INFRASTRUCTURE_CONTEXT, infrastructureContext);
-        beanContainerContext.registerContext(Constants.EXISTING_CONTEXT, existingContext);
 
         BeanContext preProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
 
         BeanFactory factory = createBeanFactory(beanContainerContext, infrastructureContext);
-        beanContainerContext.initialize(modules, factory);
+        beanContainerContext.initialize(Collections.emptyList(), factory); //TODO что делать с модулями тут?
         beanContainerContext.preProcessBeans(BeanUtils.getBeanAsList(preProcessors));
         beanContainerContext.prepareBeans();
-    }
-
-    private static List<Module> filter(List<Module> modules, Predicate<Module> filter) {
-        List<Module> filtered = new ArrayList<>();
-
-        modules.removeIf(module -> {
-            if (filter.test(module)) {
-                filtered.add(module);
-                return true;
-            }
-            return false;
-        });
-
-        return filtered;
     }
 
     private static ContainerContext createInfrastructureContext(List<Module> modules) {
@@ -88,24 +76,27 @@ public class JEngineContainer implements BeanContainer {
     }
 
     private static boolean isInfrastructureModule(Module module) {
-        return Constants.INFRASTRUCTURE_CONTEXT.equals(ContainerModuleUtils.extractContextForModule(module));
-    }
-
-    private static ContainerContext createExistingContext(List<Module> modules) {
-        ContainerContext existingContext = new DefaultContainerContext();
-        existingContext.initialize(modules, new StubBeanFactory());
-        existingContext.prepareBeans();
-        return existingContext;
-    }
-
-    private static boolean isExistingModule(Module module) {
-        return module instanceof ExistBeansModule;
+        return Constants.INFRASTRUCTURE_CONTEXT.equals(module.getContextName());
     }
 
     private static BeanFactory createBeanFactory(ContainerContext mainContext, ContainerContext infrastructureContext) {
         AutowireConfigurableBeanFactory factory = new AutowireConfigurableBeanFactory(mainContext);
         factory.configure(infrastructureContext);
         return factory;
+    }
+
+    private static Map<String, ContextPattern> groupModuleToPatterns(List<Module> groupingModules) {
+        Map<String, ContextPattern> result = new HashMap<>();
+        CollectionUtils.groupBy(groupingModules, Module::getContextName)
+                .forEach((name, modules) -> {
+                    result.put(name, new ModuleBasedContextPattern(modules));
+                });
+        return result;
+    }
+
+    private void loadFoundedContexts(List<Module> modules) {
+        groupModuleToPatterns(modules).forEach(patternsHandler::registerPattern);
+        patternsHandler.initialize();
     }
 
     @Override
@@ -119,17 +110,17 @@ public class JEngineContainer implements BeanContainer {
     }
 
     @Override
-    public void registerContext(String name, ContainerContext context) {
-        beanContainerContext.registerContext(name, context);
+    public void registerPattern(String patternName, ContextPattern contextPattern) throws ContainerException {
+        patternsHandler.registerPattern(patternName, contextPattern);
     }
 
     @Override
-    public void reloadContext(String name) {
-        beanContainerContext.reloadContext(name);
+    public void loadContext(String patternName) {
+        patternsHandler.loadContext(patternName);
     }
 
     @Override
-    public void removeContext(String name) {
-        beanContainerContext.removeContext(name);
+    public void loadContexts(List<String> patternNames) {
+        patternsHandler.loadContexts(patternNames);
     }
 }

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import ru.jengine.beancontainer.BeanDefinition;
 import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.implementation.beandefinitions.JavaClassBeanDefinition;
-import ru.jengine.beancontainer.implementation.factories.ExistBeanFactoryStrategy;
+import ru.jengine.beancontainer.implementation.factories.beanstrategies.ExistBeanFactoryStrategy;
 
 public class ExistBeanDefinitionsReader implements BeanDefinitionReader {
     private final List<Object> beans;
