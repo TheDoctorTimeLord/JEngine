@@ -1,9 +1,9 @@
 package ru.jengine.eventqueue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +14,8 @@ import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.annotations.PreDestroy;
 import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.HasPriority;
+import ru.jengine.beancontainer.service.SortedMultimap;
 import ru.jengine.beancontainer.utils.CollectionUtils.IterableStream;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
@@ -30,7 +32,7 @@ import ru.jengine.eventqueue.exceptions.EventQueueException;
 @Bean
 public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, EventRegistrar, SynchronousEventHandler {
     private final Map<Class<?>, List<PreHandler<?>>> preHandlers = new HashMap<>();
-    private final Map<Class<?>, List<PostHandler<?>>> postHandlers = new ConcurrentHashMap<>();
+    private final Map<Class<?>, SortedMultimap<PostHandler<?>>> postHandlers = new ConcurrentHashMap<>();
     private final Map<String, EventPool> eventPoolByCode = new HashMap<>();
     private final List<EventInterceptor> interceptors;
     private final List<EventPoolHandler> eventPoolHandlers;
@@ -84,7 +86,8 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public void registerPostHandler(PostHandler<?> postHandler) {
         synchronized (postHandlers) {
             Class<?> handledEventType = postHandler.getHandlingEventType();
-            List<PostHandler<?>> handlers = postHandlers.computeIfAbsent(handledEventType, k -> new LinkedList<>()); //TODO подумать на счёт Set
+            SortedMultimap<PostHandler<?>> handlers = postHandlers.computeIfAbsent(handledEventType,
+                    k -> new SortedMultimap<>(HasPriority::getPriority));
             handlers.add(postHandler);
         }
     }
@@ -93,7 +96,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public void removePostHandler(PostHandler<?> postHandler) {
         synchronized (postHandlers) {
             Class<?> handledEventType = postHandler.getHandlingEventType();
-            List<PostHandler<?>> handlers = postHandlers.get(handledEventType);
+            SortedMultimap<PostHandler<?>> handlers = postHandlers.get(handledEventType);
             if (handlers == null) {
                 return;
             }
@@ -106,9 +109,9 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
         }
     }
 
-    private List<PostHandler<?>> getPostHandlers(Class<?> eventType) {
+    private Collection<PostHandler<?>> getPostHandlers(Class<?> eventType) {
         synchronized (postHandlers) {
-            return postHandlers.getOrDefault(eventType, Collections.emptyList());
+            return postHandlers.getOrDefault(eventType, new SortedMultimap<>()).getSortedElements();
         }
     }
 
@@ -148,7 +151,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
                 return;
         }
 
-        List<PostHandler<?>> postHandlersForEvent = getPostHandlers(eventType);
+        Collection<PostHandler<?>> postHandlersForEvent = getPostHandlers(eventType);
         IterableStream<EventHandler<?>> handlers = new IterableStream<>(
                 Stream.concat(preHandlersForEvent.stream(), postHandlersForEvent.stream())
         );

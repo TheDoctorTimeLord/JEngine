@@ -17,6 +17,7 @@ import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.dataclasses.MethodMeta;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.exceptions.InvocationMethodException;
+import ru.jengine.beancontainer.implementation.factories.beanstrategies.PrototypeBeanFactoryStrategy;
 import ru.jengine.beancontainer.implementation.factories.beanstrategies.SingletonBeanFactoryStrategy;
 import ru.jengine.beancontainer.service.Constants.BeanStrategy;
 
@@ -108,9 +109,13 @@ public class BeanUtils {
     }
 
     public static BeanFactoryStrategy createStrategy(Class<?> cls, String strategyCode) { //TODO подумать о том, как ещё можно создать стратегию
-        if (BeanStrategy.SINGLETON.equals(strategyCode)) {
+        switch (strategyCode) {
+        case BeanStrategy.SINGLETON:
             return new SingletonBeanFactoryStrategy(cls);
+        case BeanStrategy.PROTOTYPE:
+            return new PrototypeBeanFactoryStrategy(cls);
+        default:
+            throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
         }
-        throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
     }
 }

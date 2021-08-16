@@ -15,5 +15,6 @@ public interface Constants {
 
     interface BeanStrategy {
         String SINGLETON = "singleton";
+        String PROTOTYPE = "prototype";
     }
 }
