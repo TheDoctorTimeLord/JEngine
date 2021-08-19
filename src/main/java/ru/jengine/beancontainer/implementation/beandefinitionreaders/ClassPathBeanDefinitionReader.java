@@ -36,9 +36,13 @@ public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
                 .filter(pair -> findInfrastructureBeans.equals(pair.getValue().isInfrastructure()))
                 .map(pair -> {
                     Class<?> cls = pair.getKey();
-                    BeanFactoryStrategy strategy = BeanUtils.createStrategy(cls, pair.getValue().strategyCode());
+                    BeanFactoryStrategy strategy = createStrategy(pair.getValue().strategyCode(), cls);
                     return new JavaClassBeanDefinition(cls, strategy);
                 })
                 .collect(Collectors.toList());
+    }
+
+    protected BeanFactoryStrategy createStrategy(String strategyCode, Class<?> strategyOwner) {
+        return BeanUtils.createStrategy(strategyOwner, strategyCode);
     }
 }
