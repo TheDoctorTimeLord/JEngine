@@ -26,7 +26,7 @@ public class BattleMapService {
         }
         CanMoved moved = (CanMoved)model;
 
-        if (moved.getPosition() == null || moved.getDirection() == null) {
+        if (!moved.hasPosition() || !moved.hasDirection()) {
             return; //TODO залогировать
         }
 

@@ -1,7 +1,5 @@
 package ru.jengine.battlemodule.models;
 
-import javax.annotation.Nullable;
-
 import ru.jengine.battlemodule.serviceclasses.Direction;
 import ru.jengine.battlemodule.serviceclasses.Point;
 
@@ -11,7 +9,11 @@ public class DynamicModel extends BattleModel implements CanMoved {
     }
 
     @Override
-    @Nullable
+    public boolean hasDirection() {
+        return getProperty("direction") != null;
+    }
+
+    @Override
     public Direction getDirection() {
         return getProperty("direction");
     }
@@ -22,7 +24,11 @@ public class DynamicModel extends BattleModel implements CanMoved {
     }
 
     @Override
-    @Nullable
+    public boolean hasPosition() {
+        return getProperty("position") != null;
+    }
+
+    @Override
     public Point getPosition() {
         return getProperty("position");
     }
