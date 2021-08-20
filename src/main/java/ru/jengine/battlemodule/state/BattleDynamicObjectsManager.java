@@ -17,7 +17,7 @@ import ru.jengine.battlemodule.models.BattleModel;
 public class BattleDynamicObjectsManager {
     private final BattleState battleState;
     private final BehaviorObjectsManager behaviorObjectsManager;
-    private final Map<Integer, List<BattleCommand>> commandsForCharacter = new HashMap<>();
+    private final Map<Integer, List<BattleCommand<?>>> commandsForCharacter = new HashMap<>();
 
     public BattleDynamicObjectsManager(BattleState battleState, BehaviorObjectsManager behaviorObjectsManager) {
         this.battleState = battleState;
@@ -31,12 +31,13 @@ public class BattleDynamicObjectsManager {
                 .collect(Collectors.toList());
     }
 
-    public void setCommandsForCharacters(Collection<BattleCommand> allCommands, BattleContext battleContext) {
+    public void setCommandsForCharacters(Collection<BattleCommand<?>> allCommands, BattleContext battleContext) {
         BattleObjectsManager objectsManager = battleContext.getBattleObjectsManager();
 
         for (Integer battleModelId : battleState.getDynamicObjects()) {
             BattleModel battleModel = objectsManager.resolve(battleModelId);
-            List<BattleCommand> commandList = commandsForCharacter.compute(battleModelId, (id, l) -> new ArrayList<>());
+            List<BattleCommand<?>> commandList = commandsForCharacter.compute(battleModelId,
+                    (id, l) -> new ArrayList<>());
 
             allCommands.stream()
                     .filter(command -> command.canExecute(battleModel, battleContext))
@@ -44,14 +45,14 @@ public class BattleDynamicObjectsManager {
         }
     }
 
-    public Collection<BattleCommandPerformElement> extractCommandOnTurn(BattleContext commandContext) {
+    public Collection<BattleCommandPerformElement<?>> extractCommandOnTurn(BattleContext commandContext) {
         BattleObjectsManager objectsManager = commandContext.getBattleObjectsManager();
 
-        Map<Integer, List<BattleCommand>> availableCommands = new HashMap<>();
-        for (Map.Entry<Integer, List<BattleCommand>> entry : commandsForCharacter.entrySet()) {
+        Map<Integer, List<BattleCommand<?>>> availableCommands = new HashMap<>();
+        for (Map.Entry<Integer, List<BattleCommand<?>>> entry : commandsForCharacter.entrySet()) {
             BattleModel model = objectsManager.resolve(entry.getKey());
             availableCommands.put(entry.getKey(), entry.getValue().stream()
-                    .filter(command -> command.isValid(model, commandContext))
+                    .filter(command -> command.isAvailableCommand(model, commandContext))
                     .collect(Collectors.toList()));
         }
 

@@ -52,7 +52,7 @@ public class BattleMasterImpl implements BattleMaster {
         binderService.bindPostHandlers(context);
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
-        behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(context));
+        behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(context), context);
     }
 
     @Override

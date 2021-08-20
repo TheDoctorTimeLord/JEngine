@@ -7,7 +7,6 @@ import java.util.Map;
 
 import ru.jengine.battlemodule.models.BattleModel;
 import ru.jengine.battlemodule.models.CanMoved;
-import ru.jengine.battlemodule.serviceclasses.Direction;
 import ru.jengine.battlemodule.serviceclasses.Point;
 
 public class BattleMapService {
@@ -26,18 +25,14 @@ public class BattleMapService {
             return; //TODO залогировать
         }
         CanMoved moved = (CanMoved)model;
-        Point oldPosition = moved.getPosition();
-        Direction direction = moved.getDirection();
 
-        if (oldPosition == null || direction == null) {
+        if (moved.getPosition() == null || moved.getDirection() == null) {
             return; //TODO залогировать
         }
 
-        Point newPosition = oldPosition.add(direction.getOffset());
-
-        moved.setPosition(newPosition);
-        removeFromPosition(oldPosition, model.getId());
-        setToPosition(newPosition, model.getId());
+        moved.setPosition(to);
+        removeFromPosition(from, model.getId());
+        setToPosition(to, model.getId());
     }
 
     private void removeFromPosition(Point position, int id) {

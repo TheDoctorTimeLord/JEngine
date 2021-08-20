@@ -1,21 +1,25 @@
 package ru.jengine.battlemodule.commands;
 
 import ru.jengine.battlemodule.BattleContext;
+import ru.jengine.battlemodule.models.BattleModel;
 
-public class BattleCommandPerformElement {
+public class BattleCommandPerformElement<P extends CommandExecutionParameters> {
     private final int battleModelId;
-    private final BattleCommand battleCommand;
+    private final BattleCommand<P> battleCommand;
+    private final P executionParameters;
 
-    public BattleCommandPerformElement(int battleModelId, BattleCommand battleCommand) {
+    public BattleCommandPerformElement(int battleModelId, BattleCommand<P> battleCommand, P executionParameters) {
         this.battleModelId = battleModelId;
         this.battleCommand = battleCommand;
+        this.executionParameters = executionParameters;
     }
 
     public void performCommand(BattleContext commandContext) {
-        battleCommand.perform(commandContext.getBattleObjectsManager().resolve(battleModelId), commandContext);
+        BattleModel model = commandContext.getBattleObjectsManager().resolve(battleModelId);
+        battleCommand.perform(model, commandContext, executionParameters);
     }
 
-    public BattleCommand getBattleCommand() {
+    public BattleCommand<P> getBattleCommand() {
         return battleCommand;
     }
 }

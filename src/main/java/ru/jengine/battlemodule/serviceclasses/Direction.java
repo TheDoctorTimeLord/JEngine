@@ -25,4 +25,13 @@ public enum Direction {
         Direction[] directions = values();
         return directions[(ordinal() + 1) % directions.length];
     }
+
+    public static Direction getByOffset(Point offset) {
+        for (Direction direction : values()) {
+            if (direction.getOffset().equals(offset)) {
+                return direction;
+            }
+        }
+        throw new IllegalArgumentException("Offset [" + offset + "] doesn't match any Direction");
+    }
 }

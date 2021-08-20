@@ -3,6 +3,6 @@ package ru.jengine.battlemodule.commands;
 import java.util.Collection;
 
 public interface BattleCommandRegistrar {
-    void registerCommand(BattleCommand battleCommand);
-    Collection<BattleCommand> getAllCommands();
+    <P extends CommandExecutionParameters> void registerCommand(BattleCommand<P> battleCommand);
+    Collection<BattleCommand<?>> getAllCommands();
 }

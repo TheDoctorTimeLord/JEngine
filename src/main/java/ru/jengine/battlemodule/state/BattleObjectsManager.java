@@ -10,6 +10,6 @@ public class BattleObjectsManager {
     }
 
     public BattleModel resolve(Integer id) {
-        return battleState.getBattleModelById().get(id);
+        return battleState.getBattleModelById().get(id); //TODO бросать ошибку, если null
     }
 }

@@ -14,12 +14,12 @@ import ru.jengine.beancontainer.service.Constants.BeanStrategy;
 
 @Bean(strategyCode = BeanStrategy.PROTOTYPE)
 public class BattleCommandMasterImpl implements BattleCommandMaster {
-    private final List<BattleCommandPerformElement> commandsOnNextPhase = new ArrayList<>();
+    private final List<BattleCommandPerformElement<?>> commandsOnNextPhase = new ArrayList<>();
 
     @Override
     public void takeTurn(BattleContext commandContext) {
         BattleDynamicObjectsManager dynamicObjectsManager = commandContext.getBattleDynamicObjectsManager();
-        List<BattleCommandPerformElement> commandOnPhase =
+        List<BattleCommandPerformElement<?>> commandOnPhase =
                 sortCommandByPriority(dynamicObjectsManager.extractCommandOnTurn(commandContext));
 
         while (!commandOnPhase.isEmpty()) {
@@ -30,27 +30,29 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
     }
 
     @Override
-    public void registerCommandOnNextPhase(BattleCommandPerformElement battleCommand) {
+    public void registerCommandOnNextPhase(BattleCommandPerformElement<?> battleCommand) {
         synchronized (commandsOnNextPhase) {
             commandsOnNextPhase.add(battleCommand);
         }
     }
 
-    private List<BattleCommandPerformElement> getCommandsOnNextPhase() {
+    private List<BattleCommandPerformElement<?>> getCommandsOnNextPhase() {
         synchronized (commandsOnNextPhase) {
-            List<BattleCommandPerformElement> result = sortCommandByPriority(commandsOnNextPhase);
+            List<BattleCommandPerformElement<?>> result = sortCommandByPriority(commandsOnNextPhase);
             commandsOnNextPhase.clear();
             return result;
         }
     }
 
-    private static void performAllCommands(List<BattleCommandPerformElement> commands, BattleContext commandContext) {
-        for (BattleCommandPerformElement command : commands) {
+    private static void performAllCommands(List<BattleCommandPerformElement<?>> commands, BattleContext commandContext) {
+        for (BattleCommandPerformElement<?> command : commands) {
             command.performCommand(commandContext);
         }
     }
 
-    private static List<BattleCommandPerformElement> sortCommandByPriority(Collection<BattleCommandPerformElement> commands) {
+    private static List<BattleCommandPerformElement<?>> sortCommandByPriority(
+            Collection<BattleCommandPerformElement<?>> commands)
+    {
         return commands.stream()
                 .sorted(Comparator.comparingInt(element -> element.getBattleCommand().getPriority()))
                 .collect(Collectors.toList());

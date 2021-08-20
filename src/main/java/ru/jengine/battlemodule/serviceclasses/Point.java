@@ -23,6 +23,10 @@ public class Point {
         return point != null ? new Point(x + point.getX(), y + point.getY()) : this;
     }
 
+    public Point sub(Point point) {
+        return point != null ? new Point(x - point.getX(), y - point.getY()) : this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

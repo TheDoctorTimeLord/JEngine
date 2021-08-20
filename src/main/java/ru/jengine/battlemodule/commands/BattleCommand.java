@@ -4,8 +4,9 @@ import ru.jengine.battlemodule.BattleContext;
 import ru.jengine.battlemodule.models.BattleModel;
 import ru.jengine.beancontainer.service.HasPriority;
 
-public interface BattleCommand extends HasPriority {
-    boolean canExecute(BattleModel model, BattleContext commandContext);
-    boolean isValid(BattleModel model, BattleContext context);
-    void perform(BattleModel model, BattleContext context);
+public interface BattleCommand<P extends CommandExecutionParameters> extends HasPriority {
+    P createParametersTemplate(Integer modelId, BattleContext battleContext);
+    boolean canExecute(BattleModel model, BattleContext battleContext);
+    boolean isAvailableCommand(BattleModel model, BattleContext battleContext);
+    void perform(BattleModel model, BattleContext battleContext, P executionParameters);
 }
