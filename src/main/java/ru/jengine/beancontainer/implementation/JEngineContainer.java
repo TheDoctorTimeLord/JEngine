@@ -1,6 +1,6 @@
 package ru.jengine.beancontainer.implementation;
 
-import static ru.jengine.beancontainer.utils.CollectionUtils.filter;
+import static ru.jengine.utils.CollectionUtils.filter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFind
 import ru.jengine.beancontainer.implementation.moduleimpls.ExistBeansModule;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
-import ru.jengine.beancontainer.utils.CollectionUtils;
+import ru.jengine.utils.CollectionUtils;
 
 public class JEngineContainer implements BeanContainer {
     private final ContainerMultiContext beanContainerContext = new ContainerContextFacade();

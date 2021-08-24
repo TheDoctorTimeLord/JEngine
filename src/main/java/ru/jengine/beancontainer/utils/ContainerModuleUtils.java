@@ -21,6 +21,7 @@ import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
+import ru.jengine.utils.ClassUtils;
 
 public class ContainerModuleUtils {
     public static List<Module> getAllSubmodules(Module mainModule, ContainerConfiguration configuration) {

@@ -16,7 +16,7 @@ import ru.jengine.beancontainer.annotations.PreDestroy;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.service.HasPriority;
 import ru.jengine.beancontainer.service.SortedMultimap;
-import ru.jengine.beancontainer.utils.CollectionUtils.IterableStream;
+import ru.jengine.utils.CollectionUtils.IterableStream;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.EventHandler;

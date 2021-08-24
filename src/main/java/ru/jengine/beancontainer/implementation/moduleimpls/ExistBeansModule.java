@@ -9,7 +9,7 @@ import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.implementation.beandefinitionreaders.ExistBeanDefinitionsReader;
 import ru.jengine.beancontainer.service.Constants;
-import ru.jengine.beancontainer.utils.ClassUtils;
+import ru.jengine.utils.ClassUtils;
 
 public class ExistBeansModule implements Module {
     private final List<Object> beans;

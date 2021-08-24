@@ -13,7 +13,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import ru.jengine.beancontainer.ClassFinder;
-import ru.jengine.beancontainer.utils.ClassUtils;
+import ru.jengine.utils.ClassUtils;
 
 public class ClassPathScanner implements ClassFinder {
     private Reflections reflections;

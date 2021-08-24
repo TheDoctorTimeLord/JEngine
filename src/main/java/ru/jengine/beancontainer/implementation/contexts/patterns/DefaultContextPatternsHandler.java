@@ -16,7 +16,7 @@ import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.factories.SelectiveAutowireConfigurableBeanFactories;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.utils.BeanUtils;
-import ru.jengine.beancontainer.utils.CollectionUtils;
+import ru.jengine.utils.CollectionUtils;
 
 public class DefaultContextPatternsHandler implements InitializableContextPatternHandler {
     private final Map<String, ContextPattern> patterns = new ConcurrentHashMap<>();

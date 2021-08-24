@@ -1,6 +1,6 @@
 package ru.jengine.beancontainer.implementation.contexts;
 
-import static ru.jengine.beancontainer.utils.CollectionUtils.groupBy;
+import static ru.jengine.utils.CollectionUtils.groupBy;
 
 import java.util.List;
 import java.util.Map;

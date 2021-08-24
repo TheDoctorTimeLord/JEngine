@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ru.jengine.beancontainer.utils.Preconditions;
+import ru.jengine.utils.Preconditions;
 import ru.jengine.eventqueue.event.Event;
 
 public class EventPoolQueueWithQuanta implements QuantaEventPool {
