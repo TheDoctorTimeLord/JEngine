@@ -1,7 +1,9 @@
 package ru.jengine.battlemodule.state;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import ru.jengine.battlemodule.models.BattleModel;
 import ru.jengine.battlemodule.serviceclasses.Point;
@@ -19,15 +21,21 @@ public class BattleState {
         this.dynamicObjects = dynamicObjects;
     }
 
-    public Map<Integer, BattleModel> getBattleModelById() {
-        return battleModelById;
+    public BattleModel resolveId(int id) {
+        return battleModelById.get(id); //TODO бросать ошибку, если null
     }
 
     public Map<Point, List<Integer>> getBattleModelOnField() {
         return battleModelOnField;
     }
 
-    public List<Integer> getDynamicObjects() {
-        return dynamicObjects;
+    public List<BattleModel> getDynamicObjects() {
+        return dynamicObjects.stream()
+                .map(this::resolveId)
+                .collect(Collectors.toList());
+    }
+
+    public List<Integer> getDynamicObjectIds() {
+        return new ArrayList<>(dynamicObjects);
     }
 }

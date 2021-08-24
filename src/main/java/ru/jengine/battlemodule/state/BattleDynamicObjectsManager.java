@@ -25,21 +25,15 @@ public class BattleDynamicObjectsManager {
         this.behaviorObjectsManager = behaviorObjectsManager;
     }
 
-    public List<BattleModel> getAllCharacters(BattleContext battleContext) {
-        BattleObjectsManager objectsManager = battleContext.getBattleObjectsManager();
-        return battleState.getDynamicObjects().stream()
-                .map(objectsManager::resolve)
-                .collect(Collectors.toList());
+    public List<BattleModel> getAllCharacters() {
+        return battleState.getDynamicObjects();
     }
 
     public void setCommandsForCharacters(Collection<BattleCommandPrototype<?, ?>> allCommands,
             BattleContext battleContext)
     {
-        BattleObjectsManager objectsManager = battleContext.getBattleObjectsManager();
-
-        for (Integer battleModelId : battleState.getDynamicObjects()) {
-            BattleModel battleModel = objectsManager.resolve(battleModelId);
-            List<BattleCommandPrototype<?, ?>> commandList = commandsForCharacter.compute(battleModelId,
+        for (BattleModel battleModel : battleState.getDynamicObjects()) {
+            List<BattleCommandPrototype<?, ?>> commandList = commandsForCharacter.compute(battleModel.getId(),
                     (id, l) -> new ArrayList<>());
 
             allCommands.stream()
@@ -49,11 +43,11 @@ public class BattleDynamicObjectsManager {
     }
 
     public Collection<BattleCommandPerformElement<?>> extractCommandOnTurn(BattleContext commandContext) {
-        BattleObjectsManager objectsManager = commandContext.getBattleObjectsManager();
+        BattleState battleState = commandContext.getBattleState();
 
         Map<Integer, List<BattleCommand<?>>> availableCommands = new HashMap<>();
         for (Map.Entry<Integer, List<BattleCommandPrototype<?, ?>>> entry : commandsForCharacter.entrySet()) {
-            BattleModel model = objectsManager.resolve(entry.getKey());
+            BattleModel model = battleState.resolveId(entry.getKey());
             availableCommands.put(entry.getKey(), entry.getValue().stream()
                     .filter(command -> command.isAvailableCommand(model, commandContext))
                     .map(command -> command.createBattleCommand(model, commandContext))

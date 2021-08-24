@@ -15,7 +15,7 @@ public class BattleCommandPerformElement<P extends CommandExecutionParameters> {
     }
 
     public void performCommand(BattleContext commandContext) {
-        BattleModel model = commandContext.getBattleObjectsManager().resolve(battleModelId);
+        BattleModel model = commandContext.getBattleState().resolveId(battleModelId);
         battleCommand.perform(model, commandContext, executionParameters);
     }
 

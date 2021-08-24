@@ -11,22 +11,15 @@ import ru.jengine.battlemodule.serviceclasses.Point;
 
 public class BattleMapService {
     private final BattleState battleState;
-    private final BattleObjectsManager objectsManager;
 
-    public BattleMapService(BattleState battleState, BattleObjectsManager objectsManager) {
+    public BattleMapService(BattleState battleState) {
         this.battleState = battleState;
-        this.objectsManager = objectsManager;
     }
 
     public void changePosition(Point from, Point to, int id) {
-        BattleModel model = objectsManager.resolve(id);
-
-        if (!(model instanceof CanMoved)) {
-            return; //TODO залогировать
-        }
-        CanMoved moved = (CanMoved)model;
-
-        if (!moved.hasPosition() || !moved.hasDirection()) {
+        BattleModel model = battleState.resolveId(id);
+        CanMoved moved = CanMoved.castToCanMoved(model);
+        if (moved == null) {
             return; //TODO залогировать
         }
 
