@@ -16,9 +16,7 @@ public class BattleCommandPerformElement<P extends CommandExecutionParameters> {
 
     public void performCommand(BattleContext commandContext) {
         BattleModel model = commandContext.getBattleState().resolveId(battleModelId);
-        if (model != null) { //TODO костыль, убрать
-            battleCommand.perform(model, commandContext, executionParameters);
-        }
+        battleCommand.perform(model, commandContext, executionParameters);
     }
 
     public BattleCommand<P> getBattleCommand() {

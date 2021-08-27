@@ -7,7 +7,6 @@ import ru.jengine.battlemodule.core.events.EventHandlerBinderService;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.information.informaionservices.InformationRegistrarService;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
-import ru.jengine.battlemodule.core.state.BattleMapService;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.eventqueue.Dispatcher;
 
@@ -48,9 +47,8 @@ public class BattleMasterImpl implements BattleMaster {
 
         BattleDynamicObjectsManager dynamicObjectsManager = new BattleDynamicObjectsManager(state,
                 behaviorObjectsManager);
-        BattleMapService battleMapService = new BattleMapService(state);
 
-        context = new BattleContext(state, dynamicObjectsManager, battleCommandMaster, battleMapService, dispatcher);
+        context = new BattleContext(state, dynamicObjectsManager, battleCommandMaster, dispatcher);
 
         binderService.bindPostHandlers(context);
 
