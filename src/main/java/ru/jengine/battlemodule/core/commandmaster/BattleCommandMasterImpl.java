@@ -8,12 +8,17 @@ import java.util.stream.Collectors;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
+import ru.jengine.battlemodule.core.commands.AdditionalBattleCommand;
 import ru.jengine.battlemodule.core.commands.BattleCommandPerformElement;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 @BattleBeanPrototype
 public class BattleCommandMasterImpl implements BattleCommandMaster {
     private final List<BattleCommandPerformElement<?>> commandsOnNextPhase = new ArrayList<>();
+    private final Multimap<Integer, AdditionalBattleCommand<?>> registeredCommandOnNextPhase = HashMultimap.create();
 
     @Override
     public void takeTurn(BattleContext commandContext) {
@@ -23,24 +28,38 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
 
         while (!commandOnPhase.isEmpty()) {
             performAllCommands(commandOnPhase, commandContext);
+            clarifyCommandParameters(dynamicObjectsManager);
 
             commandOnPhase = getCommandsOnNextPhase();
         }
     }
 
     @Override
-    public void registerCommandOnNextPhase(BattleCommandPerformElement<?> battleCommand) {
-        synchronized (commandsOnNextPhase) {
-            commandsOnNextPhase.add(battleCommand);
+    public void registerCommandOnNextPhase(int battleModelId, AdditionalBattleCommand<?> battleCommand) {
+        synchronized (registeredCommandOnNextPhase) {
+            registeredCommandOnNextPhase.put(battleModelId, battleCommand);
         }
     }
 
-    private List<BattleCommandPerformElement<?>> getCommandsOnNextPhase() {
-        synchronized (commandsOnNextPhase) {
-            List<BattleCommandPerformElement<?>> result = sortCommandByPriority(commandsOnNextPhase);
-            commandsOnNextPhase.clear();
-            return result;
+    private void clarifyCommandParameters(BattleDynamicObjectsManager dynamicObjectsManager) {
+        Multimap<Integer, AdditionalBattleCommand<?>> registeredCommands;
+
+        synchronized (registeredCommandOnNextPhase) {
+            registeredCommands = HashMultimap.create(registeredCommandOnNextPhase);
+            registeredCommandOnNextPhase.clear();
         }
+
+        if (registeredCommands.isEmpty()) {
+            return;
+        }
+
+        commandsOnNextPhase.addAll(dynamicObjectsManager.handleAdditionalCommands(registeredCommands));
+    }
+
+    private List<BattleCommandPerformElement<?>> getCommandsOnNextPhase() {
+        List<BattleCommandPerformElement<?>> result = sortCommandByPriority(commandsOnNextPhase);
+        commandsOnNextPhase.clear();
+        return result;
     }
 
     private static void performAllCommands(List<BattleCommandPerformElement<?>> commands, BattleContext commandContext) {

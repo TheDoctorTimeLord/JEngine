@@ -10,6 +10,8 @@ public interface CanMoved extends HasDirection {
     Point getPosition();
     void setPosition(Point position);
 
+    Point nextPosition();
+
     @Nullable
     static CanMoved castToCanMoved(BattleModel model) {
         if (!(model instanceof CanMoved)) {

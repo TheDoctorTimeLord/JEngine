@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.standartfilling.model.CanMoved;
 
 public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
@@ -37,5 +38,23 @@ public class BattleState {
 
     public List<Integer> getDynamicObjectIds() {
         return new ArrayList<>(dynamicObjects);
+    }
+
+    public void removeDynamicObject(int id) {
+        dynamicObjects.remove((Integer)id);
+        BattleModel model = battleModelById.remove(id);
+
+        if (model instanceof CanMoved) {
+            CanMoved canMoved = (CanMoved)model;
+            Point position = canMoved.getPosition();
+            if (position != null) {
+                List<Integer> onCell = battleModelOnField.get(position);
+                onCell.remove((Integer)id);
+
+                if (onCell.isEmpty()) {
+                    battleModelOnField.remove(position);
+                }
+            }
+        }
     }
 }

@@ -8,12 +8,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
-import ru.jengine.battlemodule.core.commands.BattleCommand;
 import ru.jengine.battlemodule.core.BattleContext;
+import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
+import ru.jengine.battlemodule.core.commands.AdditionalBattleCommand;
+import ru.jengine.battlemodule.core.commands.BattleCommand;
 import ru.jengine.battlemodule.core.commands.BattleCommandPerformElement;
 import ru.jengine.battlemodule.core.commands.BattleCommandPrototype;
+import ru.jengine.battlemodule.core.commands.executioncontexts.NoneParameters;
 import ru.jengine.battlemodule.core.models.BattleModel;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 public class BattleDynamicObjectsManager {
     private final BattleState battleState;
@@ -27,6 +32,11 @@ public class BattleDynamicObjectsManager {
 
     public List<BattleModel> getAllCharacters() {
         return battleState.getDynamicObjects();
+    }
+
+    public void removeCharacter(int characterId) {
+        commandsForCharacter.remove(characterId);
+        battleState.removeDynamicObject(characterId);
     }
 
     public void setCommandsForCharacters(Collection<BattleCommandPrototype<?, ?>> allCommands,
@@ -55,5 +65,29 @@ public class BattleDynamicObjectsManager {
         }
 
         return behaviorObjectsManager.extractNewCommands(availableCommands);
+    }
+
+    public Collection<BattleCommandPerformElement<?>> handleAdditionalCommands(
+            Multimap<Integer, AdditionalBattleCommand<?>> registeredCommands)
+    {
+        Collection<BattleCommandPerformElement<?>> commandsToPerform = new ArrayList<>();
+        Multimap<Integer, AdditionalBattleCommand<?>> commandsToHandle = HashMultimap.create();
+
+        registeredCommands.asMap().forEach((id, commands) ->
+                commands.forEach(command -> {
+                    if (command.createParametersTemplate() instanceof NoneParameters) {
+                        AdditionalBattleCommand<NoneParameters> noneParametersCommand =
+                                (AdditionalBattleCommand<NoneParameters>) command;
+                        commandsToPerform.add(
+                                new BattleCommandPerformElement<>(id, noneParametersCommand, NoneParameters.INSTANCE));
+                    } else {
+                        commandsToHandle.put(id, command);
+                    }
+                })
+        );
+
+        commandsToPerform.addAll(behaviorObjectsManager.handleAdditionalCommands(commandsToHandle));
+
+        return commandsToPerform;
     }
 }
