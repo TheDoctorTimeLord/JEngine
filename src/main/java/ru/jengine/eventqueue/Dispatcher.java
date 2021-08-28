@@ -16,6 +16,8 @@ import ru.jengine.beancontainer.annotations.PreDestroy;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.service.HasPriority;
 import ru.jengine.beancontainer.service.SortedMultimap;
+import ru.jengine.eventqueue.fasthandling.FastEventHandler;
+import ru.jengine.eventqueue.fasthandling.FastEventHandlerImpl;
 import ru.jengine.utils.CollectionUtils.IterableStream;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
@@ -30,17 +32,24 @@ import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 import ru.jengine.eventqueue.exceptions.EventQueueException;
 
 @Bean
-public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, EventRegistrar, SynchronousEventHandler {
+public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, EventRegistrar, SynchronousEventHandler,
+        FastEventHandler //TODO порафакторить диспетчер на предмет Single Responsibility
+{
     private final Map<Class<?>, List<PreHandler<?>>> preHandlers = new HashMap<>();
     private final Map<Class<?>, SortedMultimap<PostHandler<?>>> postHandlers = new ConcurrentHashMap<>();
-    private final Map<String, EventPool> eventPoolByCode = new HashMap<>();
+    private final Map<String, EventPool> eventPoolByCode = new ConcurrentHashMap<>();
+    private final FastEventHandler fastEventHandlerDelegate;
+    private final EventHandlingContext handlingContext;
     private final List<EventInterceptor> interceptors;
     private final List<EventPoolHandler> eventPoolHandlers;
     private final List<AsyncEventPoolHandler> asyncEventPoolHandlers;
     private AsyncDispatcher asyncDispatcher;
 
     public Dispatcher(List<EventInterceptor> interceptors, List<EventPoolHandler> eventPoolHandlers,
-                      List<PreHandler<?>> preHandlers) {
+                      List<PreHandler<?>> preHandlers)
+    {
+        this.fastEventHandlerDelegate = new FastEventHandlerImpl(this);
+        this.handlingContext = new EventHandlingContext(this::handle);
         this.interceptors = interceptors;
         this.eventPoolHandlers = eventPoolHandlers.stream()
                 .filter(handler -> !(handler instanceof AsyncEventPoolHandler))
@@ -54,21 +63,51 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
     @PostConstruct
     private void initialize() {
-        EventHandlingContext context = new EventHandlingContext(this::handle);
-        eventPoolHandlers.forEach(handler -> initializeEventPoolHandler(handler, context));
-        asyncEventPoolHandlers.forEach(handler -> initializeEventPoolHandler(handler, context));
+        eventPoolHandlers.forEach(handler -> initializeEventPoolHandler(handler, handlingContext));
+        asyncEventPoolHandlers.forEach(handler -> initializeEventPoolHandler(handler, handlingContext));
         initializeAsyncDispatcher();
+    }
+
+    @Override
+    public void registerFastEventPoolHandler(String handlerCode, List<EventInterceptor> interceptors,
+            EventPoolHandler handler)
+    {
+        initializeEventPoolHandler(handler, handlingContext);
+        fastEventHandlerDelegate.registerFastEventPoolHandler(handlerCode, interceptors, handler);
+    }
+
+    @Override
+    public EventPoolHandler removeHandler(String handlerCode) {
+        EventPoolHandler handler = fastEventHandlerDelegate.removeHandler(handlerCode);
+        if (handler != null) {
+            cleanAfterFastHandler(handler);
+            return handler;
+        }
+        return null;
+    }
+
+    @Override
+    public <E extends Event> void handleNow(String handlerCode, E event) {
+        fastEventHandlerDelegate.handleNow(handlerCode, event);
     }
 
     private void initializeEventPoolHandler(EventPoolHandler handler, EventHandlingContext context) {
         EventPool eventPool = handler.initialize(context);
-        String eventPoolCode = eventPool.getCode();
+        String eventPoolCode = handler.getEventPoolCode();
 
-        if (eventPoolByCode.containsKey(eventPoolCode)) {
-            throw new EventQueueException("EventPool with code [" + eventPoolCode + "] was registered already. " +
-                    "Problem with event pool handler [" + handler + "]");
+        synchronized (eventPoolByCode) {
+            if (eventPoolByCode.containsKey(eventPoolCode)) {
+                throw new EventQueueException("EventPool with code [" + eventPoolCode + "] was registered already. " +
+                        "Problem with event pool handler [" + handler + "]");
+            }
+            eventPoolByCode.put(eventPoolCode, eventPool);
         }
-        eventPoolByCode.put(eventPoolCode, eventPool);
+    }
+
+    private void cleanAfterFastHandler(EventPoolHandler handler) {
+        synchronized (eventPoolByCode) {
+            eventPoolByCode.remove(handler.getEventPoolCode());
+        }
     }
 
     private void initializeAsyncDispatcher() {

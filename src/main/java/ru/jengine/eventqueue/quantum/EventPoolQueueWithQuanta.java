@@ -11,17 +11,7 @@ import ru.jengine.eventqueue.event.Event;
 public class EventPoolQueueWithQuanta implements QuantaEventPool {
     private final Queue<Event> eventQueue = new ArrayDeque<>();
     private final Lock queueLock = new ReentrantLock();
-    private final String eventPoolCode;
     private int countQuantumEvent;
-
-    public EventPoolQueueWithQuanta(String eventPoolCode) {
-        this.eventPoolCode = eventPoolCode;
-    }
-
-    @Override
-    public String getCode() {
-        return eventPoolCode;
-    }
 
     @Override
     public void lockEventPool() {

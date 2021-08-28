@@ -9,11 +9,18 @@ import ru.jengine.eventqueue.eventpool.EventPool;
 
 public abstract class QuantumEventPoolHandler implements AsyncEventPoolHandler {
     private final QuantaEventPool eventPool;
+    private final String eventPoolCode;
     private Consumer<Event> eventProcessor;
 
     protected QuantumEventPoolHandler(QuantumEventPoolRegistrar quantumEventPoolRegistrar, String eventPoolCode) {
-        this.eventPool = new EventPoolQueueWithQuanta(eventPoolCode);
+        this.eventPoolCode = eventPoolCode;
+        this.eventPool = new EventPoolQueueWithQuanta();
         quantumEventPoolRegistrar.registerQuantumEventPool(eventPool);
+    }
+
+    @Override
+    public String getEventPoolCode() {
+        return eventPoolCode;
     }
 
     @Override

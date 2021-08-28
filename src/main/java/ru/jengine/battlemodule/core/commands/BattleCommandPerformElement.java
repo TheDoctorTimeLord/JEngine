@@ -26,9 +26,9 @@ public class BattleCommandPerformElement<P extends CommandExecutionParameters> {
     @Override
     public String toString() {
         return "BattleCommandPerformElement{" +
-                "battleModelId=" + battleModelId +
-                ", battleCommand=" + battleCommand +
-                ", executionParameters=" + executionParameters +
+                "battleCommand=" + battleCommand.getClass().getSimpleName() +
+                ", battleModelId=" + battleModelId +
+                ", executionParameters=" + executionParameters.getClass().getSimpleName() +
                 '}';
     }
 }
