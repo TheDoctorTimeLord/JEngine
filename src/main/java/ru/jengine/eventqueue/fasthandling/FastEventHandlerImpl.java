@@ -19,7 +19,7 @@ public class FastEventHandlerImpl implements FastEventHandler {
     }
 
     @Override
-    public void registerFastEventPoolHandler(String handlerCode,
+    public void registerFastHandler(String handlerCode,
             List<EventInterceptor> interceptors, EventPoolHandler handler)
     {
         synchronized (fastEventHandlerNodes) {
@@ -32,7 +32,7 @@ public class FastEventHandlerImpl implements FastEventHandler {
     }
 
     @Override
-    public EventPoolHandler removeHandler(String handlerCode) {
+    public EventPoolHandler removeFastHandler(String handlerCode) {
         synchronized (fastEventHandlerNodes) {
             FastEventHandlerNode node = fastEventHandlerNodes.remove(handlerCode);
             return node == null ? null : node.getFastPoolHandler();

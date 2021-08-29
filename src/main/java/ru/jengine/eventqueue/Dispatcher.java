@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PostConstruct;
@@ -16,9 +15,6 @@ import ru.jengine.beancontainer.annotations.PreDestroy;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.service.HasPriority;
 import ru.jengine.beancontainer.service.SortedMultimap;
-import ru.jengine.eventqueue.fasthandling.FastEventHandler;
-import ru.jengine.eventqueue.fasthandling.FastEventHandlerImpl;
-import ru.jengine.utils.CollectionUtils.IterableStream;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.EventHandler;
@@ -30,6 +26,8 @@ import ru.jengine.eventqueue.eventpool.EventPool;
 import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 import ru.jengine.eventqueue.exceptions.EventQueueException;
+import ru.jengine.eventqueue.fasthandling.FastEventHandler;
+import ru.jengine.eventqueue.fasthandling.FastEventHandlerImpl;
 
 @Bean
 public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, EventRegistrar, SynchronousEventHandler,
@@ -69,16 +67,16 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     }
 
     @Override
-    public void registerFastEventPoolHandler(String handlerCode, List<EventInterceptor> interceptors,
+    public void registerFastHandler(String handlerCode, List<EventInterceptor> interceptors,
             EventPoolHandler handler)
     {
         initializeEventPoolHandler(handler, handlingContext);
-        fastEventHandlerDelegate.registerFastEventPoolHandler(handlerCode, interceptors, handler);
+        fastEventHandlerDelegate.registerFastHandler(handlerCode, interceptors, handler);
     }
 
     @Override
-    public EventPoolHandler removeHandler(String handlerCode) {
-        EventPoolHandler handler = fastEventHandlerDelegate.removeHandler(handlerCode);
+    public EventPoolHandler removeFastHandler(String handlerCode) {
+        EventPoolHandler handler = fastEventHandlerDelegate.removeFastHandler(handlerCode);
         if (handler != null) {
             cleanAfterFastHandler(handler);
             return handler;
@@ -95,12 +93,14 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
         EventPool eventPool = handler.initialize(context);
         String eventPoolCode = handler.getEventPoolCode();
 
-        synchronized (eventPoolByCode) {
-            if (eventPoolByCode.containsKey(eventPoolCode)) {
-                throw new EventQueueException("EventPool with code [" + eventPoolCode + "] was registered already. " +
-                        "Problem with event pool handler [" + handler + "]");
+        if (eventPoolCode != null) {
+            synchronized (eventPoolByCode) {
+                if (eventPoolByCode.containsKey(eventPoolCode)) {
+                    throw new EventQueueException("EventPool with code [" + eventPoolCode + "] was registered already. "
+                                    + "Problem with event pool handler [" + handler + "]");
+                }
+                eventPoolByCode.put(eventPoolCode, eventPool);
             }
-            eventPoolByCode.put(eventPoolCode, eventPool);
         }
     }
 
@@ -191,11 +191,12 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
         }
 
         Collection<PostHandler<?>> postHandlersForEvent = getPostHandlers(eventType);
-        IterableStream<EventHandler<?>> handlers = new IterableStream<>(
-                Stream.concat(preHandlersForEvent.stream(), postHandlersForEvent.stream())
-        );
 
-        for(EventHandler handler : handlers) {
+        for (EventHandler handler : preHandlersForEvent) {
+            handler.handle(event);
+        }
+
+        for (EventHandler handler : postHandlersForEvent) {
             handler.handle(event);
         }
     }

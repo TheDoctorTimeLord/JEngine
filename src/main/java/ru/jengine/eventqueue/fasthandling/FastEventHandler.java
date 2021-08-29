@@ -7,7 +7,7 @@ import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 
 public interface FastEventHandler {
-    void registerFastEventPoolHandler(String handlerCode, List<EventInterceptor> interceptors, EventPoolHandler handler);
-    EventPoolHandler removeHandler(String handlerCode);
+    void registerFastHandler(String handlerCode, List<EventInterceptor> interceptors, EventPoolHandler handler);
+    EventPoolHandler removeFastHandler(String handlerCode);
     <E extends Event> void handleNow(String handlerCode, E event);
 }
