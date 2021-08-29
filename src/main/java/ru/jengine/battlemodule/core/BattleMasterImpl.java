@@ -1,14 +1,17 @@
 package ru.jengine.battlemodule.core;
 
+import java.util.Collections;
+
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commandmaster.BattleCommandMaster;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
+import ru.jengine.battlemodule.core.events.BattleEventPoolHandler;
+import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.events.EventHandlerBinderService;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.information.informaionservices.InformationRegistrarService;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
-import ru.jengine.eventqueue.Dispatcher;
 
 @BattleBeanPrototype
 public class BattleMasterImpl implements BattleMaster {
@@ -17,14 +20,16 @@ public class BattleMasterImpl implements BattleMaster {
     private final EventHandlerBinderService binderService;
     private final InformationRegistrarService informationRegistrarService;
     private final InformationCenter informationCenter;
-    private final Dispatcher dispatcher;
+    private final DispatcherBattleWrapper dispatcher;
+
+    private final String battleId;
 
     private BattleContext context;
 
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
             EventHandlerBinderService binderService,
             InformationRegistrarService informationRegistrarService,
-            InformationCenter informationCenter, Dispatcher dispatcher)
+            InformationCenter informationCenter, DispatcherBattleWrapper dispatcher)
     {
         this.idGenerator = idGenerator;
         this.battleCommandMaster = battleCommandMaster;
@@ -32,6 +37,9 @@ public class BattleMasterImpl implements BattleMaster {
         this.informationRegistrarService = informationRegistrarService;
         this.informationCenter = informationCenter;
         this.dispatcher = dispatcher;
+
+        this.battleId = "battle" + idGenerator.generateId();
+        this.dispatcher.setBattleId(this.battleId);
     }
 
     public BattleContext getContext() {
@@ -42,13 +50,15 @@ public class BattleMasterImpl implements BattleMaster {
     public void prepareBattle(BattleGenerator battleGenerator, BattleCommandRegistrar commandRegistrar,
             BehaviorObjectsManager behaviorObjectsManager)
     {
+        prepareDispatcherForBattle();
+
         battleGenerator.setIdGenerator(idGenerator);
         BattleState state = battleGenerator.generate();
 
         BattleDynamicObjectsManager dynamicObjectsManager = new BattleDynamicObjectsManager(state,
                 behaviorObjectsManager);
 
-        context = new BattleContext(state, dynamicObjectsManager, battleCommandMaster, dispatcher);
+        context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher);
 
         binderService.bindPostHandlers(context);
 
@@ -64,8 +74,14 @@ public class BattleMasterImpl implements BattleMaster {
         battleCommandMaster.takeTurn(context);
     }
 
+    private void prepareDispatcherForBattle() {
+        BattleEventPoolHandler handler = new BattleEventPoolHandler();
+        dispatcher.registerFastHandler(Collections.singletonList(handler), handler);
+    }
+
     @Override
     public void stopBattle() {
         binderService.unbindPostHandlers(dispatcher);
+        dispatcher.removeFastHandler();
     }
 }

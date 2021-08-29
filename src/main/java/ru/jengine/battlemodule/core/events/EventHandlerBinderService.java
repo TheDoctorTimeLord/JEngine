@@ -4,7 +4,6 @@ import java.util.List;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.eventqueue.Dispatcher;
 
 @BattleBeanPrototype
 public class EventHandlerBinderService {
@@ -18,7 +17,7 @@ public class EventHandlerBinderService {
         binders.forEach(binder -> binder.bindPostHandlerToEvent(context));
     }
 
-    public void unbindPostHandlers(Dispatcher dispatcher) {
+    public void unbindPostHandlers(DispatcherBattleWrapper dispatcher) {
         binders.forEach(eventHandlerBinder -> eventHandlerBinder.unbindPostHandlerToEvent(dispatcher));
     }
 }

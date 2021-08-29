@@ -2,11 +2,11 @@ package ru.jengine.battlemodule.standartfilling.movement;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
+import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.events.EventHandlerBinder;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.core.state.BattleState;
-import ru.jengine.eventqueue.Dispatcher;
 import ru.jengine.eventqueue.event.PostHandler;
 
 @BattleBeanPrototype
@@ -53,7 +53,7 @@ public class MovementActionRegistrar implements EventHandlerBinder {
     }
 
     @Override
-    public void unbindPostHandlerToEvent(Dispatcher dispatcher) {
+    public void unbindPostHandlerToEvent(DispatcherBattleWrapper dispatcher) {
         dispatcher.removePostHandler(handler);
     }
 }

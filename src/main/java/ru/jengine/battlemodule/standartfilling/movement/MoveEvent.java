@@ -1,9 +1,9 @@
 package ru.jengine.battlemodule.standartfilling.movement;
 
+import ru.jengine.battlemodule.core.events.BattleEvent;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
-import ru.jengine.eventqueue.event.Event;
 
-public class MoveEvent implements Event {
+public class MoveEvent extends BattleEvent {
     private final Point oldPosition;
     private final Point newPosition;
     private final int modelId;

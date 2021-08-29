@@ -1,18 +1,21 @@
 package ru.jengine.battlemodule.core;
 
 import ru.jengine.battlemodule.core.commandmaster.CommandsOnPhaseRegistrar;
+import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
-import ru.jengine.eventqueue.Dispatcher;
 
 public class BattleContext {
+    private final String battleId;
     private final BattleState battleState;
     private final BattleDynamicObjectsManager battleDynamicObjectsManager;
     private final CommandsOnPhaseRegistrar commandsOnPhaseRegistrar;
-    private final Dispatcher dispatcher;
+    private final DispatcherBattleWrapper dispatcher;
 
-    public BattleContext(BattleState battleState, BattleDynamicObjectsManager battleDynamicObjectsManager,
-            CommandsOnPhaseRegistrar commandsOnPhaseRegistrar, Dispatcher dispatcher) {
+    public BattleContext(String battleId, BattleState battleState,
+            BattleDynamicObjectsManager battleDynamicObjectsManager,
+            CommandsOnPhaseRegistrar commandsOnPhaseRegistrar, DispatcherBattleWrapper dispatcher) {
+        this.battleId = battleId;
         this.battleState = battleState;
         this.battleDynamicObjectsManager = battleDynamicObjectsManager;
         this.commandsOnPhaseRegistrar = commandsOnPhaseRegistrar;
@@ -23,6 +26,10 @@ public class BattleContext {
         return battleDynamicObjectsManager;
     }
 
+    public String getBattleId() {
+        return battleId;
+    }
+
     public BattleState getBattleState() {
         return battleState;
     }
@@ -31,7 +38,7 @@ public class BattleContext {
         return commandsOnPhaseRegistrar;
     }
 
-    public Dispatcher getDispatcher() {
+    public DispatcherBattleWrapper getDispatcher() {
         return dispatcher;
     }
 }
