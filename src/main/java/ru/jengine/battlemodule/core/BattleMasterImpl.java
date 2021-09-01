@@ -10,6 +10,7 @@ import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.events.EventHandlerBinderService;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.information.informaionservices.InformationRegistrarService;
+import ru.jengine.battlemodule.core.scheduler.BattleScheduler;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
 
@@ -21,6 +22,7 @@ public class BattleMasterImpl implements BattleMaster {
     private final InformationRegistrarService informationRegistrarService;
     private final InformationCenter informationCenter;
     private final DispatcherBattleWrapper dispatcher;
+    private final BattleScheduler battleScheduler;
 
     private final String battleId;
 
@@ -29,7 +31,8 @@ public class BattleMasterImpl implements BattleMaster {
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
             EventHandlerBinderService binderService,
             InformationRegistrarService informationRegistrarService,
-            InformationCenter informationCenter, DispatcherBattleWrapper dispatcher)
+            InformationCenter informationCenter, DispatcherBattleWrapper dispatcher,
+            BattleScheduler battleScheduler)
     {
         this.idGenerator = idGenerator;
         this.battleCommandMaster = battleCommandMaster;
@@ -37,9 +40,11 @@ public class BattleMasterImpl implements BattleMaster {
         this.informationRegistrarService = informationRegistrarService;
         this.informationCenter = informationCenter;
         this.dispatcher = dispatcher;
+        this.battleScheduler = battleScheduler;
 
         this.battleId = "battle" + idGenerator.generateId();
         this.dispatcher.setBattleId(this.battleId);
+        this.battleScheduler.setBattleId(this.battleId);
     }
 
     public BattleContext getContext() {
@@ -58,7 +63,8 @@ public class BattleMasterImpl implements BattleMaster {
         BattleDynamicObjectsManager dynamicObjectsManager = new BattleDynamicObjectsManager(state,
                 behaviorObjectsManager);
 
-        context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher);
+        context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher,
+                battleScheduler);
 
         binderService.bindPostHandlers(context);
 
@@ -71,7 +77,7 @@ public class BattleMasterImpl implements BattleMaster {
 
     @Override
     public void takeTurn() {
-        battleCommandMaster.takeTurn(context);
+        battleCommandMaster.takeTurn(context, battleScheduler);
     }
 
     private void prepareDispatcherForBattle() {

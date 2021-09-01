@@ -3,13 +3,14 @@ package ru.jengine.battlemodule.core.events;
 import java.util.List;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
+import ru.jengine.battlemodule.core.BattleIdSetter;
 import ru.jengine.eventqueue.Dispatcher;
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.event.PostHandler;
 import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 
 @BattleBeanPrototype
-public class DispatcherBattleWrapper {
+public class DispatcherBattleWrapper implements BattleIdSetter {
     private final Dispatcher dispatcher;
     private String battleId;
 

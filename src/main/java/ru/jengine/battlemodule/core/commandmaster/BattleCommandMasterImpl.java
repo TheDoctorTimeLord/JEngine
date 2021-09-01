@@ -10,6 +10,7 @@ import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.commands.AdditionalBattleCommand;
 import ru.jengine.battlemodule.core.commands.BattleCommandPerformElement;
+import ru.jengine.battlemodule.core.scheduler.SchedulerTaskExecutor;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 
 import com.google.common.collect.HashMultimap;
@@ -21,7 +22,7 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
     private final Multimap<Integer, AdditionalBattleCommand<?>> registeredCommandOnNextPhase = HashMultimap.create();
 
     @Override
-    public void takeTurn(BattleContext commandContext) {
+    public void takeTurn(BattleContext commandContext, SchedulerTaskExecutor taskExecutor) {
         BattleDynamicObjectsManager dynamicObjectsManager = commandContext.getBattleDynamicObjectsManager();
         List<BattleCommandPerformElement<?>> commandOnPhase =
                 sortCommandByPriority(dynamicObjectsManager.extractCommandOnTurn(commandContext));
@@ -30,6 +31,7 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
             performAllCommands(commandOnPhase, commandContext);
             clarifyCommandParameters(dynamicObjectsManager);
 
+            taskExecutor.executeAfterPhase();
             commandOnPhase = getCommandsOnNextPhase();
         }
     }
