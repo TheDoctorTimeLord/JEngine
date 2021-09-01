@@ -1,6 +1,10 @@
 package ru.jengine.beancontainer.implementation.factories;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContainerMultiContext;
@@ -20,19 +24,47 @@ public class SelectiveAutowireConfigurableBeanFactories extends AutowireConfigur
         ContainerContext context = getContext();
 
         if (context instanceof ContainerMultiContext) {
-            return AutowireUtils.autowire(methodParameter, context, (resultType, ctx) -> {
+            return AutowireUtils.autowire(methodParameter, context, (resultType, ctx, isCollection) -> {
                 ContainerMultiContext multiContext = (ContainerMultiContext) ctx;
 
-                for (String contextName : usedContexts) {
-                    BeanContext beanContext = multiContext.getBean(contextName, resultType);
-                    if (beanContext != null) {
-                        return beanContext;
-                    }
-                }
-                return null;
+                return isCollection
+                        ? findMultiValueBean(multiContext, resultType)
+                        : findSingleValueBean(multiContext, resultType);
             });
         }
 
         return super.autowire(methodParameter);
+    }
+
+    private BeanContext findSingleValueBean(ContainerMultiContext multiContext, Class<?> resultType) {
+        for (String contextName : usedContexts) {
+            BeanContext beanContext =
+                    checkNotEmptyCollection(multiContext.getBean(contextName, resultType));
+            if (beanContext != null) {
+                return beanContext;
+            }
+        }
+        return null;
+    }
+
+    private BeanContext findMultiValueBean(ContainerMultiContext multiContext, Class<?> resultType) {
+        return new BeanContext(
+                usedContexts.stream()
+                        .map(contextName -> multiContext.getBean(contextName, resultType))
+                        .filter(Objects::nonNull)
+                        .filter(beanContext -> beanContext.getBean() != null)
+                        .flatMap(beanContext -> beanContext.isCollectionBean()
+                                ? ((Collection<?>)beanContext.getBean()).stream()
+                                : Stream.of((Object)beanContext.getBean()))
+                        .collect(Collectors.toList()),
+                resultType
+        );
+    }
+
+    private static BeanContext checkNotEmptyCollection(BeanContext beanContext) {
+        if (beanContext == null) {
+            return null;
+        }
+        return  beanContext.getBean() instanceof Collection ? null : beanContext;
     }
 }

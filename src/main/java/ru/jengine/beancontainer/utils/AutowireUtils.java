@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
@@ -17,11 +16,11 @@ import ru.jengine.beancontainer.implementation.factories.MethodParameter;
 
 public class AutowireUtils {
     public static Object autowire(MethodParameter parameter, ContainerContext context) {
-        return autowire(parameter, context, (resultType, ctx) -> ctx.getBean(resultType));
+        return autowire(parameter, context, (resultType, ctx, isCollection) -> ctx.getBean(resultType));
     }
 
     public static Object autowire(MethodParameter parameter, ContainerContext context,
-            BiFunction<Class<?>, ContainerContext, BeanContext> beanExtractor) {
+            AutowireBeanExtractor beanExtractor) {
         Class<?> resultType = castToClass(parameter.getParameterType());
         Class<?> collectionClass = null;
 
@@ -30,7 +29,7 @@ public class AutowireUtils {
             resultType = getFirstGenericType(parameter.getGenericParameterType());
         }
 
-        BeanContext beanContext = beanExtractor.apply(resultType, context);
+        BeanContext beanContext = beanExtractor.extract(resultType, context, collectionClass != null);
 
         if (beanContext == null) {
             throw new ContainerException("Bean for [" + resultType + "] did not found");
@@ -73,5 +72,9 @@ public class AutowireUtils {
             return castToClass(((ParameterizedType) type).getRawType());
         }
         throw new ContainerException("Type [" + type + "] is not Class or ParameterizedType");
+    }
+
+    public interface AutowireBeanExtractor {
+        BeanContext extract(Class<?> type, ContainerContext containerContext, boolean isCollectionParameter);
     }
 }

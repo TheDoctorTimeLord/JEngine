@@ -28,7 +28,9 @@ public class DefaultContainerContext implements ContainerContext {
     @Override
     public void initialize(List<Module> modules, BeanFactory factory) {
         this.beanFactory = factory;
-        this.beanDefinitions = ContainerModuleUtils.extractAllBeanDefinition(modules).stream()
+        this.beanDefinitions = ContainerModuleUtils.extractAllBeanDefinition(modules)
+                .stream()
+                .distinct()
                 .collect(Collectors.toMap(BeanDefinition::getBeanClass, definition -> definition));
         beanDefinitions.values().forEach(this::registerDefinition);
     }

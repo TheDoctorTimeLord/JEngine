@@ -54,7 +54,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         ContainerContext newContext = createContext(patternName);
         preProcessBeans(newContext);
 
-        multiContext.registerContext(patternName, newContext);
+        multiContext.registerContext(patternName, newContext); //TODO отделить эту часть от prepareBeans, чтобы загружать взаимозависимые контексты
 
         newContext.prepareBeans();
     }

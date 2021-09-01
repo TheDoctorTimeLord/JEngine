@@ -63,7 +63,7 @@ public class ContainerContextFacade implements ContainerMultiContext {
     public BeanContext getBean(Class<?> beanClass) {
         for (ContainerContext context : getAllContextsWithoutNames()) {
             BeanContext beanContext = context.getBean(beanClass);
-            if (beanContext != null) {
+            if (beanContext != null) { //TODO для интерфейса нужно собрать бины по всем контекстам
                 return beanContext;
             }
         }
