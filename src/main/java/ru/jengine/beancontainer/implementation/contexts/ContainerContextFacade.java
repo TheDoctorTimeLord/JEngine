@@ -2,6 +2,7 @@ package ru.jengine.beancontainer.implementation.contexts;
 
 import static ru.jengine.utils.CollectionUtils.groupBy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,16 +19,12 @@ import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.utils.BeanUtils;
 
 public class ContainerContextFacade implements ContainerMultiContext {
     private final Map<String, ContainerContext> internalContexts = new ConcurrentHashMap<>();
     private final Map<String, ContainerContext> externalContexts = new ConcurrentHashMap<>();
     private BeanFactory beanFactory;
-
-    private Iterable<ContainerContext> getAllContextsWithoutNames() {
-        return Stream.concat(internalContexts.values().stream(), externalContexts.values().stream())
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void initialize(List<Module> modules, BeanFactory factory) {
@@ -61,13 +58,13 @@ public class ContainerContextFacade implements ContainerMultiContext {
 
     @Override
     public BeanContext getBean(Class<?> beanClass) {
-        for (ContainerContext context : getAllContextsWithoutNames()) {
-            BeanContext beanContext = context.getBean(beanClass);
-            if (beanContext != null) { //TODO для интерфейса нужно собрать бины по всем контекстам
-                return beanContext;
-            }
-        }
-        return null;
+        boolean asCollection = beanClass.isInterface();
+        BeanContext bean =
+                BeanUtils.findAppropriateValueBean(this, beanClass, getAllContextsNames(), asCollection);
+
+        return bean != null && bean.isCollectionBean() && ((Collection<?>)bean.getBean()).size() == 1
+                ? new BeanContext(((Collection<?>)bean.getBean()).iterator().next(), beanClass)
+                : bean;
     }
 
     @Override
@@ -147,5 +144,15 @@ public class ContainerContextFacade implements ContainerMultiContext {
         ContainerContext context = new DefaultContainerContext();
         internalContexts.put(contextName, context);
         context.initialize(initializedModules, beanFactory);
+    }
+
+    private Iterable<ContainerContext> getAllContextsWithoutNames() {
+        return Stream.concat(internalContexts.values().stream(), externalContexts.values().stream())
+                .collect(Collectors.toList());
+    }
+
+    private Collection<String> getAllContextsNames() {
+        return Stream.concat(internalContexts.keySet().stream(), externalContexts.keySet().stream())
+                .collect(Collectors.toList());
     }
 }

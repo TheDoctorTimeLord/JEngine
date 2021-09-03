@@ -3,6 +3,7 @@ package ru.jengine.beancontainer.implementation.contexts.patterns;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,9 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
     public void initialize() {
         patterns.entrySet().stream()
                 .filter(entry -> entry.getValue().needLoadOnContainerInitialize())
-                .forEach(entry -> loadContext(entry.getKey()));
+                .map(entry -> preLoadContext(entry.getKey()))
+                .filter(Objects::nonNull)
+                .forEach(DefaultContextPatternsHandler::initializeContexts);
     }
 
     @Override
@@ -47,16 +50,11 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
 
     @Override
     public void loadContext(String patternName) { //TODO синхронизовать
-        if (patternWasLoaded(patternName)) {
-            return;
+        ContainerContext newContext = preLoadContext(patternName);
+
+        if (newContext != null) {
+            initializeContexts(newContext);
         }
-
-        ContainerContext newContext = createContext(patternName);
-        preProcessBeans(newContext);
-
-        multiContext.registerContext(patternName, newContext); //TODO отделить эту часть от prepareBeans, чтобы загружать взаимозависимые контексты
-
-        newContext.prepareBeans();
     }
 
     @Override
@@ -69,6 +67,23 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         contexts.forEach(this::preProcessBeans);
         contexts.forEach(ContainerContext::prepareBeans);
         newContexts.forEach(multiContext::registerContext);
+    }
+
+    private ContainerContext preLoadContext(String patternName) { //TODO синхронизовать
+        if (patternWasLoaded(patternName)) {
+            return null;
+        }
+
+        ContainerContext newContext = createContext(patternName);
+        preProcessBeans(newContext);
+
+        multiContext.registerContext(patternName, newContext);
+
+        return newContext;
+    }
+
+    private static void initializeContexts(ContainerContext context) {
+        context.prepareBeans();
     }
 
     private boolean patternWasLoaded(String patternName) {
@@ -88,7 +103,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         List<String> beanSources = pattern.getBeanSources();
         loadAllSourceContextsWithWrapException(patternName, beanSources);
 
-        List<String> sources = CollectionUtils.add(beanSources, patternName, Constants.INFRASTRUCTURE_CONTEXT);
+        List<String> sources = CollectionUtils.concat(patternName, beanSources, Constants.INFRASTRUCTURE_CONTEXT);
         return pattern.buildContext(createBeanFactoryWithSource(sources));
     }
 

@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standartfilling.model;
+package ru.jengine.battlemodule.standardfilling.model;
 
 import javax.annotation.Nullable;
 

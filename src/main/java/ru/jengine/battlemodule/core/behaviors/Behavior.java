@@ -11,6 +11,7 @@ import ru.jengine.battlemodule.core.models.BattleModel;
 
 public interface Behavior {
     Set<Integer> bind(List<BattleModel> dynamicObjects, InformationCenter informationCenter);
+    void unbind(int unboundedId);
     BattleCommandPerformElement<?> sendAction(int characterId, List<BattleCommand<?>> availableCommands);
     BattleCommandPerformElement<?> handleAdditionalCommand(int characterId, AdditionalBattleCommand<?> command);
 }

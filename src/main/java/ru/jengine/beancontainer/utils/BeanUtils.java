@@ -8,9 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.BeanFactoryStrategy;
+import ru.jengine.beancontainer.ContainerMultiContext;
 import ru.jengine.beancontainer.annotations.Inject;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
@@ -117,5 +120,49 @@ public class BeanUtils {
         default:
             throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
         }
+    }
+
+    public static BeanContext findAppropriateValueBean(ContainerMultiContext multiContext, Class<?> beanType,
+            Collection<String> usedContexts, boolean needAsCollection)
+    {
+        return needAsCollection
+                ? findMultiValueBean(multiContext, beanType, usedContexts)
+                : findSingleValueBean(multiContext, beanType, usedContexts);
+    }
+
+    private static BeanContext findSingleValueBean(ContainerMultiContext multiContext, Class<?> beanType,
+            Collection<String> usedContexts)
+    {
+        for (String contextName : usedContexts) {
+            BeanContext beanContext =
+                    checkNotEmptyCollection(multiContext.getBean(contextName, beanType));
+            if (beanContext != null) {
+                return beanContext;
+            }
+        }
+        return null;
+    }
+
+    private static BeanContext findMultiValueBean(ContainerMultiContext multiContext, Class<?> beanType,
+            Collection<String> usedContexts)
+    {
+        return new BeanContext(
+                usedContexts.stream()
+                        .map(contextName -> multiContext.getBean(contextName, beanType))
+                        .filter(Objects::nonNull)
+                        .filter(beanContext -> beanContext.getBean() != null)
+                        .flatMap(beanContext -> beanContext.isCollectionBean()
+                                ? ((Collection<?>)beanContext.getBean()).stream()
+                                : Stream.of((Object)beanContext.getBean()))
+                        .collect(Collectors.toList()),
+                beanType
+        );
+    }
+
+    private static BeanContext checkNotEmptyCollection(BeanContext beanContext) {
+        if (beanContext == null) {
+            return null;
+        }
+        return  beanContext.getBean() instanceof Collection ? null : beanContext;
     }
 }

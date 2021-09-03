@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standartfilling.movement;
+package ru.jengine.battlemodule.standardfilling.movement;
 
 import ru.jengine.battlemodule.core.events.BattleEvent;
 import ru.jengine.battlemodule.core.serviceclasses.Point;

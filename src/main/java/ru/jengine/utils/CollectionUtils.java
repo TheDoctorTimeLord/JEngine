@@ -3,6 +3,7 @@ package ru.jengine.utils;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -90,6 +91,20 @@ public class CollectionUtils {
     public static <V> List<V> add(List<V> elements, V... addedElements) {
         List<V> result = new ArrayList<>(elements);
         result.addAll(new ArrayAsCollection<>(addedElements));
+        return result;
+    }
+
+    public static <V> List<V> concat(Object... elements) {
+        List<V> result = new ArrayList<>();
+
+        for (Object element : elements) {
+            if (element instanceof Collection) {
+                result.addAll((Collection<? extends V>)element);
+            } else {
+                result.add((V)element);
+            }
+        }
+
         return result;
     }
 }

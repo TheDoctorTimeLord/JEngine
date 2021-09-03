@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standartfilling.movement;
+package ru.jengine.battlemodule.standardfilling.movement;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
