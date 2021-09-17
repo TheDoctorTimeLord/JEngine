@@ -2,6 +2,8 @@ package ru.jengine.eventqueue.fasthandling;
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
@@ -14,7 +16,7 @@ public abstract class FastComplexEventPoolHandler implements EventInterceptor, E
     private Event handlingEvent;
 
     @Override
-    public String getEventPoolCode() {
+    public @Nullable String getEventPoolCode() {
         return null;
     }
 

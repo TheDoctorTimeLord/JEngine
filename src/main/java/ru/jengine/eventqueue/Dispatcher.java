@@ -106,7 +106,10 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
     private void cleanAfterFastHandler(EventPoolHandler handler) {
         synchronized (eventPoolByCode) {
-            eventPoolByCode.remove(handler.getEventPoolCode());
+            String eventPoolCode = handler.getEventPoolCode();
+            if (eventPoolCode != null) {
+                eventPoolByCode.remove(eventPoolCode);
+            }
         }
     }
 

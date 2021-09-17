@@ -7,6 +7,7 @@ import ru.jengine.battlemodule.core.events.EventHandlerBinder;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.core.state.BattleState;
+import ru.jengine.battlemodule.standardfilling.BattleEventHandlerPriority;
 import ru.jengine.eventqueue.event.PostHandler;
 
 @BattleBeanPrototype
@@ -20,7 +21,7 @@ public class MovementActionRegistrar implements EventHandlerBinder {
 
         @Override
         public int getPriority() {
-            return 0;
+            return BattleEventHandlerPriority.HANDLE.getPriority();
         }
 
         @Override

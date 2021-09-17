@@ -2,6 +2,8 @@ package ru.jengine.eventqueue.eventpool;
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
@@ -16,7 +18,7 @@ public abstract class ComplexEventPoolQueueHandler implements EventPoolHandler, 
     }
 
     @Override
-    public String getEventPoolCode() {
+    public @Nullable String getEventPoolCode() {
         return eventPoolCode;
     }
 

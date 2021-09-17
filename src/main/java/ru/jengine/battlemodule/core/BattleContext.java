@@ -1,5 +1,6 @@
 package ru.jengine.battlemodule.core;
 
+import ru.jengine.battlemodule.core.battlepresenter.BattleActionRegistrar;
 import ru.jengine.battlemodule.core.commandmaster.CommandsOnPhaseRegistrar;
 import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.scheduler.SchedulerTaskRegistrar;
@@ -13,16 +14,23 @@ public class BattleContext {
     private final CommandsOnPhaseRegistrar commandsOnPhaseRegistrar;
     private final DispatcherBattleWrapper dispatcher;
     private final SchedulerTaskRegistrar taskRegistrar;
+    private final BattleActionRegistrar battleActionRegistrar;
 
     public BattleContext(String battleId, BattleState battleState,
             BattleDynamicObjectsManager battleDynamicObjectsManager, CommandsOnPhaseRegistrar commandsOnPhaseRegistrar,
-            DispatcherBattleWrapper dispatcher, SchedulerTaskRegistrar taskRegistrar) {
+            DispatcherBattleWrapper dispatcher, SchedulerTaskRegistrar taskRegistrar,
+            BattleActionRegistrar battleActionRegistrar) {
         this.battleId = battleId;
         this.battleState = battleState;
         this.battleDynamicObjectsManager = battleDynamicObjectsManager;
         this.commandsOnPhaseRegistrar = commandsOnPhaseRegistrar;
         this.dispatcher = dispatcher;
         this.taskRegistrar = taskRegistrar;
+        this.battleActionRegistrar = battleActionRegistrar;
+    }
+
+    public BattleActionRegistrar getBattleActionRegistrar() {
+        return battleActionRegistrar;
     }
 
     public BattleDynamicObjectsManager getBattleDynamicObjectsManager() {

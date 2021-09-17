@@ -1,9 +1,9 @@
 package ru.jengine.taskscheduler;
 
 @FunctionalInterface
-public interface Task {
-    void execute();
+public interface ReusableTask extends Task {
+    @Override
     default boolean isReusable() {
-        return false;
-    };
+        return true;
+    }
 }

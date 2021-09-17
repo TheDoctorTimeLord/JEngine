@@ -2,6 +2,8 @@ package ru.jengine.eventqueue.quantum;
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.eventpool.AsyncEventPoolHandler;
@@ -19,7 +21,7 @@ public abstract class QuantumEventPoolHandler implements AsyncEventPoolHandler {
     }
 
     @Override
-    public String getEventPoolCode() {
+    public @Nullable String getEventPoolCode() {
         return eventPoolCode;
     }
 

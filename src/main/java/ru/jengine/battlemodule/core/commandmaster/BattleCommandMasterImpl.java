@@ -22,18 +22,23 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
     private final Multimap<Integer, AdditionalBattleCommand<?>> registeredCommandOnNextPhase = HashMultimap.create();
 
     @Override
-    public void takeTurn(BattleContext commandContext, SchedulerTaskExecutor taskExecutor) {
-        BattleDynamicObjectsManager dynamicObjectsManager = commandContext.getBattleDynamicObjectsManager();
+    public void takeTurn(BattleContext battleContext, SchedulerTaskExecutor taskExecutor) {
+        BattleDynamicObjectsManager dynamicObjectsManager = battleContext.getBattleDynamicObjectsManager();
+
         List<BattleCommandPerformElement<?>> commandOnPhase =
-                sortCommandByPriority(dynamicObjectsManager.extractCommandOnTurn(commandContext));
+                sortCommandByPriority(dynamicObjectsManager.extractCommandOnTurn(battleContext));
+
+        taskExecutor.executeBeforeTurn();
 
         while (!commandOnPhase.isEmpty()) {
-            performAllCommands(commandOnPhase, commandContext);
+            performAllCommands(commandOnPhase, battleContext);
             clarifyCommandParameters(dynamicObjectsManager);
 
             taskExecutor.executeAfterPhase();
             commandOnPhase = getCommandsOnNextPhase();
         }
+
+        taskExecutor.executeAfterTurn();
     }
 
     @Override

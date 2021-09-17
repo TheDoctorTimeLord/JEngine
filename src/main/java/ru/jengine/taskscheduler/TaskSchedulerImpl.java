@@ -11,7 +11,7 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Override
     public void addTask(String queueCode, Task task) {
         synchronized (taskQueues) {
-            Queue<Task> taskQueue = taskQueues.computeIfAbsent(queueCode, c -> createTaskQueue());
+            Queue<Task> taskQueue = taskQueues.computeIfAbsent(queueCode, c -> new ArrayDeque<>());
             taskQueue.add(task);
         }
     }
@@ -19,31 +19,19 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Override
     public void executeTaskQueue(String queueCode) {
         Queue<Task> taskQueue = taskQueues.remove(queueCode);
-        Queue<Task> newTaskQueue = createTaskQueue();
 
-        if (taskQueue != null && !taskQueue.isEmpty()) {
-            do {
-                Task task = taskQueue.poll();
+        if (taskQueue != null) {
+            taskQueue.removeIf(task -> {
                 task.execute();
+                return !task.isReusable();
+            });
 
-                if (task.isReusable()) {
-                    newTaskQueue.add(task);
-                }
-            } while (!taskQueue.isEmpty());
-
-            if (!newTaskQueue.isEmpty()) {
-                synchronized (taskQueues) {
-                    if (!taskQueues.containsKey(queueCode)) {
-                        taskQueues.put(queueCode, newTaskQueue);
-                    } else {
-                        taskQueues.get(queueCode).addAll(newTaskQueue);
-                    }
-                }
+            if (!taskQueue.isEmpty()) {
+                taskQueues.merge(queueCode, taskQueue, (oldQueue, newQueue) -> {
+                    oldQueue.addAll(newQueue);
+                    return oldQueue;
+                });
             }
         }
-    }
-
-    private static Queue<Task> createTaskQueue() {
-        return new ArrayDeque<>();
     }
 }
