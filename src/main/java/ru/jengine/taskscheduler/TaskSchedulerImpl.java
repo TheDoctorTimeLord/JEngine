@@ -19,7 +19,6 @@ public class TaskSchedulerImpl implements TaskScheduler {
     @Override
     public void executeTaskQueue(String queueCode) {
         Queue<Task> taskQueue = taskQueues.remove(queueCode);
-
         if (taskQueue != null) {
             taskQueue.removeIf(task -> {
                 task.execute();
