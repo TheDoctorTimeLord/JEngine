@@ -1,10 +1,11 @@
-package ru.jengine.battlemodule.standardfilling.model;
+package ru.jengine.battlemodule.standardfilling.movement;
 
 import javax.annotation.Nullable;
 
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.standardfilling.model.HasDirection;
 
 public interface CanMoved extends HasDirection, HasPosition {
     Point nextPosition();

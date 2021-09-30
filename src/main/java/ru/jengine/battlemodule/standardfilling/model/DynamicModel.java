@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 
 public class DynamicModel extends BattleModel implements CanMoved {
     public DynamicModel(int id) {

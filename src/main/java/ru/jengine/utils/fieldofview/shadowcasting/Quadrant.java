@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standardfilling.fieldofview.shadowcasting;
+package ru.jengine.utils.fieldofview.shadowcasting;
 
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 

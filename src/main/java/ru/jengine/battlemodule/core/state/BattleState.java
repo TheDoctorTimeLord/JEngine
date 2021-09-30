@@ -34,6 +34,12 @@ public class BattleState {
         return model;
     }
 
+    public List<BattleModel> resolveIds(List<Integer> ids) {
+        return ids.stream()
+                .map(this::resolveId)
+                .collect(Collectors.toList());
+    }
+
     public Map<Point, List<Integer>> getMapFilling() {
         return battleModelOnField;
     }

@@ -1,33 +1,31 @@
-package ru.jengine.battlemodule.standardfilling.fieldofview.shadowcasting;
+package ru.jengine.utils.fieldofview.shadowcasting;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import ru.jengine.battlemodule.core.serviceclasses.Point;
-import ru.jengine.battlemodule.standardfilling.fieldofview.FieldOfViewCalculator;
+import ru.jengine.utils.fieldofview.FieldOfViewCalculator;
 import ru.jengine.utils.Fraction;
 
 public class ShadowCastingCalculator implements FieldOfViewCalculator {
     private final Function<Point, String> tileClassifier;
-    private final BiConsumer<Point, String> markAsVisible;
     private final SectorScanner startScanner;
 
-    public ShadowCastingCalculator(Function<Point, String> tileClassifier, BiConsumer<Point, String> markAsVisible,
-            SectorScanner startScanner) {
+    public ShadowCastingCalculator(Function<Point, String> tileClassifier, SectorScanner startScanner) {
         this.tileClassifier = tileClassifier;
-        this.markAsVisible = markAsVisible;
         this.startScanner = startScanner;
     }
 
     @Override
-    public void calculate(Quadrant quadrant, RowRestriction restriction) {
+    public void calculate(Quadrant quadrant, RowRestriction restriction, BiConsumer<Point, String> markAsVisible) {
         markAsVisible.accept(quadrant.getStartPosition(), startScanner.getVisibleScope());
 
         calculateInQuadrant(
                 quadrant,
                 new Row(1, new Fraction(-1), new Fraction(1)),
                 startScanner,
-                restriction);
+                restriction,
+                markAsVisible);
     }
 
     /**
@@ -39,7 +37,9 @@ public class ShadowCastingCalculator implements FieldOfViewCalculator {
      * @param scanner объекта, определяющий условия сканирования
      * @param restriction ограничения для строк (позволяют уточнить диапазон)
      */
-    private void calculateInQuadrant(Quadrant quadrant, Row row, SectorScanner scanner, RowRestriction restriction) {
+    private void calculateInQuadrant(Quadrant quadrant, Row row, SectorScanner scanner, RowRestriction restriction,
+            BiConsumer<Point, String> markAsVisible)
+    {
         if (!restriction.isAvailableDepth(row.getDepth())) {
             return;
         }
@@ -60,7 +60,7 @@ public class ShadowCastingCalculator implements FieldOfViewCalculator {
             if (isFloor(previousTile, scanner) && isBarrier(tileType, scanner)) {
                 Row nextRow = row.nextRow();
                 nextRow.setEndSlope(slope(tile));
-                calculateInQuadrant(quadrant, nextRow, scanner, restriction);
+                calculateInQuadrant(quadrant, nextRow, scanner, restriction, markAsVisible);
             }
             if (isDifferentTypes(previousTileType, tileType)) {
                 if (previousTileType != null) {
@@ -68,7 +68,7 @@ public class ShadowCastingCalculator implements FieldOfViewCalculator {
                     if (newScanner != null) {
                         Row newRow = row.nextRow();
                         newRow.setEndSlope(slope(tile));
-                        calculateInQuadrant(quadrant, newRow, newScanner, restriction);
+                        calculateInQuadrant(quadrant, newRow, newScanner, restriction, markAsVisible);
                     }
                 }
                 row.setStartSlope(row.getStartSlope().max(slope(tile)));
@@ -78,12 +78,12 @@ public class ShadowCastingCalculator implements FieldOfViewCalculator {
             previousTile = tileType;
         }
         if (isFloor(previousTile, scanner)) {
-            calculateInQuadrant(quadrant, row.nextRow(), scanner, restriction);
+            calculateInQuadrant(quadrant, row.nextRow(), scanner, restriction, markAsVisible);
         }
         if (isBarrier(previousTile, scanner)) {
             SectorScanner newScanner = scanner.getScannerForTileType(previousTileType);
             if (newScanner != null) {
-                calculateInQuadrant(quadrant, row.nextRow(), newScanner, restriction);
+                calculateInQuadrant(quadrant, row.nextRow(), newScanner, restriction, markAsVisible);
             }
         }
     }

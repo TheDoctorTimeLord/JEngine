@@ -34,6 +34,11 @@ public class BattleScheduler implements BattleIdSetter, SchedulerTaskRegistrar, 
     }
 
     @Override
+    public void addTaskBeforeTurn(Task task) {
+        scheduler.addTask(beforeTurnTaskQueue, task);
+    }
+
+    @Override
     public void addTaskAfterPhase(Task task) {
         scheduler.addTask(afterPhaseTaskQueue, task);
     }
