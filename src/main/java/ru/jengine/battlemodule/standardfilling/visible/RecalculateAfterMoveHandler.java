@@ -7,8 +7,7 @@ import ru.jengine.eventqueue.event.PostHandler;
 public class RecalculateAfterMoveHandler implements PostHandler<MoveEvent> {
     private final UpdatableVisionInformationService visionService;
 
-    public RecalculateAfterMoveHandler(
-            UpdatableVisionInformationService visionService) {
+    public RecalculateAfterMoveHandler(UpdatableVisionInformationService visionService) {
         this.visionService = visionService;
     }
 

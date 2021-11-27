@@ -16,6 +16,6 @@ public interface HasVision extends HasDirection, HasPosition {
             return null;
         }
         HasVision hasVision = (HasVision)model;
-        return hasVision.hasDirection() ? hasVision : null;
+        return hasVision.hasDirection() && hasVision.hasPosition() ? hasVision : null;
     }
 }

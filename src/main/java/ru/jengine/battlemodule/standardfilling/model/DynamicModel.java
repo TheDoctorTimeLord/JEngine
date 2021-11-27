@@ -6,8 +6,9 @@ import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
+import ru.jengine.battlemodule.standardfilling.visible.HasVision;
 
-public class DynamicModel extends BattleModel implements CanMoved {
+public class DynamicModel extends BattleModel implements CanMoved, HasVision {
     public DynamicModel(int id) {
         super(id);
     }
@@ -25,6 +26,16 @@ public class DynamicModel extends BattleModel implements CanMoved {
     @Override
     public void setDirection(Direction direction) {
         setProperty("direction", direction);
+    }
+
+    @Override
+    public boolean hasVision() {
+        return Boolean.TRUE.equals(getProperty("vision"));
+    }
+
+    @Override
+    public void setVision(boolean canSee) {
+        setProperty("vision", canSee);
     }
 
     @Override

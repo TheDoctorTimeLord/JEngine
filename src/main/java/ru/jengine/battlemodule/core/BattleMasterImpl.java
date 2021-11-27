@@ -7,9 +7,11 @@ import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commandmaster.BattleCommandMaster;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
+import ru.jengine.battlemodule.core.contentregistrars.ContentRegistrarsService;
+import ru.jengine.battlemodule.core.contentregistrars.PostHandlerBindingService;
+import ru.jengine.battlemodule.core.contentregistrars.RegistrarsContext;
 import ru.jengine.battlemodule.core.events.BattleEventPoolHandler;
 import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
-import ru.jengine.battlemodule.core.events.EventHandlerBinderService;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.scheduler.BattleScheduler;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
@@ -19,27 +21,27 @@ import ru.jengine.battlemodule.core.state.BattleState;
 public class BattleMasterImpl implements BattleMaster {
     private final IdGenerator idGenerator;
     private final BattleCommandMaster battleCommandMaster;
-    private final EventHandlerBinderService eventHandlerBinderService;
     private final InformationCenter informationCenter;
     private final DispatcherBattleWrapper dispatcher;
     private final BattleScheduler battleScheduler;
     private final BattleActionLogger battleActionLogger;
+    private final ContentRegistrarsService contentRegistrarsService;
 
     private final String battleId;
 
     private BattleContext context;
 
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
-            EventHandlerBinderService eventHandlerBinderService, InformationCenter informationCenter,
-            DispatcherBattleWrapper dispatcher, BattleScheduler battleScheduler, BattleActionLogger battleActionLogger)
+            InformationCenter informationCenter, DispatcherBattleWrapper dispatcher, BattleScheduler battleScheduler,
+            BattleActionLogger battleActionLogger, ContentRegistrarsService contentRegistrarsService)
     {
         this.idGenerator = idGenerator;
         this.battleCommandMaster = battleCommandMaster;
-        this.eventHandlerBinderService = eventHandlerBinderService;
         this.informationCenter = informationCenter;
         this.dispatcher = dispatcher;
         this.battleScheduler = battleScheduler;
         this.battleActionLogger = battleActionLogger;
+        this.contentRegistrarsService = contentRegistrarsService;
 
         this.battleId = "battle" + idGenerator.generateId();
         this.dispatcher.setBattleId(this.battleId);
@@ -65,10 +67,8 @@ public class BattleMasterImpl implements BattleMaster {
         context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher,
                 battleScheduler, battleActionLogger);
 
-        eventHandlerBinderService.bindPostHandlers(context);
-
-        informationCenter.initializeByBattleContext(context);
-        battleScheduler.initializeByBattleContext(context);
+        contentRegistrarsService.register(new RegistrarsContext(context, informationCenter,
+                new PostHandlerBindingService(dispatcher)));
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
         behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(), informationCenter);
@@ -91,7 +91,7 @@ public class BattleMasterImpl implements BattleMaster {
 
     @Override
     public void stopBattle() {
-        eventHandlerBinderService.unbindPostHandlers(dispatcher);
+        contentRegistrarsService.prepareToStopBattle();
         dispatcher.removeFastHandler();
     }
 }

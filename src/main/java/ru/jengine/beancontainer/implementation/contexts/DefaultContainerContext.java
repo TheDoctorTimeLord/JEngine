@@ -75,7 +75,8 @@ public class DefaultContainerContext implements ContainerContext {
         if (beanFactory instanceof ConfigurableBeanFactory) {
             ConfigurableBeanFactory factory = (ConfigurableBeanFactory)beanFactory;
             beanDefinitions.values().stream()
-                    .map(bd -> bd.getBeanFactoryStrategy().getBean(beanFactory)) //TODO разобраться со стратегиями, которые не синглтон
+                    .filter(bd -> bd.getBeanFactoryStrategy().needPrepare())
+                    .map(bd -> bd.getBeanFactoryStrategy().getBean(beanFactory))
                     .forEach(factory::beforeRemove);
         }
         beanDefinitions.values().forEach(bd -> bd.getBeanFactoryStrategy().clear());

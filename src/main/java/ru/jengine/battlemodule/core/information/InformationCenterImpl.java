@@ -6,8 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.exceptions.BattleException;
-import ru.jengine.battlemodule.core.information.informaionservices.InformationRegistrarService;
-import ru.jengine.battlemodule.core.information.informaionservices.InformationService;
 import ru.jengine.battlemodule.core.information.personalinfo.BattleModelInfo;
 import ru.jengine.battlemodule.core.information.personalinfo.EditableBattleModelInfo;
 
@@ -15,11 +13,6 @@ import ru.jengine.battlemodule.core.information.personalinfo.EditableBattleModel
 public class InformationCenterImpl implements EditableInformationCenter { //TODO переделать центр информации
     private final Map<Class<? extends InformationService>, InformationService> services = new ConcurrentHashMap<>();
     private final Map<Integer, EditableBattleModelInfo> personalInfo = new ConcurrentHashMap<>();
-    private InformationRegistrarService serviceRegistrar;
-
-    public InformationCenterImpl(InformationRegistrarService serviceRegistrar) {
-        this.serviceRegistrar = serviceRegistrar;
-    }
 
     @Override
     public EditableBattleModelInfo getEditablePersonalInfo(int personalId) {
@@ -33,12 +26,9 @@ public class InformationCenterImpl implements EditableInformationCenter { //TODO
     }
 
     @Override
-    public void initializeByBattleContext(BattleContext battleContext) {
+    public void initialize(BattleContext battleContext) {
         battleContext.getBattleState().getDynamicObjectIds()
                 .forEach(id -> personalInfo.put(id, new EditableBattleModelInfo()));
-
-        serviceRegistrar.registerInformationServices(this, battleContext);
-        serviceRegistrar = null;
     }
 
     @Override
