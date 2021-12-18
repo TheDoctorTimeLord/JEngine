@@ -189,6 +189,11 @@ class BattleMasterContext implements BattlePresenterActionSubscriber {
         this.battleMaster = battleMaster;
 
         battleMaster.getBattlePresenter().subscribeBattleActions(
+                SubscribeType.INITIALIZATION,
+                SubscribeStrategy.ALL_ACTIONS_SUBSCRIBE_STRATEGY,
+                this
+        );
+        battleMaster.getBattlePresenter().subscribeBattleActions(
                 SubscribeType.PHASE,
                 SubscribeStrategy.ALL_ACTIONS_SUBSCRIBE_STRATEGY,
                 this
@@ -198,11 +203,15 @@ class BattleMasterContext implements BattlePresenterActionSubscriber {
                 SubscribeStrategy.INFORMATION_ABOUT_SUBSCRIBE,
                 this
         );
+        battleMaster.informationAboutInitialize();
     }
 
     @Override
     public void subscribe(SubscribeType subscribeType, Collection<BattleAction> actions) {
-        if (SubscribeType.PHASE.equals(subscribeType)) {
+        if (SubscribeType.INITIALIZATION.equals(subscribeType)) {
+            actionsLog.add(new ArrayList<>(actions));
+            actionsLog.add(new ArrayList<>());
+        } else if (SubscribeType.PHASE.equals(subscribeType)) {
             if (actionsLog.isEmpty()) {
                 actionsLog.add(new ArrayList<>());
             }

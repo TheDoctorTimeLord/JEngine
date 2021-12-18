@@ -7,6 +7,7 @@ import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.test.annotation.battle.commands.rotate.RotateParameters.RotateOption;
+import ru.test.annotation.battle.events.TestChangeDirectionEvent;
 
 @Bean
 public class TestRotate implements BattleCommand<RotateParameters> {
@@ -25,9 +26,12 @@ public class TestRotate implements BattleCommand<RotateParameters> {
         if (isExecutionParametersCorrect(parameters)) {
             CanMoved canMoved = (CanMoved)model;
             Direction oldDirection = canMoved.getDirection();
-            canMoved.setDirection(parameters.getAnswer().equals(RotateOption.LEFT)
-                    ? oldDirection.rotateLeft()
-                    : oldDirection.rotateRight());
+            battleContext.getDispatcher().handle(new TestChangeDirectionEvent(
+                    model.getId(),
+                    parameters.getAnswer().equals(RotateOption.LEFT)
+                            ? oldDirection.rotateLeft()
+                            : oldDirection.rotateRight()
+            ));
         }
     }
 

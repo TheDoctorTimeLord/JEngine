@@ -4,6 +4,8 @@ import java.util.Collections;
 
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionLogger;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
+import ru.jengine.battlemodule.core.battlepresenter.initializebattle.BattleInitializationNotifier;
+import ru.jengine.battlemodule.core.battlepresenter.initializebattle.InitializationNotifierContext;
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commandmaster.BattleCommandMaster;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
@@ -26,6 +28,7 @@ public class BattleMasterImpl implements BattleMaster {
     private final BattleScheduler battleScheduler;
     private final BattleActionLogger battleActionLogger;
     private final ContentRegistrarsService contentRegistrarsService;
+    private final BattleInitializationNotifier initializationNotifier;
 
     private final String battleId;
 
@@ -33,7 +36,8 @@ public class BattleMasterImpl implements BattleMaster {
 
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
             InformationCenter informationCenter, DispatcherBattleWrapper dispatcher, BattleScheduler battleScheduler,
-            BattleActionLogger battleActionLogger, ContentRegistrarsService contentRegistrarsService)
+            BattleActionLogger battleActionLogger, ContentRegistrarsService contentRegistrarsService,
+            BattleInitializationNotifier initializationNotifier)
     {
         this.idGenerator = idGenerator;
         this.battleCommandMaster = battleCommandMaster;
@@ -42,6 +46,7 @@ public class BattleMasterImpl implements BattleMaster {
         this.battleScheduler = battleScheduler;
         this.battleActionLogger = battleActionLogger;
         this.contentRegistrarsService = contentRegistrarsService;
+        this.initializationNotifier = initializationNotifier;
 
         this.battleId = "battle" + idGenerator.generateId();
         this.dispatcher.setBattleId(this.battleId);
@@ -72,6 +77,12 @@ public class BattleMasterImpl implements BattleMaster {
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
         behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(), informationCenter);
+    }
+
+    @Override
+    public void informationAboutInitialize() {
+        initializationNotifier.notifyAboutInitialization(
+                new InitializationNotifierContext(context, informationCenter), battleActionLogger);
     }
 
     @Override

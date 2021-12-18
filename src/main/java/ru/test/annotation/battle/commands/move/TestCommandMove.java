@@ -13,7 +13,7 @@ import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.battlemodule.standardfilling.movement.MoveEvent;
-import ru.test.annotation.battle.events.TestChangeDirectionEvent;
+import ru.test.annotation.battle.events.ChangeDirectionEvent;
 
 public class TestCommandMove implements BattleCommand<MoveParameters> {
     private final Set<Point> availablePositions;
@@ -47,7 +47,7 @@ public class TestCommandMove implements BattleCommand<MoveParameters> {
             if (isAvailablePoint(newPosition, battleState)) {
                 dispatcher.handle(new MoveEvent(model.getId(), oldPosition, newPosition));
             }
-            dispatcher.handle(new TestChangeDirectionEvent(model.getId(), newDirection));
+            dispatcher.handle(new ChangeDirectionEvent(model.getId(), newDirection));
         }
     }
 

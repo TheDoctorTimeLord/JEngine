@@ -8,6 +8,8 @@ public interface BattleMaster {
     void prepareBattle(BattleGenerator battleGenerator, BattleCommandRegistrar commandRegistrar,
             BehaviorObjectsManager behaviorObjectsManager);
 
+    void informationAboutInitialize();
+
     void takeTurn();
 
     BattleActionPresenter getBattlePresenter();

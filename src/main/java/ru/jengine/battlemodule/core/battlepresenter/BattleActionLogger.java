@@ -13,14 +13,39 @@ public class BattleActionLogger implements BattleActionRegistrar, BattleActionPr
     private final BattlePresenterActionPublisher publisherDelegate = new BattlePresenterActionPublisher();
     private final List<List<BattleAction>> loggedActions = new ArrayList<>();
 
+    private final List<BattleAction> loggedActionsForInitialize = new ArrayList<>();
+    private volatile boolean wasInitialized = false;
+
     @Override
     public void registerAction(BattleAction action) {
+        if (!wasInitialized) {
+            synchronized (loggedActionsForInitialize) {
+                if (!wasInitialized) {
+                    loggedActionsForInitialize.add(action);
+                    return;
+                }
+            }
+        }
+
         synchronized (loggedActions) {
             if (loggedActions.isEmpty()) {
                 loggedActions.add(new ArrayList<>());
             }
             loggedActions.get(loggedActions.size() - 1).add(action);
         }
+    }
+
+    @Override
+    public void declareEndBattleInitialization() {
+        wasInitialized = true;
+        Collection<BattleAction> actions;
+
+        synchronized (loggedActionsForInitialize) {
+            actions = new ArrayList<>(loggedActionsForInitialize);
+            loggedActionsForInitialize.clear();
+        }
+
+        publisherDelegate.publish(SubscribeType.INITIALIZATION, actions);
     }
 
     @Override
