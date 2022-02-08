@@ -1,5 +1,6 @@
 package ru.jengine.beancontainer.implementation.factories;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -59,8 +60,9 @@ public class AutowireBeanFactory implements BeanFactory {
 
     private Object[] findArgs(Executable parameterOwner) {
         Object[] result = new Object[parameterOwner.getParameterTypes().length];
+        Annotation[][] parametersAnnotations = parameterOwner.getParameterAnnotations();
         for (int i = 0; i < result.length; i++) {
-            MethodParameter methodParameter = new MethodParameter(parameterOwner, i);
+            MethodParameter methodParameter = new MethodParameter(parameterOwner, i, parametersAnnotations[i]);
             result[i] = autowire(methodParameter);
         }
         return result;

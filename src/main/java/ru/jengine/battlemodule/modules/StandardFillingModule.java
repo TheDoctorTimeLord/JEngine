@@ -4,10 +4,10 @@ import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 
 @ContainerModule
-@Context(Constants.BATTLE_CONTEXT)
+@Context(Contexts.BATTLE_CONTEXT)
 @PackageScan("ru.jengine.battlemodule.standardfilling")
 public class StandardFillingModule extends AnnotationModule {
 }

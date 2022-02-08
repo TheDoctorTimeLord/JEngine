@@ -34,13 +34,13 @@ import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.implementation.JEngineContainer;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.utils.CollectionUtils;
 import ru.test.annotation.battle.model.BattleCharacter;
 import ru.test.annotation.battle.model.HasHealth;
 
 @ContainerModule
-@Context(Constants.BATTLE_CONTEXT)
+@Context(Contexts.BATTLE_CONTEXT)
 @PackageScan("ru.test.annotation.battle")
 @EnableBattleCoreWithStandardFilling
 public class TestBattle extends AnnotationModule {

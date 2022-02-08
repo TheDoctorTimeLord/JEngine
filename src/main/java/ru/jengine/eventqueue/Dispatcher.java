@@ -115,6 +115,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
     private void initializeAsyncDispatcher() {
         asyncDispatcher = new AsyncDispatcher(asyncEventPoolHandlers);
+        asyncDispatcher.setDaemon(true);
         asyncDispatcher.start();
     }
 

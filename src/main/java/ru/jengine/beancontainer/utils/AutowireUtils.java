@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
@@ -31,21 +33,27 @@ public class AutowireUtils {
 
         BeanContext beanContext = beanExtractor.extract(resultType, context, collectionClass != null);
 
-        if (beanContext == null) {
+        if (beanContext == null && !parameter.isParameterAnnotated(Nullable.class)) {
             throw new ContainerException("Bean for [" + resultType + "] did not found");
         }
 
         if (collectionClass != null) {
-            return convertCollection(beanContext.getBean(), collectionClass);
+            return convertCollection(getBean(beanContext), collectionClass);
         }
-        return beanContext.getBean();
+        return getBean(beanContext);
+    }
+
+    private static Object getBean(BeanContext beanContext) { //TODO вынести метод и все похожие места в BeanUtils
+        return beanContext == null ? null : beanContext.getBean();
     }
 
     private static Object convertCollection(Object bean, Class<?> collectionClass) {
         Collection<?> beanInst;
         if (bean instanceof Collection) {
             beanInst = (Collection<?>) bean;
-        } else {
+        } else if (bean == null) {
+            beanInst = Collections.emptyList();
+        } else  {
             beanInst = Collections.singletonList(bean);
         }
 

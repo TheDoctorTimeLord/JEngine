@@ -1,6 +1,5 @@
 package ru.jengine.beancontainer.implementation.moduleimpls;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,8 +8,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-
 import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.Module;
@@ -18,7 +15,7 @@ import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ImportModule;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 public abstract class AnnotationModuleBase implements Module {
@@ -34,7 +31,7 @@ public abstract class AnnotationModuleBase implements Module {
     @Override
     public void configure(ModuleContext context) {
         this.classFinder = context.getClassFinder();
-        this.contextAnnotation = Objects.requireNonNull(getModuleAnnotation(Context.class));
+        this.contextAnnotation = Objects.requireNonNull(AnnotationUtils.getAnnotationSafe(getClass(), Context.class));
 
         beanDefinitionReadersInit(context);
     }
@@ -47,7 +44,7 @@ public abstract class AnnotationModuleBase implements Module {
 
     @Override
     public String getContextName() {
-        return contextAnnotation == null ? Constants.DEFAULT_CONTEXT : contextAnnotation.value();
+        return contextAnnotation == null ? Contexts.DEFAULT_CONTEXT : contextAnnotation.value();
     }
 
     @Override
@@ -73,17 +70,12 @@ public abstract class AnnotationModuleBase implements Module {
     }
 
     private Stream<Class<?>> handleImportModuleAnnotation() {
-        ImportModule annotation = getModuleAnnotation(ImportModule.class);
-        return annotation == null ? Stream.empty() : Arrays.stream(annotation.value());
+        return AnnotationUtils.getAnnotations(getClass(), ImportModule.class).stream()
+                .flatMap(annotation -> Arrays.stream(annotation.value()));
     }
 
     @Override
     public List<Class<?>> getImplementations(Class<?> interfaceCls) {
         return new ArrayList<>(classFinder.getSubclasses(interfaceCls));
-    }
-
-    @Nullable
-    private <A extends Annotation> A getModuleAnnotation(Class<A> contextClass) {
-        return AnnotationUtils.getAnnotationSafe(getClass(), contextClass);
     }
 }

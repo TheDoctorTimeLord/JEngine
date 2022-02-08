@@ -18,7 +18,7 @@ import ru.jengine.beancontainer.ContextPreProcessor;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 
 public class ContainerContextFacade implements ContainerMultiContext {
@@ -62,9 +62,15 @@ public class ContainerContextFacade implements ContainerMultiContext {
         BeanContext bean =
                 BeanUtils.findAppropriateValueBean(this, beanClass, getAllContextsNames(), asCollection);
 
-        return bean != null && bean.isCollectionBean() && ((Collection<?>)bean.getBean()).size() == 1
-                ? new BeanContext(((Collection<?>)bean.getBean()).iterator().next(), beanClass)
-                : bean;
+        if (bean != null && bean.isCollectionBean()) {
+            Collection<?> elements = bean.getBean();
+            if (elements.size() == 1) {
+                return new BeanContext(((Collection<?>)bean.getBean()).iterator().next(), beanClass);
+            } else if (elements.isEmpty() && !beanClass.isAssignableFrom(Collection.class)) {
+                return null;
+            }
+        }
+        return bean;
     }
 
     @Override
@@ -108,7 +114,7 @@ public class ContainerContextFacade implements ContainerMultiContext {
 
     @Override
     public void removeContext(String name) {
-        if (Constants.INFRASTRUCTURE_CONTEXT.equals(name)) {
+        if (Contexts.INFRASTRUCTURE_CONTEXT.equals(name)) {
             throw new ContainerException("Can not remove infrastructure context");
         }
 

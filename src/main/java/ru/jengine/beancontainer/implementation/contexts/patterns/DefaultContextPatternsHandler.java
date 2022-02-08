@@ -15,7 +15,7 @@ import ru.jengine.beancontainer.ContextPreProcessor;
 import ru.jengine.beancontainer.InitializableContextPatternHandler;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.factories.SelectiveAutowireConfigurableBeanFactories;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
 
@@ -29,6 +29,13 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
 
     @Override
     public void initialize() {
+        ContainerContext externalBeansContext = preLoadContext(Contexts.EXTERNAL_BEANS_CONTEXT);
+        if (externalBeansContext != null) {
+            initializeContexts(externalBeansContext);
+        } else {
+            //TODO ЛОГИРОВАТЬ!
+        }
+
         patterns.entrySet().stream()
                 .filter(entry -> entry.getValue().needLoadOnContainerInitialize())
                 .map(entry -> preLoadContext(entry.getKey()))
@@ -103,7 +110,8 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         List<String> beanSources = pattern.getBeanSources();
         loadAllSourceContextsWithWrapException(patternName, beanSources);
 
-        List<String> sources = CollectionUtils.concat(patternName, beanSources, Constants.INFRASTRUCTURE_CONTEXT);
+        List<String> sources = CollectionUtils.concat(patternName, beanSources, Contexts.EXTERNAL_BEANS_CONTEXT,
+                Contexts.INFRASTRUCTURE_CONTEXT);
         return pattern.buildContext(createBeanFactoryWithSource(sources));
     }
 
@@ -111,7 +119,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         SelectiveAutowireConfigurableBeanFactories beanFactory =
                 new SelectiveAutowireConfigurableBeanFactories(multiContext, beanSources);
 
-        ContainerContext infrastructureContext = multiContext.getContext(Constants.INFRASTRUCTURE_CONTEXT);
+        ContainerContext infrastructureContext = multiContext.getContext(Contexts.INFRASTRUCTURE_CONTEXT);
         if (infrastructureContext != null) {
             beanFactory.configure(infrastructureContext);
         } else {
@@ -147,7 +155,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
 
     private void preProcessBeans(ContainerContext newContext) {
         List<ContextPreProcessor> preProcessors = BeanUtils.getBeanAsList(
-                multiContext.getBean(Constants.INFRASTRUCTURE_CONTEXT, ContextPreProcessor.class));
+                multiContext.getBean(Contexts.INFRASTRUCTURE_CONTEXT, ContextPreProcessor.class));
 
         newContext.preProcessBeans(preProcessors);
     }

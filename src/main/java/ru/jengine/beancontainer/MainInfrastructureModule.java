@@ -5,10 +5,10 @@ import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.PackagesScan;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationInfrastructureModule;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 
 @ContainerModule
-@Context(Constants.INFRASTRUCTURE_CONTEXT)
+@Context(Contexts.INFRASTRUCTURE_CONTEXT)
 @PackagesScan({
         @PackageScan("ru.jengine.beancontainer")
 })

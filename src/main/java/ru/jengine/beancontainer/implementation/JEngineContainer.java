@@ -28,6 +28,7 @@ import ru.jengine.beancontainer.implementation.factories.AutowireConfigurableBea
 import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer.implementation.moduleimpls.ExistBeansModule;
 import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
 
@@ -58,7 +59,7 @@ public class JEngineContainer implements BeanContainer {
     }
 
     private void prepareContext(ContainerContext infrastructureContext) {
-        beanContainerContext.registerContext(Constants.INFRASTRUCTURE_CONTEXT, infrastructureContext);
+        beanContainerContext.registerContext(Contexts.INFRASTRUCTURE_CONTEXT, infrastructureContext);
 
         BeanContext preProcessors = infrastructureContext.getBean(ContextPreProcessor.class);
 
@@ -76,7 +77,7 @@ public class JEngineContainer implements BeanContainer {
     }
 
     private static boolean isInfrastructureModule(Module module) {
-        return Constants.INFRASTRUCTURE_CONTEXT.equals(module.getContextName());
+        return Contexts.INFRASTRUCTURE_CONTEXT.equals(module.getContextName());
     }
 
     private static BeanFactory createBeanFactory(ContainerContext mainContext, ContainerContext infrastructureContext) {
@@ -101,7 +102,8 @@ public class JEngineContainer implements BeanContainer {
 
     @Override
     public <T> T getBean(Class<?> beanClass) {
-        return beanContainerContext.getBean(beanClass).getBean();
+        BeanContext bean = beanContainerContext.getBean(beanClass);
+        return bean == null ? null : bean.getBean();
     }
 
     @Override
