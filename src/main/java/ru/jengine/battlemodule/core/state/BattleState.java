@@ -11,11 +11,19 @@ import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 
+/**
+ * Хранит всю необходимую информацию о текущем состоянии боя
+ */
 public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
     private final Map<Point, List<Integer>> battleModelOnField;
     private final List<Integer> dynamicObjects;
 
+    /**
+     * @param battleModelById сопоставление всех объектов в бою с их ID
+     * @param battleModelOnField расположение всех объектов на поле боя (объекты представлены их ID)
+     * @param dynamicObjects список ID объектов, которые являются динамическими (могут совершать действия)
+     */
     public BattleState(Map<Integer, BattleModel> battleModelById,
             Map<Point, List<Integer>> battleModelOnField, List<Integer> dynamicObjects)
     {
@@ -24,6 +32,11 @@ public class BattleState {
         this.dynamicObjects = dynamicObjects;
     }
 
+    /**
+     * Возвращает объект, соответствующий переданному ID
+     * @param id ID объекта
+     * @throws BattleException если объекта, по переданному ID не было найдено
+     */
     public BattleModel resolveId(int id) {
         BattleModel model = battleModelById.get(id);
 
@@ -34,16 +47,30 @@ public class BattleState {
         return model;
     }
 
+    /**
+     * Возвращает объект, соответствующих переданном ID
+     * @param ids список ID объектов
+     * @return список объектов в порядке переданных ID
+     * @throws BattleException если хотя бы один ID не был найден
+     */
     public List<BattleModel> resolveIds(List<Integer> ids) {
         return ids.stream()
                 .map(this::resolveId)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Возвращает все объекты на поля боя. Данные хранятся в виде "Клетка поля боя -> список ID объектов на этой клетке"
+     */
     public Map<Point, List<Integer>> getMapFilling() {
         return battleModelOnField;
     }
 
+    /**
+     * Возвращает список ID объектов, которые находятся на указанной клетке поля боя
+     * @param point координаты клетки на поле боя
+     * @return список ID объектов на указанной клетке (если объектов на клетке нет, то список будет пустой)
+     */
     public List<Integer> getOnPosition(Point point) {
         List<Integer> models = battleModelOnField.get(point);
 
@@ -61,6 +88,11 @@ public class BattleState {
         return battleModelOnField.computeIfAbsent(point, p -> new ArrayList<>());
     }
 
+    /**
+     * Удаляет объект с переданной клетки поля боя
+     * @param position координаты клетки поля боя
+     * @param id ID удаляемого объекта
+     */
     public void removeFromPosition(Point position, int id) {
         List<Integer> onCell = battleModelOnField.get(position);
 
@@ -75,6 +107,11 @@ public class BattleState {
         }
     }
 
+    /**
+     * Добавляет объект на переданную позицию поля боя
+     * @param position координаты клетки поля боя
+     * @param id ID добавляемого объекта
+     */
     public void setToPosition(Point position, int id) {
         getOnPositionEditable(position).add(id);
     }
@@ -85,10 +122,17 @@ public class BattleState {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Возвращает ID всех динамических объектов в бою
+     */
     public List<Integer> getDynamicObjectIds() {
         return new ArrayList<>(dynamicObjects);
     }
 
+    /**
+     * Добавляет динамический объект в бой
+     * @param battleModel добавляемый объект
+     */
     public void addDynamicObject(BattleModel battleModel) {
         int id = battleModel.getId();
 
@@ -101,6 +145,10 @@ public class BattleState {
         }
     }
 
+    /**
+     * Удаляет динамический объект из боя //TODO заменить единым методом для удаления объектов
+     * @param id ID динамического объекта
+     */
     public void removeDynamicObject(int id) {
         dynamicObjects.remove((Integer)id);
         BattleModel model = battleModelById.remove(id);

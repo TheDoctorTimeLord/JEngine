@@ -1,7 +1,7 @@
 package ru.test.annotation.battle.commands.damage;
 
-import static ru.test.annotation.battle.commands.move.TestCommandMovePrototype.inBound;
-import static ru.test.annotation.battle.commands.move.TestCommandMovePrototype.isAvailablePoint;
+import static ru.test.annotation.battle.commands.move.TestCommandMoveFactory.inBound;
+import static ru.test.annotation.battle.commands.move.TestCommandMoveFactory.isAvailablePoint;
 
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.commands.BattleCommand;

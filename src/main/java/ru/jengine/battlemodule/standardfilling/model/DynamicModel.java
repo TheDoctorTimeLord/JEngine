@@ -8,49 +8,61 @@ import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.battlemodule.standardfilling.visible.HasVision;
 
+/**
+ * Класс, описывающий динамический объект в бою. Динамический объект характеризуется тем, что он:
+ * <ol>
+ * <li>Может осуществлять действия</li>
+ * <li>Находится на некоторой позиции поля боя</li>
+ * <li>Имеет некоторое направление взгляда</li>
+ * </ol>
+ */
 public class DynamicModel extends BattleModel implements CanMoved, HasVision {
+    private Direction direction;
+    private Point position;
+    private boolean canSee;
+
     public DynamicModel(int id) {
         super(id);
     }
 
     @Override
     public boolean hasDirection() {
-        return getProperty("direction") != null;
+        return direction != null;
     }
 
     @Override
     public Direction getDirection() {
-        return getProperty("direction");
+        return direction;
     }
 
     @Override
     public void setDirection(Direction direction) {
-        setProperty("direction", direction);
+        this.direction = direction;
     }
 
     @Override
     public boolean hasVision() {
-        return Boolean.TRUE.equals(getProperty("vision"));
+        return canSee;
     }
 
     @Override
     public void setVision(boolean canSee) {
-        setProperty("vision", canSee);
+        this.canSee = canSee;
     }
 
     @Override
     public boolean hasPosition() {
-        return getProperty("position") != null;
+        return position != null;
     }
 
     @Override
     public Point getPosition() {
-        return getProperty("position");
+        return position;
     }
 
     @Override
     public void setPosition(Point position) {
-        setProperty("position", position);
+        this.position = position;
     }
 
     @Override

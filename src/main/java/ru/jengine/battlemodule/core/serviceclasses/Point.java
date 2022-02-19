@@ -2,6 +2,10 @@ package ru.jengine.battlemodule.core.serviceclasses;
 
 import com.google.common.base.Objects;
 
+/**
+ * Класс, хранящий координаты. Класс является immutable (только поддерживает наследование)
+ * //TODO добавить кэширование для уменьшения количества создаваемых объектов
+ */
 public class Point {
     private final int x;
     private final int y;
@@ -11,18 +15,34 @@ public class Point {
         this.y = y;
     }
 
+    /**
+     * Получение X координаты точки
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Получение Y координаты точки
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Покоординатно складывает текущую точку с другой точкой
+     * @param point точка, с которой производится сложение
+     * @return новая точка — результат покоординатного сложения
+     */
     public Point add(Point point) {
         return point != null ? new Point(x + point.getX(), y + point.getY()) : this;
     }
 
+    /**
+     * Покоординатно вычитает из текущей точки другую точку
+     * @param point вычитаемая точка
+     * @return новая точка — результат покоординатного вычитания
+     */
     public Point sub(Point point) {
         return point != null ? new Point(x - point.getX(), y - point.getY()) : this;
     }
@@ -44,9 +64,6 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return "Point{" + "x=" + x + ", y=" + y + '}';
     }
 }

@@ -9,19 +9,19 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SortedMultimap<E> {
+public class SortedMultiset<E> {
     private final SortedMap<Integer, List<E>> container;
     private final Function<E, Integer> priorityExtractor;
 
-    public SortedMultimap() {
+    public SortedMultiset() {
         this(element -> 0);
     }
 
-    public SortedMultimap(Function<E, Integer> priorityExtractor) {
+    public SortedMultiset(Function<E, Integer> priorityExtractor) {
         this(Comparator.naturalOrder(), priorityExtractor);
     }
 
-    public SortedMultimap(Comparator<Integer> comparator, Function<E, Integer> priorityExtractor) {
+    public SortedMultiset(Comparator<Integer> comparator, Function<E, Integer> priorityExtractor) {
         this.container = new TreeMap<>(comparator);
         this.priorityExtractor = priorityExtractor;
     }

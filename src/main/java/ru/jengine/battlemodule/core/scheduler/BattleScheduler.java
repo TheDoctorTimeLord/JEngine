@@ -5,6 +5,10 @@ import ru.jengine.battlemodule.core.BattleIdSetter;
 import ru.jengine.taskscheduler.Task;
 import ru.jengine.taskscheduler.TaskScheduler;
 
+/**
+ * Обёртка для планировщика задач в игре. Предоставляет несколько специфичных для боевой системы категорий задач. Для
+ * каждого боя создаётся своя обёртка планировщика задач
+ */
 @BattleBeanPrototype
 public class BattleScheduler implements BattleIdSetter, SchedulerTaskRegistrar, SchedulerTaskExecutor {
     private final TaskScheduler scheduler;

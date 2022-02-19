@@ -7,6 +7,9 @@ import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
 import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.taskscheduler.EnableTaskScheduler;
 
+/**
+ * Модуль, сканирующий пакет основного ядра боевой системы.
+ */
 @ContainerModule
 @Context(value = Contexts.BATTLE_CONTEXT, beanSources = Contexts.DEFAULT_CONTEXT)
 @PackageScan("ru.jengine.battlemodule.core")

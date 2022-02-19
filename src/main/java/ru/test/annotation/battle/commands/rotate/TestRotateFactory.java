@@ -1,14 +1,14 @@
 package ru.test.annotation.battle.commands.rotate;
 
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.battlemodule.core.commands.BattleCommandPrototype;
+import ru.jengine.battlemodule.core.commands.BattleCommandFactory;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.test.annotation.battle.model.HasHealth;
 
 @Bean
-public class TestRotatePrototype implements BattleCommandPrototype<RotateParameters, TestRotate> {
+public class TestRotateFactory implements BattleCommandFactory<RotateParameters, TestRotate> {
     @Override
     public boolean canExecute(BattleModel model, BattleContext battleContext) {
         return model instanceof CanMoved && ((CanMoved)model).hasPosition() && ((CanMoved)model).hasDirection();

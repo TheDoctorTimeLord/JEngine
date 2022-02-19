@@ -16,6 +16,9 @@ import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+/**
+ * Реализация интерфейса {@link BattleCommandMaster}
+ */
 @BattleBeanPrototype
 public class BattleCommandMasterImpl implements BattleCommandMaster {
     private final List<BattleCommandPerformElement<?>> commandsOnNextPhase = new ArrayList<>();

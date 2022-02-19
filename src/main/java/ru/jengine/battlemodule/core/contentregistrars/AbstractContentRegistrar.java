@@ -7,8 +7,12 @@ import ru.jengine.eventqueue.event.PostHandler;
 import ru.jengine.taskscheduler.ReusableTask;
 import ru.jengine.taskscheduler.Task;
 
+/**
+ * Абстрактный класс для {@link ContentRegistrar}, который предоставляет удобные методы для регистрации разного
+ * контента боя.
+ */
 public abstract class AbstractContentRegistrar implements ContentRegistrar {
-    protected RegistrarsContext registrarsContext;
+    private RegistrarsContext registrarsContext;
     protected BattleContext battleContext;
 
     @Override
@@ -18,6 +22,9 @@ public abstract class AbstractContentRegistrar implements ContentRegistrar {
         registerInt();
     }
 
+    /**
+     * Регистрирует часть контента боя
+     */
     protected abstract void registerInt();
 
     protected <T extends InformationService, S extends T> void registerInformationService(Class<T> serviceType, S service) {

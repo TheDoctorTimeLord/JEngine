@@ -14,7 +14,7 @@ import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.annotations.PreDestroy;
 import ru.jengine.beancontainer.service.Constants;
 import ru.jengine.beancontainer.service.HasPriority;
-import ru.jengine.beancontainer.service.SortedMultimap;
+import ru.jengine.beancontainer.service.SortedMultiset;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.EventHandler;
@@ -34,7 +34,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
         FastEventHandler //TODO порафакторить диспетчер на предмет Single Responsibility
 {
     private final Map<Class<?>, List<PreHandler<?>>> preHandlers = new HashMap<>();
-    private final Map<Class<?>, SortedMultimap<PostHandler<?>>> postHandlers = new ConcurrentHashMap<>();
+    private final Map<Class<?>, SortedMultiset<PostHandler<?>>> postHandlers = new ConcurrentHashMap<>();
     private final Map<String, EventPool> eventPoolByCode = new ConcurrentHashMap<>();
     private final FastEventHandler fastEventHandlerDelegate;
     private final EventHandlingContext handlingContext;
@@ -129,8 +129,8 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public void registerPostHandler(PostHandler<?> postHandler) {
         synchronized (postHandlers) {
             Class<?> handledEventType = postHandler.getHandlingEventType();
-            SortedMultimap<PostHandler<?>> handlers = postHandlers.computeIfAbsent(handledEventType,
-                    k -> new SortedMultimap<>(HasPriority::getPriority));
+            SortedMultiset<PostHandler<?>> handlers = postHandlers.computeIfAbsent(handledEventType,
+                    k -> new SortedMultiset<>(HasPriority::getPriority));
             handlers.add(postHandler);
         }
     }
@@ -139,7 +139,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
     public void removePostHandler(PostHandler<?> postHandler) {
         synchronized (postHandlers) {
             Class<?> handledEventType = postHandler.getHandlingEventType();
-            SortedMultimap<PostHandler<?>> handlers = postHandlers.get(handledEventType);
+            SortedMultiset<PostHandler<?>> handlers = postHandlers.get(handledEventType);
             if (handlers == null) {
                 return;
             }
@@ -154,7 +154,7 @@ public class Dispatcher implements EventPoolProvider, EventHandlerRegistrar, Eve
 
     private Collection<PostHandler<?>> getPostHandlers(Class<?> eventType) {
         synchronized (postHandlers) {
-            return postHandlers.getOrDefault(eventType, new SortedMultimap<>()).getSortedElements();
+            return postHandlers.getOrDefault(eventType, new SortedMultiset<>()).getSortedElements();
         }
     }
 

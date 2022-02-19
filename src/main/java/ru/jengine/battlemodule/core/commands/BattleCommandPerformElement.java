@@ -3,6 +3,10 @@ package ru.jengine.battlemodule.core.commands;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.models.BattleModel;
 
+/**
+ * Класс, хранящий все необходимые для исполнения данные о команде. Также отвечает за корректное выполнение команды
+ * @param <P> тип параметров, необходимых для исполняемой команды
+ */
 public class BattleCommandPerformElement<P extends CommandExecutionParameters> {
     private final int battleModelId;
     private final BattleCommand<P> battleCommand;

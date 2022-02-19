@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
-import ru.jengine.battlemodule.core.battlepresenter.initializebattle.InitializationNotifierContext;
+import ru.jengine.battlemodule.core.ExtendedBattleContext;
 import ru.jengine.battlemodule.core.battlepresenter.initializebattle.InitializationPresenter;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.standardfilling.model.DynamicModel;
@@ -13,8 +13,8 @@ import ru.jengine.battlemodule.standardfilling.model.DynamicModel;
 @BattleBeanPrototype
 public class StartPositionPresenter implements InitializationPresenter {
     @Override
-    public List<BattleAction> presentBattleInitialize(InitializationNotifierContext notifierContext) {
-        BattleState battleState = notifierContext.getBattleContext().getBattleState();
+    public List<BattleAction> presentBattleInitialize(ExtendedBattleContext extendedBattleContext) {
+        BattleState battleState = extendedBattleContext.getBattleContext().getBattleState();
         return battleState.getDynamicObjects().stream()
                 .filter(model -> model instanceof DynamicModel)
                 .map(model -> (DynamicModel)model)

@@ -8,6 +8,12 @@ import java.lang.annotation.Target;
 import ru.jengine.battlemodule.modules.StandardFillingModule;
 import ru.jengine.beancontainer.annotations.ImportModule;
 
+/**
+ * Подключает к проекту контекст, содержащий основное ядро пошаговой боевой системы (см. подробнее
+ * {@link ru.jengine.battlemodule.core.BattleMaster BattleMaster}) и её стандартное наполнение. Если стандартное
+ * наполнение вам не требуется или вас не устраивает, то разместите аннотацию {@link EnableBattleCore}
+ * Для подключения боевой системы — разместите эту аннотацию над одним из своих модулей.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ImportModule(StandardFillingModule.class)

@@ -1,13 +1,16 @@
-package ru.jengine.battlemodule.core.battlepresenter.initializebattle;
+package ru.jengine.battlemodule.core;
 
-import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 
-public class InitializationNotifierContext {
+/**
+ * Расширенный контекст боя. Дополнительно был включён {@link InformationCenter}
+ * //TODO не забыть поменять, если {@link InformationCenter} будет включен в основной контекст
+ */
+public class ExtendedBattleContext {
     private final BattleContext battleContext;
     private final InformationCenter informationCenter;
 
-    public InitializationNotifierContext(BattleContext battleContext, InformationCenter informationCenter) {
+    public ExtendedBattleContext(BattleContext battleContext, InformationCenter informationCenter) {
         this.battleContext = battleContext;
         this.informationCenter = informationCenter;
     }

@@ -7,6 +7,10 @@ import ru.jengine.battlemodule.core.scheduler.SchedulerTaskRegistrar;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
 
+/**
+ * Контекст конкретного боя. Предоставляет доступ к объектам, изменяющим состояние боя. Контекст используется для
+ * внутренних компонент боевой системы
+ */
 public class BattleContext {
     private final String battleId;
     private final BattleState battleState;

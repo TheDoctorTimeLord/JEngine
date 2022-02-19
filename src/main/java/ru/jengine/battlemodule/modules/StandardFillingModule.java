@@ -6,6 +6,9 @@ import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
 import ru.jengine.beancontainer.service.Constants.Contexts;
 
+/**
+ * Модуль, сканирующий пакет стандартного наполнения боевой системы.
+ */
 @ContainerModule
 @Context(Contexts.BATTLE_CONTEXT)
 @PackageScan("ru.jengine.battlemodule.standardfilling")

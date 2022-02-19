@@ -1,7 +1,7 @@
 package ru.test.annotation.battle.commands.damage;
 
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.battlemodule.core.commands.BattleCommandPrototype;
+import ru.jengine.battlemodule.core.commands.BattleCommandFactory;
 import ru.jengine.battlemodule.core.commands.executioncontexts.NoneParameters;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
@@ -10,7 +10,7 @@ import ru.jengine.beancontainer.annotations.Bean;
 import ru.test.annotation.battle.model.HasHealth;
 
 @Bean
-public class TestHitPrototype implements BattleCommandPrototype<NoneParameters, TestHit> {
+public class TestHitFactory implements BattleCommandFactory<NoneParameters, TestHit> {
     @Override
     public boolean canExecute(BattleModel model, BattleContext battleContext) {
         return model instanceof HasHealth && model instanceof CanMoved;

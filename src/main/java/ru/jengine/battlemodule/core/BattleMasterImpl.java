@@ -5,7 +5,6 @@ import java.util.Collections;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionLogger;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
 import ru.jengine.battlemodule.core.battlepresenter.initializebattle.BattleInitializationNotifier;
-import ru.jengine.battlemodule.core.battlepresenter.initializebattle.InitializationNotifierContext;
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commandmaster.BattleCommandMaster;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
@@ -19,6 +18,9 @@ import ru.jengine.battlemodule.core.scheduler.BattleScheduler;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
 
+/**
+ * Реализация {@link BattleMaster}.
+ */
 @BattleBeanPrototype
 public class BattleMasterImpl implements BattleMaster {
     private final IdGenerator idGenerator;
@@ -33,6 +35,7 @@ public class BattleMasterImpl implements BattleMaster {
     private final String battleId;
 
     private BattleContext context;
+    private ExtendedBattleContext extendedBattleContext;
 
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
             InformationCenter informationCenter, DispatcherBattleWrapper dispatcher, BattleScheduler battleScheduler,
@@ -71,9 +74,9 @@ public class BattleMasterImpl implements BattleMaster {
 
         context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher,
                 battleScheduler, battleActionLogger);
+        extendedBattleContext = new ExtendedBattleContext(context, informationCenter);
 
-        contentRegistrarsService.register(new RegistrarsContext(context, informationCenter,
-                new PostHandlerBindingService(dispatcher)));
+        contentRegistrarsService.register(new RegistrarsContext(extendedBattleContext, new PostHandlerBindingService(dispatcher)));
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
         behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(), informationCenter);
@@ -81,8 +84,7 @@ public class BattleMasterImpl implements BattleMaster {
 
     @Override
     public void informationAboutInitialize() {
-        initializationNotifier.notifyAboutInitialization(
-                new InitializationNotifierContext(context, informationCenter), battleActionLogger);
+        initializationNotifier.notifyAboutInitialization(extendedBattleContext, battleActionLogger);
     }
 
     @Override

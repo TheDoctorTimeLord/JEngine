@@ -8,6 +8,10 @@ import java.util.function.Function;
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.utils.CollectionUtils;
 
+/**
+ * Реализует интерфейсы {@link BattleActionRegistrar} (для внутренней работы в бою) и {@link BattleActionPresenter}
+ * (для внешнего API боя)
+ */
 @BattleBeanPrototype
 public class BattleActionLogger implements BattleActionRegistrar, BattleActionPresenter {
     private final BattlePresenterActionPublisher publisherDelegate = new BattlePresenterActionPublisher();

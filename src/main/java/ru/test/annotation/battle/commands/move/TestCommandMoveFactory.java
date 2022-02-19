@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.battlemodule.core.commands.BattleCommandPrototype;
+import ru.jengine.battlemodule.core.commands.BattleCommandFactory;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
@@ -15,7 +15,7 @@ import ru.test.annotation.battle.TestBattle;
 import ru.test.annotation.battle.model.HasHealth;
 
 @Bean
-public class TestCommandMovePrototype implements BattleCommandPrototype<MoveParameters, TestCommandMove> {
+public class TestCommandMoveFactory implements BattleCommandFactory<MoveParameters, TestCommandMove> {
     @Override
     public boolean canExecute(BattleModel model, BattleContext battleContext) {
         return model instanceof CanMoved && ((CanMoved)model).hasPosition() && ((CanMoved)model).hasDirection();

@@ -5,35 +5,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.battlemodule.core.exceptions.BattleException;
-import ru.jengine.battlemodule.core.information.personalinfo.BattleModelInfo;
-import ru.jengine.battlemodule.core.information.personalinfo.EditableBattleModelInfo;
 
 @BattleBeanPrototype
-public class InformationCenterImpl implements EditableInformationCenter { //TODO переделать центр информации
+public class InformationCenterImpl implements InformationCenter { //TODO переделать центр информации
     private final Map<Class<? extends InformationService>, InformationService> services = new ConcurrentHashMap<>();
-    private final Map<Integer, EditableBattleModelInfo> personalInfo = new ConcurrentHashMap<>();
-
-    @Override
-    public EditableBattleModelInfo getEditablePersonalInfo(int personalId) {
-        EditableBattleModelInfo info = personalInfo.get(personalId);
-
-        if (info == null) {
-            throw new BattleException("Personal [" + personalId + "] has no personal info. Maybe he is not registered");
-        }
-
-        return info;
-    }
 
     @Override
     public void initialize(BattleContext battleContext) {
-        battleContext.getBattleState().getDynamicObjectIds()
-                .forEach(id -> personalInfo.put(id, new EditableBattleModelInfo()));
-    }
-
-    @Override
-    public BattleModelInfo getPersonalInfoOnTurn(int personalId) {
-        return personalInfo.get(personalId);
+        //TODO пока не используется, если вы увидели это, то инициализация скорее всего здесь не нужна
     }
 
     @Override

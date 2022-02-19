@@ -1,6 +1,6 @@
 package ru.test.annotation.battle.commands.move;
 
-import static ru.test.annotation.battle.commands.move.TestCommandMovePrototype.isAvailablePoint;
+import static ru.test.annotation.battle.commands.move.TestCommandMoveFactory.isAvailablePoint;
 
 import java.util.Set;
 

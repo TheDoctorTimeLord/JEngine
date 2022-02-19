@@ -5,28 +5,28 @@ import java.util.Collection;
 import java.util.List;
 
 import ru.jengine.battlemodule.core.commands.BattleCommand;
-import ru.jengine.battlemodule.core.commands.BattleCommandPrototype;
+import ru.jengine.battlemodule.core.commands.BattleCommandFactory;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
 import ru.jengine.battlemodule.core.commands.CommandExecutionParameters;
 import ru.jengine.beancontainer.annotations.Bean;
 
 @Bean
 public class CommandRegistrarByContainer implements BattleCommandRegistrar {
-    private final List<BattleCommandPrototype<?, ?>> allBattleCommands;
+    private final List<BattleCommandFactory<?, ?>> allBattleCommands;
 
-    public CommandRegistrarByContainer(List<BattleCommandPrototype<?, ?>> allBattleCommands) {
+    public CommandRegistrarByContainer(List<BattleCommandFactory<?, ?>> allBattleCommands) {
         this.allBattleCommands = allBattleCommands;
     }
 
     @Override
     public <P extends CommandExecutionParameters, C extends BattleCommand<P>> void registerCommand(
-            BattleCommandPrototype<P, C> battleCommandPrototype)
+            BattleCommandFactory<P, C> battleCommandFactory)
     {
-        allBattleCommands.add(battleCommandPrototype);
+        allBattleCommands.add(battleCommandFactory);
     }
 
     @Override
-    public Collection<BattleCommandPrototype<?, ?>> getAllCommands() {
+    public Collection<BattleCommandFactory<?, ?>> getAllCommands() {
         return new ArrayList<>(allBattleCommands);
     }
 }
