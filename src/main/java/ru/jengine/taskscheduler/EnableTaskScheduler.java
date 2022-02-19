@@ -5,10 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import ru.jengine.beancontainer.annotations.Import;
+import ru.jengine.beancontainer.annotations.ImportModule;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(TaskSchedulerImpl.class)
+@ImportModule(TaskSchedulerModule.class)
 public @interface EnableTaskScheduler {
 }
