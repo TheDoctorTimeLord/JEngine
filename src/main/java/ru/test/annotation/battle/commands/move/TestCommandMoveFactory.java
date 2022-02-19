@@ -11,7 +11,6 @@ import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.test.annotation.battle.TestBattle;
 import ru.test.annotation.battle.model.HasHealth;
 
 @Bean
@@ -46,12 +45,7 @@ public class TestCommandMoveFactory implements BattleCommandFactory<MoveParamete
     }
 
     public static boolean isAvailablePoint(Point checked, BattleState battleState) {
-        return inBound(checked) && battleState.getOnPosition(checked).isEmpty();
-    }
-
-    public static boolean inBound(Point checked) {
-        return 0 <= checked.getX() && checked.getX() < TestBattle.MAP_SIZE && 0 <= checked.getY()
-                && checked.getY() < TestBattle.MAP_SIZE;
+        return battleState.inBattlefieldBound(checked) && battleState.getOnPosition(checked).isEmpty();
     }
 
     @Override

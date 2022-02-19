@@ -26,6 +26,7 @@ import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.core.state.BattleState;
+import ru.jengine.battlemodule.core.state.BattlefieldLimiter;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.BeanContainer;
 import ru.jengine.beancontainer.annotations.ContainerModule;
@@ -270,6 +271,24 @@ class SimpleBattleGenerator implements BattleGenerator {
             dynamicModels.add(model.getId());
         }
 
-        return new BattleState(battleModelById, mapPosition, dynamicModels);
+        SquareBattleFieldLimiter battleFieldLimiter = new SquareBattleFieldLimiter(new Point(0, 0), TestBattle.MAP_SIZE);
+
+        return new BattleState(battleModelById, mapPosition, dynamicModels, battleFieldLimiter);
+    }
+
+    private static class SquareBattleFieldLimiter implements BattlefieldLimiter {
+        private final Point leftTopVertex;
+        private final int side;
+
+        private SquareBattleFieldLimiter(Point leftTopVertex, int side) {
+            this.leftTopVertex = leftTopVertex;
+            this.side = side;
+        }
+
+        @Override
+        public boolean inBound(Point point) {
+            Point dist = point.sub(leftTopVertex);
+            return 0 <= dist.getX() && dist.getX() < side && 0 <= dist.getY() && dist.getY() < side;
+        }
     }
 }

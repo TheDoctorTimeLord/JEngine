@@ -18,18 +18,22 @@ public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
     private final Map<Point, List<Integer>> battleModelOnField;
     private final List<Integer> dynamicObjects;
+    private final BattlefieldLimiter[] battlefieldLimiters;
 
     /**
      * @param battleModelById сопоставление всех объектов в бою с их ID
      * @param battleModelOnField расположение всех объектов на поле боя (объекты представлены их ID)
      * @param dynamicObjects список ID объектов, которые являются динамическими (могут совершать действия)
+     * @param battlefieldLimiters ограничители поля боя
      */
     public BattleState(Map<Integer, BattleModel> battleModelById,
-            Map<Point, List<Integer>> battleModelOnField, List<Integer> dynamicObjects)
+            Map<Point, List<Integer>> battleModelOnField, List<Integer> dynamicObjects,
+            BattlefieldLimiter... battlefieldLimiters)
     {
         this.battleModelById = battleModelById;
         this.battleModelOnField = battleModelOnField;
         this.dynamicObjects = dynamicObjects;
+        this.battlefieldLimiters = battlefieldLimiters;
     }
 
     /**
@@ -84,8 +88,18 @@ public class BattleState {
         return new ArrayList<>(models);
     }
 
-    private List<Integer> getOnPositionEditable(Point point) {
-        return battleModelOnField.computeIfAbsent(point, p -> new ArrayList<>());
+    /**
+     * Проверяет находится ли точка в пределах поля боя
+     * @param point проверяемая точка
+     * @return true - если точка находится в пределах поля боя, false - иначе
+     */
+    public boolean inBattlefieldBound(Point point) {
+        for (BattlefieldLimiter limiter : battlefieldLimiters) {
+            if (!limiter.inBound(point)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -114,6 +128,10 @@ public class BattleState {
      */
     public void setToPosition(Point position, int id) {
         getOnPositionEditable(position).add(id);
+    }
+
+    private List<Integer> getOnPositionEditable(Point point) {
+        return battleModelOnField.computeIfAbsent(point, p -> new ArrayList<>());
     }
 
     public List<BattleModel> getDynamicObjects() {

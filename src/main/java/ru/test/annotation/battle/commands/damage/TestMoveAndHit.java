@@ -1,6 +1,5 @@
 package ru.test.annotation.battle.commands.damage;
 
-import static ru.test.annotation.battle.commands.move.TestCommandMoveFactory.inBound;
 import static ru.test.annotation.battle.commands.move.TestCommandMoveFactory.isAvailablePoint;
 
 import ru.jengine.battlemodule.core.BattleContext;
@@ -40,7 +39,7 @@ public class TestMoveAndHit extends NoParametersCommand {
         Point nextPosition = canMoved.nextPosition();
         Point afterNextPosition = nextPosition.add(canMoved.getDirection().getOffset());
 
-        return isAvailablePoint(nextPosition, battleState) && inBound(afterNextPosition) &&
+        return isAvailablePoint(nextPosition, battleState) && battleState.inBattlefieldBound(afterNextPosition) &&
                 !battleState.getOnPosition(afterNextPosition).isEmpty();
     }
 
