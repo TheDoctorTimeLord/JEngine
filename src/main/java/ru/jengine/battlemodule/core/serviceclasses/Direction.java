@@ -4,10 +4,10 @@ package ru.jengine.battlemodule.core.serviceclasses;
  * Направления взгляда персонажей.
  */
 public enum Direction {
-    UP(new Point(0, 1)),
-    RIGHT(new Point(1, 0)),
-    DOWN(new Point(0, -1)),
-    LEFT(new Point(-1, 0));
+    UP(PointPool.obtain(0, 1)),
+    RIGHT(PointPool.obtain(1, 0)),
+    DOWN(PointPool.obtain(0, -1)),
+    LEFT(PointPool.obtain(-1, 0));
 
     private final Point offset;
 

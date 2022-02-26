@@ -49,7 +49,7 @@ public class BattleDynamicObjectsManager {
     public void removeCharacter(int characterId) {
         behaviorObjectsManager.unbindBehavior(characterId);
         commandsForCharacter.remove(characterId);
-        battleState.removeDynamicObject(characterId);
+        battleState.removeObject(characterId);
     }
 
     /**

@@ -99,6 +99,10 @@ public class BeanUtils {
         methodMeta.invokeWithInnerParameters();
     }
 
+    public static Object getBean(BeanContext beanContext) {
+        return beanContext == null ? null : beanContext.getBean();
+    }
+
     public static <T> List<T> getBeanAsList(BeanContext context) {
         if (context == null) {
             return new ArrayList<>();
@@ -112,14 +116,11 @@ public class BeanUtils {
     }
 
     public static BeanFactoryStrategy createStrategy(Class<?> cls, String strategyCode) { //TODO подумать о том, как ещё можно создать стратегию
-        switch (strategyCode) {
-        case BeanStrategy.SINGLETON:
-            return new SingletonBeanFactoryStrategy(cls);
-        case BeanStrategy.PROTOTYPE:
-            return new PrototypeBeanFactoryStrategy(cls);
-        default:
-            throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
-        }
+        return switch (strategyCode) {
+            case BeanStrategy.SINGLETON -> new SingletonBeanFactoryStrategy(cls);
+            case BeanStrategy.PROTOTYPE -> new PrototypeBeanFactoryStrategy(cls);
+            default -> throw new ContainerException("Unknown strategy type [" + strategyCode + "]");
+        };
     }
 
     public static BeanContext findAppropriateValueBean(ContainerMultiContext multiContext, Class<?> beanType,

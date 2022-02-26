@@ -1,6 +1,7 @@
 package ru.jengine.utils.fieldofview.shadowcasting;
 
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.core.serviceclasses.PointPool;
 
 public abstract class Quadrant {
     protected final Point startFieldOfView;
@@ -22,7 +23,7 @@ public abstract class Quadrant {
 
         @Override
         public Point getPositionOnMap(Tile tile) {
-            return new Point(
+            return PointPool.obtain(
                     startFieldOfView.getX() + tile.getColumn(),
                     startFieldOfView.getY() + tile.getDepth());
         }
@@ -35,7 +36,7 @@ public abstract class Quadrant {
 
         @Override
         public Point getPositionOnMap(Tile tile) {
-            return new Point(
+            return PointPool.obtain(
                     startFieldOfView.getX() + tile.getDepth(),
                     startFieldOfView.getY() - tile.getColumn()
             );
@@ -49,7 +50,7 @@ public abstract class Quadrant {
 
         @Override
         public Point getPositionOnMap(Tile tile) {
-            return new Point(
+            return PointPool.obtain(
                     startFieldOfView.getX() - tile.getColumn(),
                     startFieldOfView.getY() - tile.getDepth()
             );
@@ -63,7 +64,7 @@ public abstract class Quadrant {
 
         @Override
         public Point getPositionOnMap(Tile tile) {
-            return new Point(
+            return PointPool.obtain(
                     startFieldOfView.getX() - tile.getDepth(),
                     startFieldOfView.getY() + tile.getColumn()
             );

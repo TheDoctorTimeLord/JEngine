@@ -1,9 +1,12 @@
 package ru.jengine.battlemodule.core.state;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import ru.jengine.battlemodule.core.exceptions.BattleException;
@@ -17,7 +20,7 @@ import ru.jengine.battlemodule.core.serviceclasses.Point;
 public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
     private final Map<Point, List<Integer>> battleModelOnField;
-    private final List<Integer> dynamicObjects;
+    private final Set<Integer> dynamicObjects;
     private final BattlefieldLimiter[] battlefieldLimiters;
 
     /**
@@ -27,12 +30,12 @@ public class BattleState {
      * @param battlefieldLimiters ограничители поля боя
      */
     public BattleState(Map<Integer, BattleModel> battleModelById,
-            Map<Point, List<Integer>> battleModelOnField, List<Integer> dynamicObjects,
+            Map<Point, List<Integer>> battleModelOnField, Collection<Integer> dynamicObjects,
             BattlefieldLimiter... battlefieldLimiters)
     {
         this.battleModelById = battleModelById;
         this.battleModelOnField = battleModelOnField;
-        this.dynamicObjects = dynamicObjects;
+        this.dynamicObjects = new HashSet<>(dynamicObjects);
         this.battlefieldLimiters = battlefieldLimiters;
     }
 
@@ -89,17 +92,30 @@ public class BattleState {
     }
 
     /**
-     * Проверяет находится ли точка в пределах поля боя
+     * Возвращает все клетки в пределах поля боя.
+     */
+    public Set<Point> getBattlefieldCells() {
+        Set<Point> battlefield = new HashSet<>();
+
+        for (BattlefieldLimiter limiter : battlefieldLimiters) {
+            battlefield.addAll(limiter.getPointsInBound());
+        }
+
+        return battlefield;
+    }
+
+    /**
+     * Проверяет, находится ли точка в пределах поля боя
      * @param point проверяемая точка
      * @return true - если точка находится в пределах поля боя, false - иначе
      */
     public boolean inBattlefieldBound(Point point) {
         for (BattlefieldLimiter limiter : battlefieldLimiters) {
-            if (!limiter.inBound(point)) {
-                return false;
+            if (limiter.inBound(point)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -164,11 +180,11 @@ public class BattleState {
     }
 
     /**
-     * Удаляет динамический объект из боя //TODO заменить единым методом для удаления объектов
-     * @param id ID динамического объекта
+     * Удаляет объект из боя
+     * @param id ID объекта
      */
-    public void removeDynamicObject(int id) {
-        dynamicObjects.remove((Integer)id);
+    public void removeObject(int id) {
+        dynamicObjects.remove(id);
         BattleModel model = battleModelById.remove(id);
 
         if (model instanceof HasPosition) {

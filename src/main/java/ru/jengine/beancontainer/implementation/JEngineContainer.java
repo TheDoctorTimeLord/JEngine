@@ -103,7 +103,7 @@ public class JEngineContainer implements BeanContainer {
     @Override
     public <T> T getBean(Class<?> beanClass) {
         BeanContext bean = beanContainerContext.getBean(beanClass);
-        return bean == null ? null : bean.getBean();
+        return (T)BeanUtils.getBean(bean);
     }
 
     @Override

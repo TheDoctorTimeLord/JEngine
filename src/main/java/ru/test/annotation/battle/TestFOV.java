@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import ru.jengine.battlemodule.core.exceptions.BattleException;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.core.serviceclasses.PointPool;
 import ru.jengine.utils.fieldofview.FieldOfViewCalculator;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.NorthQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.RowRestriction;
@@ -54,7 +55,7 @@ public class TestFOV {
 
             for (int y = 0; y < map.length; y++) {
                 for (int x = 0; x < map[0].length; x++) {
-                    Point point = new Point(x, y);
+                    Point point = PointPool.obtain(x, y);
                     if (visible.getOrDefault("all", Collections.emptyList()).contains(point)) {
                         System.out.print(map[y][x]);
                     } else if (visible.getOrDefault("partition", Collections.emptyList()).contains(point)) {
@@ -94,7 +95,7 @@ public class TestFOV {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
                 if (map[y][x] == '@') {
-                    return new Point(x, y);
+                    return PointPool.obtain(x, y);
                 }
             }
         }

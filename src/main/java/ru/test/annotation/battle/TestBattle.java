@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.battlemodule.core.serviceclasses.PointPool;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.core.state.BattlefieldLimiter;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
@@ -262,7 +265,7 @@ class SimpleBattleGenerator implements BattleGenerator {
 
         for (int i = 0; i < 5; i++) {
             BattleCharacter model = new BattleCharacter(idGenerator.generateId(), 10);
-            Point position = new Point(random.nextInt(TestBattle.MAP_SIZE), random.nextInt(TestBattle.MAP_SIZE));
+            Point position = PointPool.obtain(random.nextInt(TestBattle.MAP_SIZE), random.nextInt(TestBattle.MAP_SIZE));
 
             battleModelById.put(model.getId(), model);
             mapPosition.computeIfAbsent(position, p -> new ArrayList<>()).add(model.getId());
@@ -271,7 +274,7 @@ class SimpleBattleGenerator implements BattleGenerator {
             dynamicModels.add(model.getId());
         }
 
-        SquareBattleFieldLimiter battleFieldLimiter = new SquareBattleFieldLimiter(new Point(0, 0), TestBattle.MAP_SIZE);
+        SquareBattleFieldLimiter battleFieldLimiter = new SquareBattleFieldLimiter(PointPool.obtain(0, 0), TestBattle.MAP_SIZE);
 
         return new BattleState(battleModelById, mapPosition, dynamicModels, battleFieldLimiter);
     }
@@ -289,6 +292,19 @@ class SimpleBattleGenerator implements BattleGenerator {
         public boolean inBound(Point point) {
             Point dist = point.sub(leftTopVertex);
             return 0 <= dist.getX() && dist.getX() < side && 0 <= dist.getY() && dist.getY() < side;
+        }
+
+        @Override
+        public Set<Point> getPointsInBound() {
+            Set<Point> inBound = new HashSet<>();
+
+            for (int x = 0; x < side; x++) {
+                for (int y = 0; y < side; y++) {
+                    inBound.add(PointPool.obtain(x, y));
+                }
+            }
+
+            return inBound;
         }
     }
 }

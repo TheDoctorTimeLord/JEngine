@@ -7,7 +7,7 @@ import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
 
 @BattleBeanPrototype
-public class InformationCenterImpl implements InformationCenter { //TODO переделать центр информации
+public class InformationCenterImpl implements InformationCenter {
     private final Map<Class<? extends InformationService>, InformationService> services = new ConcurrentHashMap<>();
 
     @Override

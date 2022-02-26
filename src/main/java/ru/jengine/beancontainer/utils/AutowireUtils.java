@@ -1,5 +1,7 @@
 package ru.jengine.beancontainer.utils;
 
+import static ru.jengine.beancontainer.utils.BeanUtils.getBean;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,10 +43,6 @@ public class AutowireUtils {
             return convertCollection(getBean(beanContext), collectionClass);
         }
         return getBean(beanContext);
-    }
-
-    private static Object getBean(BeanContext beanContext) { //TODO вынести метод и все похожие места в BeanUtils
-        return beanContext == null ? null : beanContext.getBean();
     }
 
     private static Object convertCollection(Object bean, Class<?> collectionClass) {

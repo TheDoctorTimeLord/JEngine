@@ -1,5 +1,7 @@
 package ru.jengine.battlemodule.core.state;
 
+import java.util.Set;
+
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 
 /**
@@ -14,4 +16,9 @@ public interface BattlefieldLimiter {
      * @return true - если точка удовлетворяет условиям текущего ограничителя, false - иначе
      */
     boolean inBound(Point point);
+
+    /**
+     * Возвращает все точки, находящиеся в пределах поля боя
+     */
+    Set<Point> getPointsInBound();
 }

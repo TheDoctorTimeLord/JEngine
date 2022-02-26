@@ -4,13 +4,12 @@ import com.google.common.base.Objects;
 
 /**
  * Класс, хранящий координаты. Класс является immutable (только поддерживает наследование)
- * //TODO добавить кэширование для уменьшения количества создаваемых объектов
  */
 public class Point {
     private final int x;
     private final int y;
 
-    public Point(int x, int y) {
+    Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -35,7 +34,7 @@ public class Point {
      * @return новая точка — результат покоординатного сложения
      */
     public Point add(Point point) {
-        return point != null ? new Point(x + point.getX(), y + point.getY()) : this;
+        return point != null ? PointPool.obtain(x + point.getX(), y + point.getY()) : this;
     }
 
     /**
@@ -44,7 +43,7 @@ public class Point {
      * @return новая точка — результат покоординатного вычитания
      */
     public Point sub(Point point) {
-        return point != null ? new Point(x - point.getX(), y - point.getY()) : this;
+        return point != null ? PointPool.obtain(x - point.getX(), y - point.getY()) : this;
     }
 
     @Override

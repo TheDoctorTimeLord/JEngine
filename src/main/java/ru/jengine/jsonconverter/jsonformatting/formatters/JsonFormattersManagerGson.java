@@ -15,7 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @Bean
-public class JsonFormattersManagerGson implements JsonFormattersManager<JsonObject> { //TODO добавить применение форматтеров по типам
+public class JsonFormattersManagerGson implements JsonFormattersManager<JsonObject> {
     private final Map<String, List<JsonFormatter<JsonObject>>> formattersByType = new HashMap<>();
     private final List<JsonFormatter<JsonObject>> commonFormatters = new ArrayList<>();
 

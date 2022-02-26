@@ -75,7 +75,7 @@ public class ConfiguratorsHandler implements ContextPreProcessor, BeanPostProces
         public void configure(Object configurable, ContainerContext context) {
             Object[] parameters = Stream.concat(Stream.of(configurable), neededParameters.stream()
                     .map(context::getBean)
-                    .map(beanContext -> beanContext == null ? null : beanContext.getBean()))
+                    .map(BeanUtils::getBean))
                     .toArray();
 
             configurator.invoke(parameters);
