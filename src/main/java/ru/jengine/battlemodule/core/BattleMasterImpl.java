@@ -11,6 +11,7 @@ import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
 import ru.jengine.battlemodule.core.contentregistrars.ContentRegistrarsService;
 import ru.jengine.battlemodule.core.contentregistrars.PostHandlerBindingService;
 import ru.jengine.battlemodule.core.contentregistrars.RegistrarsContext;
+import ru.jengine.battlemodule.core.events.BattleEvent;
 import ru.jengine.battlemodule.core.events.BattleEventPoolHandler;
 import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.information.InformationCenter;
@@ -95,6 +96,11 @@ public class BattleMasterImpl implements BattleMaster {
     @Override
     public BattleActionPresenter getBattlePresenter() {
         return battleActionLogger;
+    }
+
+    @Override
+    public void handleBattleEvent(BattleEvent event) {
+        dispatcher.handle(event);
     }
 
     private void prepareDispatcherForBattle() {

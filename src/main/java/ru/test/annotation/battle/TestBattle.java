@@ -280,17 +280,17 @@ class SimpleBattleGenerator implements BattleGenerator {
     }
 
     private static class SquareBattleFieldLimiter implements BattlefieldLimiter {
-        private final Point leftTopVertex;
+        private final Point leftBottomVertex;
         private final int side;
 
-        private SquareBattleFieldLimiter(Point leftTopVertex, int side) {
-            this.leftTopVertex = leftTopVertex;
+        private SquareBattleFieldLimiter(Point leftBottomVertex, int side) {
+            this.leftBottomVertex = leftBottomVertex;
             this.side = side;
         }
 
         @Override
         public boolean inBound(Point point) {
-            Point dist = point.sub(leftTopVertex);
+            Point dist = point.sub(leftBottomVertex);
             return 0 <= dist.getX() && dist.getX() < side && 0 <= dist.getY() && dist.getY() < side;
         }
 

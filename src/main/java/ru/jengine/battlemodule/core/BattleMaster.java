@@ -3,6 +3,7 @@ package ru.jengine.battlemodule.core;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
+import ru.jengine.battlemodule.core.events.BattleEvent;
 
 /**
  * Главный класс для управления боем. Класс занимается инициализацией, выполнением процесса и остановкой боя. Данные
@@ -66,6 +67,12 @@ public interface BattleMaster {
      * выполняемыми в {@link ru.jengine.eventqueue.Dispatcher})
      */
     BattleActionPresenter getBattlePresenter();
+
+    /**
+     * Исполняет событие в рамках текущего боя. Позволяет исполнить событие из-вне боя
+     * @param event событие, которое будет исполнено в текущем бою
+     */
+    void handleBattleEvent(BattleEvent event);
 
     /**
      * Останавливает бой и освобождает занятые боем игровые ресурсы

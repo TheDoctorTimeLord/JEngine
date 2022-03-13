@@ -6,13 +6,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ru.jengine.battlemodule.core.exceptions.BattleException;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
+import ru.jengine.utils.CollectionUtils;
 
 /**
  * Хранит всю необходимую информацию о текущем состоянии боя
@@ -36,6 +39,30 @@ public class BattleState {
         this.battleModelById = battleModelById;
         this.battleModelOnField = battleModelOnField;
         this.dynamicObjects = new HashSet<>(dynamicObjects);
+        this.battlefieldLimiters = battlefieldLimiters;
+    }
+
+    public BattleState(Collection<BattleModel> staticModels, Collection<BattleModel> dynamicModels,
+            BattlefieldLimiter... battlefieldLimiters)
+    {
+        this.battleModelById = Stream.concat(staticModels.stream(), dynamicModels.stream())
+                .collect(Collectors.toMap(BattleModel::getId, battleModel -> battleModel));
+        List<BattleModel> modelsWithPosition = Stream.concat(staticModels.stream(), dynamicModels.stream())
+                .filter(battleModel -> battleModel instanceof HasPosition)
+                .filter(battleModel -> ((HasPosition)battleModel).hasPosition())
+                .toList();
+        this.battleModelOnField = CollectionUtils.groupBy(modelsWithPosition, m -> ((HasPosition)m).getPosition())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        e -> e.getValue().stream()
+                                .map(BattleModel::getId)
+                                .collect(Collectors.toList())
+                ));
+        this.dynamicObjects = dynamicModels.stream()
+                .map(BattleModel::getId)
+                .collect(Collectors.toSet());
         this.battlefieldLimiters = battlefieldLimiters;
     }
 
@@ -187,8 +214,7 @@ public class BattleState {
         dynamicObjects.remove(id);
         BattleModel model = battleModelById.remove(id);
 
-        if (model instanceof HasPosition) {
-            HasPosition hasPosition = (HasPosition)model;
+        if (model instanceof HasPosition hasPosition) {
             Point position = hasPosition.getPosition();
             if (position != null) {
                 removeFromPosition(position, id);
