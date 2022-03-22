@@ -50,7 +50,7 @@ import ru.test.annotation.battle.model.HasHealth;
 public class TestBattle extends AnnotationModule {
     public static final int MAP_SIZE = 5;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         BeanContainer container = new JEngineContainer();
         container.initializeCommonContexts(ContainerConfiguration.build(TestBattle.class).addAdditionalBean(container));
 
@@ -67,7 +67,7 @@ public class TestBattle extends AnnotationModule {
         AtomicInteger battleCounter = new AtomicInteger(battles.length);
 
         while (battleCounter.get() > 0) {
-//            Thread.sleep(2000);
+            Thread.sleep(2000);
             turnBattles(battles);
 
             Arrays.stream(battles)

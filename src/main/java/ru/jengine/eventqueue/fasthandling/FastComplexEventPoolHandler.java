@@ -1,40 +1,60 @@
 package ru.jengine.eventqueue.fasthandling;
 
-import java.util.function.Consumer;
-
 import javax.annotation.Nullable;
 
 import ru.jengine.eventqueue.EventInterceptor;
+import ru.jengine.eventqueue.EventProcessor;
+import ru.jengine.eventqueue.dataclasses.EventHandlersManager;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
+import ru.jengine.eventqueue.event.PostHandler;
 import ru.jengine.eventqueue.eventpool.EventPool;
 import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 
 public abstract class FastComplexEventPoolHandler implements EventInterceptor, EventPoolHandler {
-    private Consumer<Event> eventProcessor;
-    private Event handlingEvent;
+    private final String eventPoolCode;
+    private EventHandlersManager eventHandlersManager;
+    private EventProcessor eventProcessor;
 
-    @Override
-    public @Nullable String getEventPoolCode() {
-        return null;
+    protected FastComplexEventPoolHandler(String eventPoolCode) {
+        this.eventPoolCode = eventPoolCode;
     }
 
     @Override
+    public String getEventPoolCode() {
+        return eventPoolCode;
+    }
+
+    @Override
+    @Nullable
     public EventPool initialize(EventHandlingContext context) {
+        this.eventHandlersManager = new EventHandlersManager(context.getPreHandlers());
         this.eventProcessor = context.getEventProcessor();
         return null;
     }
 
     @Override
-    public void handle() {
-        if (handlingEvent != null) {
-            eventProcessor.accept(handlingEvent);
-        }
+    public void intercept(Event event, EventPoolProvider poolProvider) {
+        eventProcessor.process(
+                eventHandlersManager.getPreHandlers(event),
+                eventHandlersManager.getPostHandlers(event),
+                event
+        );
     }
 
     @Override
-    public void intercept(Event event, EventPoolProvider poolProvider) {
-        this.handlingEvent = event;
+    public void handle() {
+        //Метод handle не должен отрабатывать, так как требуется чтобы событие было обработано в момент регистрации
+    }
+
+    @Override
+    public void registerPostHandler(PostHandler<?> postHandler) {
+        eventHandlersManager.registerPostHandler(postHandler);
+    }
+
+    @Override
+    public void removePostHandler(PostHandler<?> postHandler) {
+        eventHandlersManager.removePostHandler(postHandler);
     }
 }

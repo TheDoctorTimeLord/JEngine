@@ -1,5 +1,6 @@
 package ru.jengine.battlemodule.core.events;
 
+import java.util.Collections;
 import java.util.List;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
@@ -7,7 +8,6 @@ import ru.jengine.battlemodule.core.BattleIdSetter;
 import ru.jengine.eventqueue.Dispatcher;
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.event.PostHandler;
-import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 
 /**
  * Обёртка над {@link Dispatcher}, которая обеспечивает удобную работу с диспетчером событий внутри логики боя
@@ -15,6 +15,7 @@ import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 @BattleBeanPrototype
 public class DispatcherBattleWrapper implements BattleIdSetter {
     private final Dispatcher dispatcher;
+    private List<EventInterceptor> eventInterceptors;
     private String battleId;
 
     public DispatcherBattleWrapper(Dispatcher dispatcher) {
@@ -28,18 +29,18 @@ public class DispatcherBattleWrapper implements BattleIdSetter {
 
     /**
      * Регистрирует обработчик очереди для быстрых событий
-     * @param interceptors список перехватчиков событий для передаваемого обработчика
-     * @param handler обработчик очереди для быстрых событий
      */
-    public void registerFastHandler(List<EventInterceptor> interceptors, EventPoolHandler handler) {
-        dispatcher.registerFastHandler(battleId, interceptors, handler);
+    public void registerFastHandler() {
+        BattleEventPoolHandler poolHandler = new BattleEventPoolHandler(battleId);
+        eventInterceptors = Collections.singletonList(poolHandler);
+        dispatcher.registerEventPoolHandler(eventInterceptors, poolHandler, Collections.emptyList());
     }
 
     /**
      * Удаляет обработчик быстрых событий из {@link Dispatcher}
      */
     public void removeFastHandler() {
-        dispatcher.removeFastHandler(battleId);
+        dispatcher.removeEventPoolHandler(eventInterceptors, battleId);
     }
 
     /**
@@ -47,7 +48,7 @@ public class DispatcherBattleWrapper implements BattleIdSetter {
      * @param handler пост обработчик событий
      */
     public <T extends BattleEvent> void registerPostHandler(PostHandler<T> handler) {
-        dispatcher.registerPostHandler(new BattlePostHandlerWrapper<>(battleId, handler));
+        dispatcher.registerPostHandlerToPool(battleId, handler);
     }
 
     /**
@@ -55,7 +56,7 @@ public class DispatcherBattleWrapper implements BattleIdSetter {
      * @param handler пост обработчик событий
      */
     public void removePostHandler(PostHandler<?> handler) {
-        dispatcher.removePostHandler(new BattlePostHandlerWrapper(battleId, handler));
+        dispatcher.removePostHandlerFromPool(battleId, handler);
     }
 
     /**
@@ -65,6 +66,6 @@ public class DispatcherBattleWrapper implements BattleIdSetter {
      */
     public <E extends BattleEvent> void handle(E event) {
         event.setBattleId(battleId);
-        dispatcher.handleNow(battleId, event);
+        dispatcher.registerEvent(event);
     }
 }

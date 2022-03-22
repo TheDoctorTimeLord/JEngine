@@ -1,7 +1,5 @@
 package ru.jengine.battlemodule.core;
 
-import java.util.Collections;
-
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionLogger;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
 import ru.jengine.battlemodule.core.battlepresenter.initializebattle.BattleInitializationNotifier;
@@ -12,7 +10,6 @@ import ru.jengine.battlemodule.core.contentregistrars.ContentRegistrarsService;
 import ru.jengine.battlemodule.core.contentregistrars.PostHandlerBindingService;
 import ru.jengine.battlemodule.core.contentregistrars.RegistrarsContext;
 import ru.jengine.battlemodule.core.events.BattleEvent;
-import ru.jengine.battlemodule.core.events.BattleEventPoolHandler;
 import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.scheduler.BattleScheduler;
@@ -65,7 +62,7 @@ public class BattleMasterImpl implements BattleMaster {
     public void prepareBattle(BattleGenerator battleGenerator, BattleCommandRegistrar commandRegistrar,
             BehaviorObjectsManager behaviorObjectsManager)
     {
-        prepareDispatcherForBattle();
+        dispatcher.registerFastHandler();
 
         battleGenerator.setIdGenerator(idGenerator);
         BattleState state = battleGenerator.generate();
@@ -101,11 +98,6 @@ public class BattleMasterImpl implements BattleMaster {
     @Override
     public void handleBattleEvent(BattleEvent event) {
         dispatcher.handle(event);
-    }
-
-    private void prepareDispatcherForBattle() {
-        BattleEventPoolHandler handler = new BattleEventPoolHandler();
-        dispatcher.registerFastHandler(Collections.singletonList(handler), handler);
     }
 
     @Override
