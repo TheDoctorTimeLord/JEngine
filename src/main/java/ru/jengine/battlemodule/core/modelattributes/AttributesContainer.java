@@ -1,54 +1,38 @@
 package ru.jengine.battlemodule.core.modelattributes;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import ru.jengine.battlemodule.core.modelattributes.baseattributes.AttributesBasedAttribute;
-import ru.jengine.battlemodule.core.modelattributes.baseattributes.BooleanAttribute;
-import ru.jengine.battlemodule.core.modelattributes.baseattributes.FloatAttribute;
-import ru.jengine.battlemodule.core.modelattributes.baseattributes.IntAttribute;
-import ru.jengine.battlemodule.core.modelattributes.baseattributes.StringAttribute;
 
 /**
  * Контейнер, хранящий все атрибуты некоторой модели в бою
  */
-public class AttributesContainer {
+public class AttributesContainer implements AttributeStore<AttributesContainer> {
     private final Map<String, BattleAttribute> attributes = new ConcurrentHashMap<>();
 
-    public <T extends BattleAttribute> T getAttribute(String attributeCode) {
+    @Override
+    public <T extends BattleAttribute> T get(String attributeCode) {
         return (T)attributes.get(attributeCode);
     }
 
-    public StringAttribute getAsString(String attributeCode) {
-        return getAttribute(attributeCode);
-    }
-
-    public IntAttribute getAsInt(String attributeCode) {
-        return getAttribute(attributeCode);
-    }
-
-    public FloatAttribute getAsFloat(String attributeCode) {
-        return getAttribute(attributeCode);
-    }
-
-    public BooleanAttribute getAsBoolean(String attributeCode) {
-        return getAttribute(attributeCode);
-    }
-
-    public AttributesBasedAttribute getAsContainer(String attributeCode) {
-        return getAttribute(attributeCode);
-    }
-
-    public boolean containsAttribute(String attributeCode) {
-        return attributes.containsKey(attributeCode);
-    }
-
-    public AttributesContainer addAttribute(BattleAttribute attribute) {
+    @Override
+    public AttributesContainer add(BattleAttribute attribute) {
         attributes.put(attribute.getCode(), attribute);
         return this;
     }
 
-    public BattleAttribute removeAttribute(String attributeCode) {
+    @Override
+    public BattleAttribute remove(String attributeCode) {
         return attributes.remove(attributeCode);
+    }
+
+    @Override
+    public void removeAll() {
+        attributes.clear();
+    }
+
+    @Override
+    public Collection<BattleAttribute> getAttributes() {
+        return attributes.values();
     }
 }

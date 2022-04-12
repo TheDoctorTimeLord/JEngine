@@ -5,6 +5,11 @@ package ru.jengine.battlemodule.core.scheduler;
  */
 public interface SchedulerTaskExecutor {
     /**
+     * Выполняет все запланированные на момент завершения инициализации боя задачи
+     */
+    void executeAfterInitializeBattle();
+
+    /**
      * Выполняет все запланированные на момент начала хода задачи
      */
     void executeBeforeTurn();

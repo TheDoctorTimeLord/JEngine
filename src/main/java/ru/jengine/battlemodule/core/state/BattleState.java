@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ru.jengine.battlemodule.core.containers.ItemContainersManager;
 import ru.jengine.battlemodule.core.exceptions.BattleException;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
@@ -24,7 +25,26 @@ public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
     private final Map<Point, List<Integer>> battleModelOnField;
     private final Set<Integer> dynamicObjects;
+    private final ItemContainersManager containersManager;
     private final BattlefieldLimiter[] battlefieldLimiters;
+
+    /**
+     * @param battleModelById сопоставление всех объектов в бою с их ID
+     * @param battleModelOnField расположение всех объектов на поле боя (объекты представлены их ID)
+     * @param dynamicObjects список ID объектов, которые являются динамическими (могут совершать действия)
+     * @param containersManager руководитель всех контейнеров в бою
+     * @param battlefieldLimiters ограничители поля боя
+     */
+    public BattleState(Map<Integer, BattleModel> battleModelById,
+            Map<Point, List<Integer>> battleModelOnField, Collection<Integer> dynamicObjects,
+            ItemContainersManager containersManager, BattlefieldLimiter... battlefieldLimiters)
+    {
+        this.battleModelById = battleModelById;
+        this.battleModelOnField = battleModelOnField;
+        this.dynamicObjects = new HashSet<>(dynamicObjects);
+        this.containersManager = containersManager;
+        this.battlefieldLimiters = battlefieldLimiters;
+    }
 
     /**
      * @param battleModelById сопоставление всех объектов в бою с их ID
@@ -32,18 +52,31 @@ public class BattleState {
      * @param dynamicObjects список ID объектов, которые являются динамическими (могут совершать действия)
      * @param battlefieldLimiters ограничители поля боя
      */
-    public BattleState(Map<Integer, BattleModel> battleModelById,
-            Map<Point, List<Integer>> battleModelOnField, Collection<Integer> dynamicObjects,
-            BattlefieldLimiter... battlefieldLimiters)
+    public BattleState(Map<Integer, BattleModel> battleModelById, Map<Point, List<Integer>> battleModelOnField,
+            Collection<Integer> dynamicObjects, BattlefieldLimiter... battlefieldLimiters)
     {
-        this.battleModelById = battleModelById;
-        this.battleModelOnField = battleModelOnField;
-        this.dynamicObjects = new HashSet<>(dynamicObjects);
-        this.battlefieldLimiters = battlefieldLimiters;
+        this(battleModelById, battleModelOnField, dynamicObjects, new ItemContainersManager(), battlefieldLimiters);
     }
 
+    /**
+     * @param staticModels все модели статических (тех, кто НЕ может влиять на мир) объектов
+     * @param dynamicModels все модели статических (тех, кто влиять на мир) объектов
+     * @param battlefieldLimiters ограничители поля боя
+     */
     public BattleState(Collection<BattleModel> staticModels, Collection<BattleModel> dynamicModels,
             BattlefieldLimiter... battlefieldLimiters)
+    {
+        this(staticModels, dynamicModels, new ItemContainersManager(), battlefieldLimiters);
+    }
+
+    /**
+     * @param staticModels все модели статических (тех, кто НЕ может влиять на мир) объектов
+     * @param dynamicModels все модели статических (тех, кто влиять на мир) объектов
+     * @param containersManager руководитель всех контейнеров в бою
+     * @param battlefieldLimiters ограничители поля боя
+     */
+    public BattleState(Collection<BattleModel> staticModels, Collection<BattleModel> dynamicModels,
+            ItemContainersManager containersManager, BattlefieldLimiter... battlefieldLimiters)
     {
         this.battleModelById = Stream.concat(staticModels.stream(), dynamicModels.stream())
                 .collect(Collectors.toMap(BattleModel::getId, battleModel -> battleModel));
@@ -63,7 +96,15 @@ public class BattleState {
         this.dynamicObjects = dynamicModels.stream()
                 .map(BattleModel::getId)
                 .collect(Collectors.toSet());
+        this.containersManager = containersManager;
         this.battlefieldLimiters = battlefieldLimiters;
+    }
+
+    /**
+     * Все объекты в бою (как статические, так и динамические)
+     */
+    public Collection<BattleModel> getModelsInBattle() {
+        return battleModelById.values();
     }
 
     /**
@@ -116,6 +157,22 @@ public class BattleState {
         }
 
         return new ArrayList<>(models);
+    }
+
+    /**
+     * Получение списка боевых объектов в указанной точке поля боя
+     * @param point точка, из которой будут получены объекты
+     * @return Список боевых объектов. Если объектов на позиции нет, то вернётся пустой список
+     */
+    public List<BattleModel> getModelsOnPosition(Point point) {
+        return resolveIds(getOnPosition(point));
+    }
+
+    /**
+     * Получение главного менеджера всех контейнеров в бою
+     */
+    public ItemContainersManager getContainersManager() {
+        return containersManager;
     }
 
     /**

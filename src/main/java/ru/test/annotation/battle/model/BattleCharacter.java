@@ -1,6 +1,6 @@
 package ru.test.annotation.battle.model;
 
-import ru.jengine.battlemodule.standardfilling.model.DynamicModel;
+import ru.jengine.battlemodule.standardfilling.dynamicmodel.DynamicModel;
 
 public class BattleCharacter extends DynamicModel implements HasHealth {
     private int health;

@@ -12,6 +12,7 @@ import ru.jengine.taskscheduler.TaskScheduler;
 @BattleBeanPrototype
 public class BattleScheduler implements BattleIdSetter, SchedulerTaskRegistrar, SchedulerTaskExecutor {
     private final TaskScheduler scheduler;
+    private String afterInitializeBattleQueue;
     private String beforeTurnTaskQueue;
     private String afterPhaseTaskQueue;
     private String afterTurnTaskQueue;
@@ -22,9 +23,15 @@ public class BattleScheduler implements BattleIdSetter, SchedulerTaskRegistrar, 
 
     @Override
     public void setBattleId(String battleId) {
+        this.afterInitializeBattleQueue = battleId + "-afterInitializeBattle";
         this.beforeTurnTaskQueue = battleId + "-beforeTurn";
         this.afterPhaseTaskQueue = battleId + "-afterPhase";
         this.afterTurnTaskQueue = battleId + "-afterTurn";
+    }
+
+    @Override
+    public void addTaskAfterInitializeBattle(Task task) {
+        scheduler.addTask(afterInitializeBattleQueue, task);
     }
 
     @Override
@@ -40,6 +47,11 @@ public class BattleScheduler implements BattleIdSetter, SchedulerTaskRegistrar, 
     @Override
     public void addTaskAfterTurn(Task task) {
         scheduler.addTask(afterTurnTaskQueue, task);
+    }
+
+    @Override
+    public void executeAfterInitializeBattle() {
+        scheduler.executeTaskQueue(afterInitializeBattleQueue);
     }
 
     @Override

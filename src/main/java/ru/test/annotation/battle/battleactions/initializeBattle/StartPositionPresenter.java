@@ -8,7 +8,7 @@ import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
 import ru.jengine.battlemodule.core.ExtendedBattleContext;
 import ru.jengine.battlemodule.core.battlepresenter.initializebattle.InitializationPresenter;
 import ru.jengine.battlemodule.core.state.BattleState;
-import ru.jengine.battlemodule.standardfilling.model.DynamicModel;
+import ru.jengine.battlemodule.standardfilling.dynamicmodel.DynamicModel;
 
 @BattleBeanPrototype
 public class StartPositionPresenter implements InitializationPresenter {

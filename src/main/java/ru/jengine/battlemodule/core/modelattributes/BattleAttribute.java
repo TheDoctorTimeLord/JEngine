@@ -1,6 +1,7 @@
 package ru.jengine.battlemodule.core.modelattributes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ import java.util.Objects;
  */
 public abstract class BattleAttribute {
     private final String code;
-    private List<String> path = new ArrayList<>();
+    private List<String> path = Collections.emptyList();
 
     protected BattleAttribute(String code) {
         this.code = Objects.requireNonNull(code, "Code of attribute must be not null");
@@ -32,8 +33,11 @@ public abstract class BattleAttribute {
         this.path = path;
     }
 
+    /**
+     * Возвращает копию пути до данного атрибута из {@link AttributesContainer} по цепочке атрибутов вложенных атрибутов
+     */
     public List<String> getPath() {
-        return path;
+        return new ArrayList<>(path);
     }
 
     @Override

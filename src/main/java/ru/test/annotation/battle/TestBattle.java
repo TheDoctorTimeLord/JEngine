@@ -16,7 +16,6 @@ import ru.jengine.battlemodule.EnableBattleCoreWithStandardFilling;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.BattleGenerator;
 import ru.jengine.battlemodule.core.BattleMasterImpl;
-import ru.jengine.battlemodule.core.IdGenerator;
 import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
 import ru.jengine.battlemodule.core.battlepresenter.BattlePresenterActionSubscriber;
@@ -248,14 +247,7 @@ class BattleMasterContext implements BattlePresenterActionSubscriber {
     public static class EndPhase implements BattleAction { }
 }
 
-class SimpleBattleGenerator implements BattleGenerator {
-    private IdGenerator idGenerator;
-
-    @Override
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
+class SimpleBattleGenerator extends BattleGenerator {
     @Override
     public BattleState generate() {
         Map<Integer, BattleModel> battleModelById = new HashMap<>();

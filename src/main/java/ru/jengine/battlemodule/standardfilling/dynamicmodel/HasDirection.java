@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standardfilling.model;
+package ru.jengine.battlemodule.standardfilling.dynamicmodel;
 
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 

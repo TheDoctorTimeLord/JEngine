@@ -78,6 +78,8 @@ public class BattleMasterImpl implements BattleMaster {
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
         behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(), informationCenter);
+
+        battleScheduler.executeAfterInitializeBattle(); //TODO объединить с informationAboutInitialize()
     }
 
     @Override

@@ -7,6 +7,12 @@ import ru.jengine.taskscheduler.Task;
  */
 public interface SchedulerTaskRegistrar {
     /**
+     * Добавляет задачу, которая будет после завершения инициализации боя
+     * @param task запланированная задача
+     */
+    void addTaskAfterInitializeBattle(Task task);
+
+    /**
      * Добавляет задачу, которая будет исполнена в момент перед началом нового хода
      * @param task запланированная задача
      */
