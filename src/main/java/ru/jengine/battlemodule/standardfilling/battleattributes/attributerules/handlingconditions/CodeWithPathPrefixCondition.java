@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.handlingconditions;
+package ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.handlingconditions;
 
 import java.util.List;
 

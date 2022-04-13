@@ -1,11 +1,11 @@
-package ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.processedattributes;
+package ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.processedattributes;
 
 import java.util.List;
 
 import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
 import ru.jengine.battlemodule.core.models.BattleModel;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandler;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandlerManager;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeRule;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager;
 
 /**
  * Общий класс для атрибутов, находящихся в процессе обработки {@link AttributeHandlerManager}'ом. Данная абстракция
@@ -25,9 +25,9 @@ public abstract class AbstractProcessedAttribute {
 
     /**
      * Запускает обработку атрибута, в соответствии с типом его обработки (удаление, изменение и т.д.)
-     * @param attributeHandler конкретный обработчик изменённых атрибутов
+     * @param attributeRule конкретный обработчик изменённых атрибутов
      * @param model модель объекта в бою, у которого происходит изменение атрибута
      * @return список изменённых атрибутов, в результате обработки
      */
-    public abstract List<AbstractProcessedAttribute> processAttribute(AttributeHandler attributeHandler, BattleModel model);
+    public abstract List<AbstractProcessedAttribute> processAttribute(AttributeRule attributeRule, BattleModel model);
 }

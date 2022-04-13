@@ -10,7 +10,7 @@ import ru.jengine.beancontainer.annotations.ImportModule;
 
 /**
  * Подключает к проекту стандартный модуль
- * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandlerManager обработки
+ * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager обработки
  * атрибутов}.<br>
  * ВАЖНО: аннотация {@link EnableBattleCoreWithStandardFilling} позволяет использовать ВСЁ стандартное
  * наполнение, ВКЛЮЧАЯ то, что будет добавлено текущей аннотацией. Если вы используете аннотацию

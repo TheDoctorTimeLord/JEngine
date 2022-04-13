@@ -1,10 +1,11 @@
-package ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.handlingconditions;
+package ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.handlingconditions;
 
 import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeRule;
 
 /**
  * Условие, описывающее может ли некоторый
- * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandler обработчик
+ * {@link AttributeRule обработчик
  * атрибутов} обработать изменённый атрибут
  */
 public interface HandlingCondition {

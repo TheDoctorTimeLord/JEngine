@@ -121,4 +121,14 @@ public class CollectionUtils {
     private static int getLastIndex(List<?> list) {
         return list.isEmpty() ? -1 : list.size() - 1;
     }
+
+    /**
+     * Возвращает исходную коллекцию, либо пустую коллекцию, если исходная - null
+     *
+     * @param collection преобразуемая коллекция
+     * @param <V> тип элементов коллекции
+     */
+    public static <V> Collection<V> getOrEmpty(@Nullable Collection<V> collection) {
+        return collection == null ? new ArrayList<>() : collection;
+    }
 }

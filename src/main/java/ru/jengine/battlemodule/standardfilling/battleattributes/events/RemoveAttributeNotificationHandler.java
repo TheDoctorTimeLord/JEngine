@@ -3,7 +3,7 @@ package ru.jengine.battlemodule.standardfilling.battleattributes.events;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.standardfilling.BattleEventHandlerPriority;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandlerManager;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager;
 import ru.jengine.eventqueue.event.PostHandler;
 
 /**

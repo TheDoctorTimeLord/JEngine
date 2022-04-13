@@ -21,7 +21,7 @@ import ru.jengine.battlemodule.standardfilling.battleattributes.events.RemoveAtt
 public class AttributeUtils {
     /**
      * Уведомляет
-     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandlerManager
+     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager
      * систему обработки атрибутов} об изменении некоторого атрибута
      * @param modelId ID объекта, которому принадлежит этот атрибут
      * @param dispatcher диспетчер событий внутри боя
@@ -33,7 +33,7 @@ public class AttributeUtils {
 
     /**
      * Уведомляет
-     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.AttributeHandlerManager
+     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager
      * систему обработки атрибутов} об удалении некоторого атрибута
      * @param modelId ID объекта, которому принадлежал этот атрибут
      * @param dispatcher диспетчер событий внутри боя

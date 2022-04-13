@@ -1,4 +1,4 @@
-package ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling;
+package ru.jengine.battlemodule.standardfilling.battleattributes.attributerules;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.Queue;
 
 import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
 import ru.jengine.battlemodule.core.models.BattleModel;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.processedattributes.AbstractProcessedAttribute;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.processedattributes.PuttedProcessedAttribute;
-import ru.jengine.battlemodule.standardfilling.battleattributes.attributehandling.processedattributes.RemovedProcessedAttribute;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.processedattributes.AbstractProcessedAttribute;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.processedattributes.PuttedProcessedAttribute;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.processedattributes.RemovedProcessedAttribute;
 
 /**
  * Главный менеджер обработки атрибутов. Он организует работу системы изменения атрибутов, которые были зависимы от
@@ -48,10 +48,10 @@ public class AttributeHandlerManager {
         while (!attributesQueue.isEmpty()) {
             AbstractProcessedAttribute changedAttribute = attributesQueue.poll();
 
-            List<AttributeHandler> availableHandlers =
+            List<AttributeRule> availableHandlers =
                     attributeHandlersFinder.findAttributeHandlers(changedAttribute.getAttribute());
 
-            for (AttributeHandler handler : availableHandlers) {
+            for (AttributeRule handler : availableHandlers) {
                 attributesQueue.addAll(changedAttribute.processAttribute(handler, model));
             }
         }
