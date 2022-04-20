@@ -30,4 +30,9 @@ public class ItemContainerAggregator extends BattleAttribute { //TODO объед
     public void setItemContainerData(@Nullable ItemContainerData itemContainerData) {
         this.itemContainerData = itemContainerData;
     }
+
+    @Override
+    public BattleAttribute clone() {
+        return new ItemContainerAggregator(getCode(), getItemContainerData()).setPath(getPath());
+    }
 }

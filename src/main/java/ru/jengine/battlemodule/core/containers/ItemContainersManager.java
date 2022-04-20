@@ -1,7 +1,9 @@
 package ru.jengine.battlemodule.core.containers;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -48,5 +50,13 @@ public class ItemContainersManager {
     @Nullable
     public ItemContainer getContainer(String containerCode) {
         return containers.get(containerCode);
+    }
+
+    public Collection<Item> getContainedItems() {
+        return containers.values().stream()
+                .map(ItemContainer::getContainedItems)
+                .flatMap(Collection::stream)
+                .map(ItemStack::getItem)
+                .collect(Collectors.toList());
     }
 }

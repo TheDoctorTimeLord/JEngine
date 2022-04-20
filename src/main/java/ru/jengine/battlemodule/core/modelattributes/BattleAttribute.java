@@ -17,7 +17,7 @@ import java.util.Objects;
  * При изменении атрибута НЕОБХОДИМО производить дополнительные операции, если вы хотите как-то уведомить некоторые
  * ваши системы об изменении. По умолчанию атрибуты не имеют автоматического уведомления каких-либо систем
  */
-public abstract class BattleAttribute {
+public abstract class BattleAttribute implements Cloneable {
     private final String code;
     private List<String> path = Collections.emptyList();
 
@@ -29,8 +29,9 @@ public abstract class BattleAttribute {
         return code;
     }
 
-    public void setPath(List<String> path) {
+    public BattleAttribute setPath(List<String> path) {
         this.path = path;
+        return this;
     }
 
     /**
@@ -39,6 +40,9 @@ public abstract class BattleAttribute {
     public List<String> getPath() {
         return new ArrayList<>(path);
     }
+
+    @Override
+    public abstract BattleAttribute clone();
 
     @Override
     public boolean equals(Object o) {

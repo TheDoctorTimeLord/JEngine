@@ -101,6 +101,11 @@ public class AttributeUtils {
         }
 
         @Override
+        public BattleAttribute clone() {
+            return new AttributeContainerWrapper(wrapped.clone());
+        }
+
+        @Override
         public <T extends BattleAttribute> T get(String attributeCode) {
             return wrapped.get(attributeCode);
         }

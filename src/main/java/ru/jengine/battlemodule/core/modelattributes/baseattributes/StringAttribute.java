@@ -23,6 +23,11 @@ public class StringAttribute extends BattleAttribute {
     }
 
     @Override
+    public BattleAttribute clone() {
+        return new StringAttribute(getCode(), getValue()).setValue(getValue());
+    }
+
+    @Override
     public String toString() {
         return "StringAttribute [" + getCode() + "]=[" + value + "]";
     }

@@ -49,6 +49,17 @@ public class AttributesBasedAttribute extends BattleAttribute implements Attribu
     }
 
     @Override
+    public BattleAttribute clone() {
+        AttributesBasedAttribute clonedAttribute = new AttributesBasedAttribute(getCode());
+
+        for (BattleAttribute attribute : attributes.values()) {
+            clonedAttribute.add(attribute.clone());
+        }
+
+        return clonedAttribute.setPath(getPath());
+    }
+
+    @Override
     public String toString() {
         return "AttributesBasedAttribute [" + getCode() + "]";
     }

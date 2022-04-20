@@ -11,6 +11,11 @@ public class AttributeMarker extends BattleAttribute {
     }
 
     @Override
+    public BattleAttribute clone() {
+        return new AttributeMarker(getCode()).setPath(getPath());
+    }
+
+    @Override
     public String toString() {
         return "AttributeMarker [" + getCode() + "]";
     }

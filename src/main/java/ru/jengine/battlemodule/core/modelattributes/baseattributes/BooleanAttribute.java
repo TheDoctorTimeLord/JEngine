@@ -23,6 +23,11 @@ public class BooleanAttribute extends BattleAttribute {
     }
 
     @Override
+    public BattleAttribute clone() {
+        return new BooleanAttribute(getCode(), getValue()).setPath(getPath());
+    }
+
+    @Override
     public String toString() {
         return "FloatAttribute [" + getCode() + "]=[" + value + "]";
     }

@@ -23,6 +23,11 @@ public class IntAttribute extends BattleAttribute {
     }
 
     @Override
+    public BattleAttribute clone() {
+        return new IntAttribute(getCode(), getValue()).setValue(getValue());
+    }
+
+    @Override
     public String toString() {
         return "IntAttribute [" + getCode() + "]=[" + value + "]";
     }

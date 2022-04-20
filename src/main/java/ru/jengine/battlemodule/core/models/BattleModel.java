@@ -7,14 +7,25 @@ import ru.jengine.battlemodule.core.modelattributes.AttributesContainer;
  */
 public abstract class BattleModel {
     private final int id;
-    private final AttributesContainer attributes = new AttributesContainer();
+    private final BattleModelType battleModelType;
+    private final AttributesContainer attributes;
 
-    protected BattleModel(int id) {
+    protected BattleModel(int id, BattleModelType battleModelType) {
+        this(id, battleModelType, new AttributesContainer());
+    }
+
+    protected BattleModel(int id, BattleModelType battleModelType, AttributesContainer attributesContainer) {
         this.id = id;
+        this.battleModelType = battleModelType;
+        this.attributes = attributesContainer;
     }
 
     public int getId() {
         return id;
+    }
+
+    public BattleModelType getBattleModelType() {
+        return battleModelType;
     }
 
     /**

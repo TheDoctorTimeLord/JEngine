@@ -6,7 +6,7 @@ public class BattleCharacter extends DynamicModel implements HasHealth {
     private int health;
 
     public BattleCharacter(int id, int maxHealth) {
-        super(id);
+        super(id, new BattleCharacterTypeStub());
         this.health = maxHealth;
         setVision(true);
     }

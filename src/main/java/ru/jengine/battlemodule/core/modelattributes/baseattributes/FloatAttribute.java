@@ -23,6 +23,11 @@ public class FloatAttribute extends BattleAttribute {
     }
 
     @Override
+    public BattleAttribute clone() {
+        return new FloatAttribute(getCode(), getValue()).setValue(getValue());
+    }
+
+    @Override
     public String toString() {
         return "FloatAttribute [" + getCode() + "]=[" + value + "]";
     }

@@ -15,6 +15,7 @@ import ru.jengine.battlemodule.core.containers.ItemContainersManager;
 import ru.jengine.battlemodule.core.exceptions.BattleException;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.models.HasPosition;
+import ru.jengine.battlemodule.core.models.ObjectType;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.utils.CollectionUtils;
 
@@ -25,6 +26,7 @@ public class BattleState {
     private final Map<Integer, BattleModel> battleModelById;
     private final Map<Point, List<Integer>> battleModelOnField;
     private final Set<Integer> dynamicObjects;
+    private final Set<String> availableObjectTypeNames;
     private final ItemContainersManager containersManager;
     private final BattlefieldLimiter[] battlefieldLimiters;
 
@@ -32,16 +34,25 @@ public class BattleState {
      * @param battleModelById сопоставление всех объектов в бою с их ID
      * @param battleModelOnField расположение всех объектов на поле боя (объекты представлены их ID)
      * @param dynamicObjects список ID объектов, которые являются динамическими (могут совершать действия)
+     * @param availableObjectTypes Все доступные типы объектов в бою. Этот список обязан содержать типы всех
+     *                             переданных объектов в этот конструктор (включая предметы). Может содержать
+     *                             больше типов, если они будут использованы в бою
      * @param containersManager руководитель всех контейнеров в бою
      * @param battlefieldLimiters ограничители поля боя
      */
     public BattleState(Map<Integer, BattleModel> battleModelById,
             Map<Point, List<Integer>> battleModelOnField, Collection<Integer> dynamicObjects,
-            ItemContainersManager containersManager, BattlefieldLimiter... battlefieldLimiters)
+            Collection<ObjectType> availableObjectTypes, ItemContainersManager containersManager,
+            BattlefieldLimiter... battlefieldLimiters)
     {
+        checkTypes(battleModelById.values(), containersManager, availableObjectTypes);
+
         this.battleModelById = battleModelById;
         this.battleModelOnField = battleModelOnField;
         this.dynamicObjects = new HashSet<>(dynamicObjects);
+        this.availableObjectTypeNames = availableObjectTypes.stream()
+                .map(ObjectType::getObjectTypeName)
+                .collect(Collectors.toSet());
         this.containersManager = containersManager;
         this.battlefieldLimiters = battlefieldLimiters;
     }
@@ -55,7 +66,8 @@ public class BattleState {
     public BattleState(Map<Integer, BattleModel> battleModelById, Map<Point, List<Integer>> battleModelOnField,
             Collection<Integer> dynamicObjects, BattlefieldLimiter... battlefieldLimiters)
     {
-        this(battleModelById, battleModelOnField, dynamicObjects, new ItemContainersManager(), battlefieldLimiters);
+        this(battleModelById, battleModelOnField, dynamicObjects, convertToTypes(battleModelById.values()),
+                new ItemContainersManager(), battlefieldLimiters);
     }
 
     /**
@@ -78,6 +90,31 @@ public class BattleState {
     public BattleState(Collection<BattleModel> staticModels, Collection<BattleModel> dynamicModels,
             ItemContainersManager containersManager, BattlefieldLimiter... battlefieldLimiters)
     {
+        this(staticModels, dynamicModels, convertToTypes(CollectionUtils.concat(staticModels, dynamicModels)),
+                containersManager, battlefieldLimiters);
+    }
+
+    private static Collection<ObjectType> convertToTypes(Collection<BattleModel> battleModels) {
+        return battleModels.stream()
+                .map(BattleModel::getBattleModelType)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @param staticModels все модели статических (тех, кто НЕ может влиять на мир) объектов
+     * @param dynamicModels все модели статических (тех, кто влиять на мир) объектов
+     * @param availableObjectTypes Все доступные типы объектов в бою. Этот список обязан содержать типы всех
+     *                             переданных объектов в этот конструктор (включая предметы). Может содержать больше
+     *                             типов, если они будут использованы в бою
+     * @param containersManager руководитель всех контейнеров в бою
+     * @param battlefieldLimiters ограничители поля боя
+     */
+    public BattleState(Collection<BattleModel> staticModels, Collection<BattleModel> dynamicModels,
+            Collection<ObjectType> availableObjectTypes, ItemContainersManager containersManager,
+            BattlefieldLimiter... battlefieldLimiters)
+    {
+        checkTypes(CollectionUtils.concat(staticModels, dynamicModels), containersManager, availableObjectTypes);
+
         this.battleModelById = Stream.concat(staticModels.stream(), dynamicModels.stream())
                 .collect(Collectors.toMap(BattleModel::getId, battleModel -> battleModel));
         List<BattleModel> modelsWithPosition = Stream.concat(staticModels.stream(), dynamicModels.stream())
@@ -96,8 +133,48 @@ public class BattleState {
         this.dynamicObjects = dynamicModels.stream()
                 .map(BattleModel::getId)
                 .collect(Collectors.toSet());
+        this.availableObjectTypeNames = availableObjectTypes.stream()
+                .map(ObjectType::getObjectTypeName)
+                .collect(Collectors.toSet());
         this.containersManager = containersManager;
         this.battlefieldLimiters = battlefieldLimiters;
+    }
+
+    private static void checkTypes(Collection<BattleModel> battleModels, ItemContainersManager containersManager,
+            Collection<ObjectType> objectTypes)
+    {
+        Collection<String> startedObjectTypeNames = Stream.concat(
+                battleModels.stream().map(BattleModel::getBattleModelType),
+                containersManager.getContainedItems().stream()
+        )
+                .map(ObjectType::getObjectTypeName)
+                .toList();
+
+        Set<String> objectTypeNames = objectTypes.stream()
+                .map(ObjectType::getObjectTypeName)
+                .collect(Collectors.toSet());
+
+        for (String startedObjectTypeName : startedObjectTypeNames) {
+            if (!objectTypeNames.contains(startedObjectTypeName)) {
+                throwTypeNotFoundException(startedObjectTypeName);
+            }
+        }
+    }
+
+    /**
+     * Регистрирует тип объекта в бою
+     * @param objectType общий тип, характеризующий группу объектов в бою
+     */
+    public void registerAvailableObjectType(ObjectType objectType) {
+        availableObjectTypeNames.add(objectType.getObjectTypeName());
+    }
+
+    /**
+     * Имена доступных типов объектов в бою. В бою не может появиться объекта, тип которого не зарегистрирован в
+     * {@link BattleState}
+     */
+    public Set<String> getAvailableObjectTypeNames() {
+        return availableObjectTypeNames;
     }
 
     /**
@@ -252,6 +329,8 @@ public class BattleState {
      * @param battleModel добавляемый объект
      */
     public void addDynamicObject(BattleModel battleModel) {
+        checkType(battleModel.getBattleModelType());
+
         int id = battleModel.getId();
 
         dynamicObjects.add(id);
@@ -277,5 +356,17 @@ public class BattleState {
                 removeFromPosition(position, id);
             }
         }
+    }
+
+    private void checkType(ObjectType objectType) {
+        String typeName = objectType.getObjectTypeName();
+        if (!availableObjectTypeNames.contains(typeName)) {
+            throwTypeNotFoundException(typeName);
+        }
+    }
+
+    private static void throwTypeNotFoundException(String startedObjectTypeName) {
+        throw new BattleException(("Type [%s] doesn't contain in available object types, but it bind to some object")
+                .formatted(startedObjectTypeName));
     }
 }

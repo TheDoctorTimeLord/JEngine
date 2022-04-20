@@ -36,7 +36,7 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
         this.restriction = restriction;
 
         calculator = new ShadowCastingCalculator(
-                point -> classifier.classify(battleState.resolveIds(battleState.getOnPosition(point))),
+                point -> classifier.classify(battleState.getModelsOnPosition(point)),
                 scanner
         );
     }
