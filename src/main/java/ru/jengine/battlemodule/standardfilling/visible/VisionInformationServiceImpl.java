@@ -11,13 +11,13 @@ import ru.jengine.battlemodule.core.exceptions.BattleException;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.core.state.BattleState;
+import ru.jengine.battlemodule.standardfilling.visible.outside.CustomRowRestrictionFactory;
 import ru.jengine.utils.fieldofview.FieldOfViewCalculator;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.EastQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.NorthQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.SoulsQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.WestQuadrant;
-import ru.jengine.utils.fieldofview.shadowcasting.RowRestriction;
 import ru.jengine.utils.fieldofview.shadowcasting.ShadowCastingCalculator;
 import ru.jengine.battlemodule.standardfilling.visible.outside.BaseSectorScanner;
 import ru.jengine.battlemodule.standardfilling.visible.outside.CustomRowRestriction;
@@ -27,13 +27,13 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
     private final Map<Integer, Map<String, Set<Point>>> fovs = new ConcurrentHashMap<>();
     private final FieldOfViewCalculator calculator;
     private final BattleState battleState;
-    private final RowRestriction restriction;
+    private final CustomRowRestrictionFactory restrictionFactory;
 
-    public VisionInformationServiceImpl(BattleState battleState, CustomRowRestriction restriction,
+    public VisionInformationServiceImpl(BattleState battleState, CustomRowRestrictionFactory restrictionFactory,
             TileClassifier classifier, BaseSectorScanner scanner)
     {
         this.battleState = battleState;
-        this.restriction = restriction;
+        this.restrictionFactory = restrictionFactory;
 
         calculator = new ShadowCastingCalculator(
                 point -> classifier.classify(battleState.getModelsOnPosition(point)),
@@ -55,8 +55,10 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
 
         Map<String, Set<Point>> visible = new HashMap<>();
 
+        CustomRowRestriction rowRestriction = restrictionFactory.createRowRestriction(hasVision, battleState);
+
         Quadrant quadrant = calculateQuadrant(hasVision.getDirection(), hasVision.getPosition());
-        calculator.calculate(quadrant, restriction, (position, visibleType) ->
+        calculator.calculate(quadrant, rowRestriction, (position, visibleType) ->
                 visible.computeIfAbsent(visibleType, k -> new HashSet<>()).add(position));
         fovs.put(visitorId, visible);
     }

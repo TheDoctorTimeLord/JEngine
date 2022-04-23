@@ -3,16 +3,16 @@ package ru.jengine.battlemodule.standardfilling.visible;
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.contentregistrars.AbstractContentRegistrar;
 import ru.jengine.battlemodule.standardfilling.visible.outside.BaseSectorScanner;
-import ru.jengine.battlemodule.standardfilling.visible.outside.CustomRowRestriction;
+import ru.jengine.battlemodule.standardfilling.visible.outside.CustomRowRestrictionFactory;
 import ru.jengine.battlemodule.standardfilling.visible.outside.TileClassifier;
 
 @BattleBeanPrototype
 public class VisionInformationRegistrar extends AbstractContentRegistrar {
-    private final CustomRowRestriction customRowRestriction;
+    private final CustomRowRestrictionFactory customRowRestriction;
     private final TileClassifier tileClassifier;
     private final BaseSectorScanner baseSectorScanner;
 
-    public VisionInformationRegistrar(CustomRowRestriction customRowRestriction, TileClassifier tileClassifier,
+    public VisionInformationRegistrar(CustomRowRestrictionFactory customRowRestriction, TileClassifier tileClassifier,
             BaseSectorScanner baseSectorScanner)
     {
         this.customRowRestriction = customRowRestriction;
