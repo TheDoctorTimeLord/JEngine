@@ -1,7 +1,6 @@
 package ru.jengine.battlemodule.core.contentregistrars;
 
 import ru.jengine.battlemodule.core.BattleContext;
-import ru.jengine.battlemodule.core.ExtendedBattleContext;
 import ru.jengine.battlemodule.core.information.InformationCenter;
 
 /**
@@ -9,21 +8,20 @@ import ru.jengine.battlemodule.core.information.InformationCenter;
  * {@link ru.jengine.eventqueue.event.PostHandler PostHandler}
  */
 public class RegistrarsContext {
-    private final ExtendedBattleContext extendedBattleContext;
+    private final BattleContext battleContext;
     private final PostHandlerBindingService postHandlerBindings;
 
-    public RegistrarsContext(ExtendedBattleContext extendedBattleContext,
-            PostHandlerBindingService postHandlerBindings) {
-        this.extendedBattleContext = extendedBattleContext;
+    public RegistrarsContext(BattleContext battleContext, PostHandlerBindingService postHandlerBindings) {
+        this.battleContext = battleContext;
         this.postHandlerBindings = postHandlerBindings;
     }
 
     public BattleContext getBattleContext() {
-        return extendedBattleContext.getBattleContext();
+        return battleContext;
     }
 
     public InformationCenter getInformationCenter() {
-        return extendedBattleContext.getInformationCenter();
+        return battleContext.getInformationCenter();
     }
 
     public PostHandlerBindingService getPostHandlerBindings() {

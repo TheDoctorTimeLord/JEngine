@@ -2,7 +2,7 @@ package ru.jengine.battlemodule.core.battlepresenter.initializebattle;
 
 import java.util.List;
 
-import ru.jengine.battlemodule.core.ExtendedBattleContext;
+import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
 
 /**
@@ -13,8 +13,8 @@ import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
 public interface InitializationPresenter {
     /**
      * Предоставляет события, которые были собраны за период инициализации боя
-     * @param extendedBattleContext расширенный контекст боя
+     * @param battleContext контекст боя, хранящий все данные о бое
      * @return список действий в бою, либо пустой список, если никаких действий не произошло
      */
-    List<BattleAction> presentBattleInitialize(ExtendedBattleContext extendedBattleContext);
+    List<BattleAction> presentBattleInitialize(BattleContext battleContext);
 }

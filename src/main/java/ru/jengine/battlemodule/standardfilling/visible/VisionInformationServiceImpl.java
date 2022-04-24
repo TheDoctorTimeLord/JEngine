@@ -47,6 +47,11 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
     }
 
     @Override
+    public Set<Point> getVisiblePoints(int visitorId, String visibleScope) {
+        return fovs.getOrDefault(visitorId, Collections.emptyMap()).getOrDefault(visibleScope, Collections.emptySet());
+    }
+
+    @Override
     public void recalculateFieldOfView(int visitorId) {
         HasVision hasVision = HasVision.castToHasVision(battleState.resolveId(visitorId));
         if (hasVision == null || !hasVision.hasVision()) {
@@ -64,17 +69,13 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
     }
 
     private static Quadrant calculateQuadrant(Direction direction, Point position) {
-        switch (direction) {
-        case UP:
-            return new NorthQuadrant(position);
-        case DOWN:
-            return new SoulsQuadrant(position);
-        case LEFT:
-            return new WestQuadrant(position);
-        case RIGHT:
-            return new EastQuadrant(position);
-        default:
-            throw new BattleException("Direction can not be not UP, DOWN, LEFT or RIGHT. Direction=" + direction);
-        }
+        return switch (direction) {
+            case UP -> new NorthQuadrant(position);
+            case DOWN -> new SoulsQuadrant(position);
+            case LEFT -> new WestQuadrant(position);
+            case RIGHT -> new EastQuadrant(position);
+            default -> throw new BattleException(
+                    "Direction can not be not UP, DOWN, LEFT or RIGHT. Direction=" + direction);
+        };
     }
 }

@@ -3,7 +3,7 @@ package ru.jengine.battlemodule.core.battlepresenter.initializebattle;
 import java.util.List;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
-import ru.jengine.battlemodule.core.ExtendedBattleContext;
+import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionRegistrar;
 
 /**
@@ -22,12 +22,12 @@ public class BattleInitializationNotifier {
 
     /**
      * Инициирует уведомление подписчиков на начальное состояние боя, о том, какие действия произошли
-     * @param extendedBattleContext расширенный контекст боя
+     * @param battleContext контекст боя, хранящий все данные о бое
      * @param actionRegistrar регистратор действий в бою
      */
-    public void notifyAboutInitialization(ExtendedBattleContext extendedBattleContext, BattleActionRegistrar actionRegistrar) {
+    public void notifyAboutInitialization(BattleContext battleContext, BattleActionRegistrar actionRegistrar) {
         presenters.forEach(presenter ->
-                presenter.presentBattleInitialize(extendedBattleContext).forEach(actionRegistrar::registerAction)
+                presenter.presentBattleInitialize(battleContext).forEach(actionRegistrar::registerAction)
         );
         actionRegistrar.declareEndBattleInitialization();
     }

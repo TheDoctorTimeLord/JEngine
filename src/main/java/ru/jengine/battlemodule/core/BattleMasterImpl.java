@@ -33,7 +33,6 @@ public class BattleMasterImpl implements BattleMaster {
     private final String battleId;
 
     private BattleContext context;
-    private ExtendedBattleContext extendedBattleContext;
 
     public BattleMasterImpl(IdGenerator idGenerator, BattleCommandMaster battleCommandMaster,
             InformationCenter informationCenter, DispatcherBattleWrapper dispatcher, BattleScheduler battleScheduler,
@@ -71,10 +70,9 @@ public class BattleMasterImpl implements BattleMaster {
                 behaviorObjectsManager);
 
         context = new BattleContext(battleId, state, dynamicObjectsManager, battleCommandMaster, dispatcher,
-                battleScheduler, battleActionLogger);
-        extendedBattleContext = new ExtendedBattleContext(context, informationCenter);
+                battleScheduler, battleActionLogger, informationCenter);
 
-        contentRegistrarsService.register(new RegistrarsContext(extendedBattleContext, new PostHandlerBindingService(dispatcher)));
+        contentRegistrarsService.register(new RegistrarsContext(context, new PostHandlerBindingService(dispatcher)));
 
         dynamicObjectsManager.setCommandsForCharacters(commandRegistrar.getAllCommands(), context);
         behaviorObjectsManager.bindBehaviors(dynamicObjectsManager.getAllCharacters(), informationCenter);
@@ -84,7 +82,7 @@ public class BattleMasterImpl implements BattleMaster {
 
     @Override
     public void informationAboutInitialize() {
-        initializationNotifier.notifyAboutInitialization(extendedBattleContext, battleActionLogger);
+        initializationNotifier.notifyAboutInitialization(context, battleActionLogger);
     }
 
     @Override

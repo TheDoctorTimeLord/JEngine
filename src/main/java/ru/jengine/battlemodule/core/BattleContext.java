@@ -3,6 +3,7 @@ package ru.jengine.battlemodule.core;
 import ru.jengine.battlemodule.core.battlepresenter.BattleActionRegistrar;
 import ru.jengine.battlemodule.core.commandmaster.CommandsOnPhaseRegistrar;
 import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
+import ru.jengine.battlemodule.core.information.InformationCenter;
 import ru.jengine.battlemodule.core.scheduler.SchedulerTaskRegistrar;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
 import ru.jengine.battlemodule.core.state.BattleState;
@@ -19,11 +20,12 @@ public class BattleContext {
     private final DispatcherBattleWrapper dispatcher;
     private final SchedulerTaskRegistrar taskRegistrar;
     private final BattleActionRegistrar battleActionRegistrar;
+    private final InformationCenter informationCenter;
 
     public BattleContext(String battleId, BattleState battleState,
             BattleDynamicObjectsManager battleDynamicObjectsManager, CommandsOnPhaseRegistrar commandsOnPhaseRegistrar,
             DispatcherBattleWrapper dispatcher, SchedulerTaskRegistrar taskRegistrar,
-            BattleActionRegistrar battleActionRegistrar) {
+            BattleActionRegistrar battleActionRegistrar, InformationCenter informationCenter) {
         this.battleId = battleId;
         this.battleState = battleState;
         this.battleDynamicObjectsManager = battleDynamicObjectsManager;
@@ -31,6 +33,7 @@ public class BattleContext {
         this.dispatcher = dispatcher;
         this.taskRegistrar = taskRegistrar;
         this.battleActionRegistrar = battleActionRegistrar;
+        this.informationCenter = informationCenter;
     }
 
     public BattleActionRegistrar getBattleActionRegistrar() {
@@ -55,6 +58,10 @@ public class BattleContext {
 
     public DispatcherBattleWrapper getDispatcher() {
         return dispatcher;
+    }
+
+    public InformationCenter getInformationCenter() {
+        return informationCenter;
     }
 
     public SchedulerTaskRegistrar getTaskRegistrar() {
