@@ -60,6 +60,18 @@ public class AttributesBasedAttribute extends BattleAttribute implements Attribu
     }
 
     @Override
+    public BattleAttribute setPath(List<String> path) {
+        super.setPath(path);
+
+        List<String> innerAttributesPath = CollectionUtils.addLast(getPath(), getCode());
+        for (BattleAttribute innerAttribute : attributes.values()) {
+            innerAttribute.setPath(innerAttributesPath);
+        }
+
+        return this;
+    }
+
+    @Override
     public String toString() {
         return "AttributesBasedAttribute [" + getCode() + "]";
     }

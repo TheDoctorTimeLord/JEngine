@@ -2,6 +2,7 @@ package ru.jengine.battlemodule.core.battlepresenter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -79,6 +80,7 @@ public class BattleActionLogger implements BattleActionRegistrar, BattleActionPr
             actions = synchronizedBattleActionsExtractor.apply(loggedActions);
         }
 
+        actions = actions == null ? Collections.emptyList() : actions;
         publisherDelegate.publish(subscribeType, actions);
     }
 
