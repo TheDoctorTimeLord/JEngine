@@ -12,6 +12,7 @@ import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.modelattributes.AttributeStore;
 import ru.jengine.battlemodule.core.modelattributes.AttributesContainer;
 import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeRulesManager;
 import ru.jengine.battlemodule.standardfilling.battleattributes.events.PutAttributeNotification;
 import ru.jengine.battlemodule.standardfilling.battleattributes.events.RemoveAttributeNotification;
 
@@ -21,7 +22,7 @@ import ru.jengine.battlemodule.standardfilling.battleattributes.events.RemoveAtt
 public class AttributeUtils {
     /**
      * Уведомляет
-     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager
+     * {@link AttributeRulesManager
      * систему обработки атрибутов} об изменении некоторого атрибута
      * @param modelId ID объекта, которому принадлежит этот атрибут
      * @param dispatcher диспетчер событий внутри боя
@@ -33,7 +34,7 @@ public class AttributeUtils {
 
     /**
      * Уведомляет
-     * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager
+     * {@link AttributeRulesManager
      * систему обработки атрибутов} об удалении некоторого атрибута
      * @param modelId ID объекта, которому принадлежал этот атрибут
      * @param dispatcher диспетчер событий внутри боя

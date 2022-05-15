@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ru.jengine.utils.Logger;
+
 /**
  * Класс, реализующий компонент "Наблюдаемый" из шаблона проектирования "Наблюдаемый-Наблюдатель" для API получения
  * информации о бое
@@ -15,6 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BattlePresenterActionPublisher {
     private final Map<SubscribeType, List<SubscriberContext>> subscribersByType =
             new ConcurrentHashMap<>();
+    private final Logger logger;
+
+    public BattlePresenterActionPublisher(Logger logger) {
+        this.logger = logger;
+    }
 
     /**
      * Подписывает внешнего получателя на события в бою
@@ -56,9 +63,14 @@ public class BattlePresenterActionPublisher {
     public void publish(SubscribeType subscribeType, Collection<BattleAction> loggedActions) {
         subscribersByType.computeIfPresent(subscribeType, (type, subscribers) -> {
             for (SubscriberContext subscriber : subscribers) {
-                subscriber
-                        .subscriber
-                        .subscribe(subscribeType, new ArrayList<>(subscriber.strategy.filterAvailableAction(loggedActions)));
+                try {
+                    subscriber.subscriber.subscribe(
+                            subscribeType,
+                            new ArrayList<>(subscriber.strategy.filterAvailableAction(loggedActions))
+                    );
+                } catch (Exception e) {
+                    logger.error("BattlePresenterActionPublisher", "Subscriber [%s] throw exception".formatted(subscriber), e);
+                }
             }
             return subscribers;
         });

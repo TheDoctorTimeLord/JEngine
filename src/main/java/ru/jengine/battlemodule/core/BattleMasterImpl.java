@@ -20,7 +20,7 @@ import ru.jengine.battlemodule.core.state.BattleState;
  * Реализация {@link BattleMaster}.
  */
 @BattleBeanPrototype
-public class BattleMasterImpl implements BattleMaster {
+public class BattleMasterImpl implements BattleMaster { //TODO исправить на очередь действий
     private final IdGenerator idGenerator;
     private final BattleCommandMaster battleCommandMaster;
     private final InformationCenter informationCenter;

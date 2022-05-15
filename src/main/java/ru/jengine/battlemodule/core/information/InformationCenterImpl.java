@@ -11,11 +11,6 @@ public class InformationCenterImpl implements InformationCenter {
     private final Map<Class<? extends InformationService>, InformationService> services = new ConcurrentHashMap<>();
 
     @Override
-    public void initialize(BattleContext battleContext) {
-        //TODO пока не используется, если вы увидели это, то инициализация скорее всего здесь не нужна
-    }
-
-    @Override
     public <S extends InformationService> void setService(Class<S> serviceType, S service) {
         services.put(serviceType, service);
     }

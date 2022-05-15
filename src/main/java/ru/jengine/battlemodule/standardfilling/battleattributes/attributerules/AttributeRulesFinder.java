@@ -8,7 +8,7 @@ import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
  * Описывает объект, отвечающий за подбор {@link AttributeRule обработчиков атрибутов}, которые могут обработать
  * изменённый атрибут
  */
-public interface AttributeHandlersFinder {
+public interface AttributeRulesFinder {
     /**
      * подбор {@link AttributeRule обработчиков атрибутов}, которые могут обработать изменённый атрибут
      * @param changedAttribute атрибут модели, который был изменён

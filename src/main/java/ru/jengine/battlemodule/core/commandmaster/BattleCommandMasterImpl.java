@@ -12,6 +12,7 @@ import ru.jengine.battlemodule.core.commands.AdditionalBattleCommand;
 import ru.jengine.battlemodule.core.commands.BattleCommandPerformElement;
 import ru.jengine.battlemodule.core.scheduler.SchedulerTaskExecutor;
 import ru.jengine.battlemodule.core.state.BattleDynamicObjectsManager;
+import ru.jengine.utils.Logger;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -23,6 +24,11 @@ import com.google.common.collect.Multimap;
 public class BattleCommandMasterImpl implements BattleCommandMaster {
     private final List<BattleCommandPerformElement<?>> commandsOnNextPhase = new ArrayList<>();
     private final Multimap<Integer, AdditionalBattleCommand<?>> registeredCommandOnNextPhase = HashMultimap.create();
+    private final Logger logger;
+
+    public BattleCommandMasterImpl(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void takeTurn(BattleContext battleContext, SchedulerTaskExecutor taskExecutor) {
@@ -72,9 +78,13 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
         return result;
     }
 
-    private static void performAllCommands(List<BattleCommandPerformElement<?>> commands, BattleContext commandContext) {
+    private void performAllCommands(List<BattleCommandPerformElement<?>> commands, BattleContext commandContext) {
         for (BattleCommandPerformElement<?> command : commands) {
-            command.performCommand(commandContext);
+            try {
+                command.performCommand(commandContext);
+            } catch (Exception e) {
+                logger.error("BattleCommandMasterImpl", "Command [%s] performs with error".formatted(command), e);
+            }
         }
     }
 

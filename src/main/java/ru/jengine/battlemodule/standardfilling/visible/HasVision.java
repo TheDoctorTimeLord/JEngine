@@ -7,8 +7,9 @@ import ru.jengine.battlemodule.core.models.HasPosition;
 import ru.jengine.battlemodule.standardfilling.dynamicmodel.HasDirection;
 
 public interface HasVision extends HasDirection, HasPosition {
+    int getVisionDistance();
     boolean hasVision();
-    void setVision(boolean canSee);
+    void setVisionDistance(int visionDistance);
 
     @Nullable
     static HasVision castToHasVision(BattleModel model) {

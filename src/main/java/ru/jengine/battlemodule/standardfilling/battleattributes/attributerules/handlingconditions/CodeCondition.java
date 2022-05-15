@@ -17,7 +17,7 @@ public class CodeCondition implements HandlingCondition {
         return expectedCode.equals(attribute.getCode());
     }
 
-    protected String getExpectedCode() {
+    public String getExpectedCode() {
         return expectedCode;
     }
 }

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ru.jengine.beancontainer.BeanFactoryStrategy;
+import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContainerMultiContext;
 import ru.jengine.beancontainer.annotations.Inject;
 import ru.jengine.beancontainer.annotations.PostConstruct;
@@ -23,6 +24,7 @@ import ru.jengine.beancontainer.exceptions.InvocationMethodException;
 import ru.jengine.beancontainer.implementation.factories.beanstrategies.PrototypeBeanFactoryStrategy;
 import ru.jengine.beancontainer.implementation.factories.beanstrategies.SingletonBeanFactoryStrategy;
 import ru.jengine.beancontainer.service.Constants.BeanStrategy;
+import ru.jengine.utils.Logger;
 
 public class BeanUtils {
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
@@ -101,6 +103,10 @@ public class BeanUtils {
 
     public static Object getBean(BeanContext beanContext) {
         return beanContext == null ? null : beanContext.getBean();
+    }
+
+    public static Logger getLogger(ContainerContext context) {
+        return (Logger)BeanUtils.getBean(context.getBean(Logger.class));
     }
 
     public static <T> List<T> getBeanAsList(BeanContext context) {

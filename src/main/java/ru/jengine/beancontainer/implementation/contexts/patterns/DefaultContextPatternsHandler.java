@@ -14,10 +14,12 @@ import ru.jengine.beancontainer.ContextPattern;
 import ru.jengine.beancontainer.ContextPreProcessor;
 import ru.jengine.beancontainer.InitializableContextPatternHandler;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
 import ru.jengine.beancontainer.implementation.factories.SelectiveAutowireConfigurableBeanFactories;
 import ru.jengine.beancontainer.service.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
+import ru.jengine.utils.Logger;
 
 public class DefaultContextPatternsHandler implements InitializableContextPatternHandler {
     private final Map<String, ContextPattern> patterns = new ConcurrentHashMap<>();
@@ -29,18 +31,19 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
 
     @Override
     public void initialize() {
-        ContainerContext externalBeansContext = preLoadContext(Contexts.EXTERNAL_BEANS_CONTEXT);
-        if (externalBeansContext != null) {
-            initializeContexts(externalBeansContext);
-        } else {
-            //TODO ЛОГИРОВАТЬ!
-        }
+        initializeExistingContext();
 
         patterns.entrySet().stream()
                 .filter(entry -> entry.getValue().needLoadOnContainerInitialize())
                 .map(entry -> preLoadContext(entry.getKey()))
                 .filter(Objects::nonNull)
                 .forEach(DefaultContextPatternsHandler::initializeContexts);
+    }
+
+    private void initializeExistingContext() {
+        ContainerContext externalBeansContext = preLoadContext(Contexts.EXTERNAL_BEANS_CONTEXT);
+        externalBeansContext = externalBeansContext == null ? new DefaultContainerContext() : externalBeansContext;
+        initializeContexts(externalBeansContext);
     }
 
     @Override
@@ -123,7 +126,11 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         if (infrastructureContext != null) {
             beanFactory.configure(infrastructureContext);
         } else {
-            //TODO LOG IT!!!!
+            Logger logger = BeanUtils.getLogger(multiContext);
+            if (logger != null) {
+                logger.error("DefaultContextPatternsHandler", ("Can not configure bean factory [%s]. "
+                        + "Infrastructure context is null").formatted(beanFactory));
+            }
         }
 
         return beanFactory;

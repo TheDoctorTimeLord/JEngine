@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
+import ru.jengine.battlemodule.core.events.DispatcherBattleWrapper;
 import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.processedattributes.AbstractProcessedAttribute;
@@ -15,11 +16,13 @@ import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.p
  * изменившихся в процессе работы атрибутов. Другими словами менеджер организует процесс реакции на изменение
  * атрибутов. Менеджер поддерживает реакцию на разные типы изменений, например, на удаление или добавление.
  */
-public class AttributeHandlerManager {
-    private final AttributeHandlersFinder attributeHandlersFinder;
+public class AttributeRulesManager {
+    private final AttributeRulesFinder attributeRulesFinder;
+    private final DispatcherBattleWrapper dispatcher;
 
-    public AttributeHandlerManager(AttributeHandlersFinder attributeHandlersFinder) {
-        this.attributeHandlersFinder = attributeHandlersFinder;
+    public AttributeRulesManager(AttributeRulesFinder attributeRulesFinder, DispatcherBattleWrapper dispatcher) {
+        this.attributeRulesFinder = attributeRulesFinder;
+        this.dispatcher = dispatcher;
     }
 
     /**
@@ -49,10 +52,10 @@ public class AttributeHandlerManager {
             AbstractProcessedAttribute changedAttribute = attributesQueue.poll();
 
             List<AttributeRule> availableHandlers =
-                    attributeHandlersFinder.findAttributeHandlers(changedAttribute.getAttribute());
+                    attributeRulesFinder.findAttributeHandlers(changedAttribute.getAttribute());
 
             for (AttributeRule handler : availableHandlers) {
-                attributesQueue.addAll(changedAttribute.processAttribute(handler, model));
+                attributesQueue.addAll(changedAttribute.processAttribute(handler, model, dispatcher));
             }
         }
     }

@@ -6,11 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import ru.jengine.battlemodule.modules.AttributesHandlingModule;
+import ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeRulesManager;
 import ru.jengine.beancontainer.annotations.ImportModule;
 
 /**
  * Подключает к проекту стандартный модуль
- * {@link ru.jengine.battlemodule.standardfilling.battleattributes.attributerules.AttributeHandlerManager обработки
+ * {@link AttributeRulesManager обработки
  * атрибутов}.<br>
  * ВАЖНО: аннотация {@link EnableBattleCoreWithStandardFilling} позволяет использовать ВСЁ стандартное
  * наполнение, ВКЛЮЧАЯ то, что будет добавлено текущей аннотацией. Если вы используете аннотацию

@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.utils.CollectionUtils;
+import ru.jengine.utils.Logger;
 
 /**
  * Реализует интерфейсы {@link BattleActionRegistrar} (для внутренней работы в бою) и {@link BattleActionPresenter}
@@ -15,8 +16,12 @@ import ru.jengine.utils.CollectionUtils;
  */
 @BattleBeanPrototype
 public class BattleActionLogger implements BattleActionRegistrar, BattleActionPresenter {
-    private final BattlePresenterActionPublisher publisherDelegate = new BattlePresenterActionPublisher();
+    private final BattlePresenterActionPublisher publisherDelegate;
     private final List<List<BattleAction>> loggedActions = new ArrayList<>();
+
+    public BattleActionLogger(Logger logger) {
+        this.publisherDelegate = new BattlePresenterActionPublisher(logger);
+    }
 
     private final List<BattleAction> loggedActionsForInitialize = new ArrayList<>();
     private volatile boolean wasInitialized = false;

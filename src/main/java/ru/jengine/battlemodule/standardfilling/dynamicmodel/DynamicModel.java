@@ -8,7 +8,6 @@ import ru.jengine.battlemodule.core.models.BattleModelType;
 import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
-import ru.jengine.battlemodule.standardfilling.visible.HasVision;
 
 /**
  * Класс, описывающий динамический объект в бою. Динамический объект характеризуется тем, что он:
@@ -18,10 +17,9 @@ import ru.jengine.battlemodule.standardfilling.visible.HasVision;
  * <li>Имеет некоторое направление взгляда</li>
  * </ol>
  */
-public class DynamicModel extends BattleModel implements CanMoved, HasVision {
+public class DynamicModel extends BattleModel implements CanMoved {
     private Direction direction;
     private Point position;
-    private boolean canSee;
 
     public DynamicModel(int id, BattleModelType type) {
         this(id, type, new AttributesContainer());
@@ -44,16 +42,6 @@ public class DynamicModel extends BattleModel implements CanMoved, HasVision {
     @Override
     public void setDirection(Direction direction) {
         this.direction = direction;
-    }
-
-    @Override
-    public boolean hasVision() {
-        return canSee;
-    }
-
-    @Override
-    public void setVision(boolean canSee) {
-        this.canSee = canSee;
     }
 
     @Override

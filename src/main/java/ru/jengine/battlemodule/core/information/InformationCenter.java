@@ -1,6 +1,5 @@
 package ru.jengine.battlemodule.core.information;
 
-import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.utils.ServiceLocator;
 
 /**
@@ -11,9 +10,4 @@ import ru.jengine.utils.ServiceLocator;
  * информация с помощью специальных {@link InformationService информационных сервисов}
  */
 public interface InformationCenter extends ServiceLocator<InformationService> {
-    /**
-     * Инициализирует центр информации
-     * @param battleContext контекст текущего боя
-     */
-    void initialize(BattleContext battleContext);
 }

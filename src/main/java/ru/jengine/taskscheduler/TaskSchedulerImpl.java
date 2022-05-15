@@ -5,8 +5,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import ru.jengine.utils.Logger;
+
 public class TaskSchedulerImpl implements TaskScheduler {
     private final Map<String, Queue<Task>> taskQueues = new ConcurrentHashMap<>();
+    private final Logger logger;
+
+    public TaskSchedulerImpl(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void addTask(String queueCode, Task task) {
@@ -21,7 +28,12 @@ public class TaskSchedulerImpl implements TaskScheduler {
         Queue<Task> taskQueue = taskQueues.remove(queueCode);
         if (taskQueue != null) {
             taskQueue.removeIf(task -> {
-                task.execute();
+                try {
+                    task.execute();
+                } catch (Exception e) {
+                    logger.error("TaskSchedulerImpl", "Error in task", e);
+                }
+
                 return !task.isReusable();
             });
 
