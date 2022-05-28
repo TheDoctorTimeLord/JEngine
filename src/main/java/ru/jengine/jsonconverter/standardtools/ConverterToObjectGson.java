@@ -11,8 +11,8 @@ import com.google.gson.JsonSyntaxException;
 
 @Bean
 public class ConverterToObjectGson implements ConverterToObject {
-    private static class GSON {
-        public static final Gson INSTANCE = new GsonBuilder().create();
+    private enum GSON {
+        ; public static final Gson INSTANCE = new GsonBuilder().create();
     }
 
     @Override

@@ -23,7 +23,5 @@ public abstract class BaseGsonFormatter implements JsonFormatter<JsonObject> {
     }
 
     @Override
-    public void cleanResultObject(JsonObject resultObject) {
-
-    }
+    public void cleanResultObject(JsonObject resultObject) { }
 }

@@ -28,6 +28,7 @@ import ru.jengine.battlemodule.core.serviceclasses.Direction;
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.battlemodule.core.serviceclasses.PointPool;
 import ru.jengine.battlemodule.core.state.BattleState;
+import ru.jengine.battlemodule.core.state.BattleStateBuilder;
 import ru.jengine.battlemodule.core.state.BattlefieldLimiter;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.BeanContainer;
@@ -268,7 +269,10 @@ class SimpleBattleGenerator extends BattleGenerator {
 
         SquareBattleFieldLimiter battleFieldLimiter = new SquareBattleFieldLimiter(PointPool.obtain(0, 0), TestBattle.MAP_SIZE);
 
-        return new BattleState(battleModelById, mapPosition, dynamicModels, battleFieldLimiter);
+        return BattleStateBuilder
+                .createByState(battleModelById, mapPosition, dynamicModels)
+                .battlefieldLimiters(battleFieldLimiter)
+                .build();
     }
 
     private static class SquareBattleFieldLimiter implements BattlefieldLimiter {
