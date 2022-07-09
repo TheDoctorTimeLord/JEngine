@@ -1,16 +1,14 @@
 package ru.jengine.jsonconverter.modules;
 
 import ru.jengine.beancontainer.annotations.ContainerModule;
-import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.Import;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.annotations.PackagesScan;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.jsonconverter.JsonConverterImpl;
 
-@ContainerModule
-@Context(Contexts.JSON_CONVERTER_CONTEXT)
+@ContainerModule(contextName = Contexts.JSON_CONVERTER_CONTEXT)
 @PackagesScan({
         @PackageScan("ru.jengine.jsonconverter.converting"),
         @PackageScan("ru.jengine.jsonconverter.jsonformatting")

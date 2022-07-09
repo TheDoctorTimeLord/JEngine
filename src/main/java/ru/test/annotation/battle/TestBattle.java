@@ -33,18 +33,16 @@ import ru.jengine.battlemodule.core.state.BattlefieldLimiter;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
 import ru.jengine.beancontainer.BeanContainer;
 import ru.jengine.beancontainer.annotations.ContainerModule;
-import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
 import ru.jengine.beancontainer.implementation.JEngineContainer;
 import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.utils.CollectionUtils;
 import ru.test.annotation.battle.model.BattleCharacter;
 import ru.test.annotation.battle.model.HasHealth;
 
-@ContainerModule
-@Context(Contexts.BATTLE_CONTEXT)
+@ContainerModule(contextName = Contexts.BATTLE_CONTEXT)
 @PackageScan("ru.test.annotation.battle")
 @EnableBattleCoreWithStandardFilling
 public class TestBattle extends AnnotationModule {
@@ -52,7 +50,10 @@ public class TestBattle extends AnnotationModule {
 
     public static void main(String[] args) throws InterruptedException {
         BeanContainer container = new JEngineContainer();
-        container.initializeCommonContexts(ContainerConfiguration.build(TestBattle.class).addAdditionalBean(container));
+        container.initializeCommonContexts(ContainerConfiguration.builder(TestBattle.class)
+                .addAdditionalBean(container)
+                .build()
+        );
 
         BattleMasterContext battle1 = createBattle(container);
         BattleMasterContext battle2 = createBattle(container);

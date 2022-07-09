@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.service;
+package ru.jengine.beancontainer;
 
 import ru.jengine.beancontainer.MainInfrastructureModule;
 import ru.jengine.beancontainer.MainModule;

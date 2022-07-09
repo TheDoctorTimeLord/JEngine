@@ -18,7 +18,7 @@ import ru.jengine.beancontainer.ContextPreProcessor;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 
 public class ContainerContextFacade implements ContainerMultiContext {

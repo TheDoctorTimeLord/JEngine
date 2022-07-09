@@ -19,7 +19,7 @@ import java.util.Objects;
  */
 public abstract class BattleAttribute implements Cloneable {
     private final String code;
-    private transient List<String> path = Collections.emptyList();
+    private List<String> path = Collections.emptyList();
 
     protected BattleAttribute(String code) {
         this.code = Objects.requireNonNull(code, "Code of attribute must be not null");

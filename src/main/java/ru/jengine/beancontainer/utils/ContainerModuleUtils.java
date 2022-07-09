@@ -21,7 +21,7 @@ import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.implementation.classfinders.EmptyClassFinder;
-import ru.jengine.utils.ClassUtils;
+import ru.jengine.utils.ReflectionUtils;
 
 public class ContainerModuleUtils {
     public static List<Module> getAllSubmodules(Module mainModule, ContainerConfiguration configuration) {
@@ -37,7 +37,7 @@ public class ContainerModuleUtils {
 
             List<Class<?>> submodules = module.getSubmodules().stream()
                     .filter(cls -> !moduleClasses.contains(cls))
-                    .collect(Collectors.toList());
+                    .toList();
             moduleClasses.addAll(submodules);
             submodules.stream()
                     .map(moduleClass -> createModule(moduleClass, configuration))
@@ -95,8 +95,8 @@ public class ContainerModuleUtils {
     public static Set<Class<?>> getAllModuleFinders(List<Module> foundedModules) {
         return foundedModules.stream()
                 .flatMap(module -> module.getImplementations(ModuleFinder.class).stream())
-                .filter(ClassUtils.IS_CLASS_PREDICATE)
-                .filter(cls -> cls.isAnnotationPresent(ModuleFinderMarker.class))
+                .filter(ReflectionUtils.IS_CLASS_PREDICATE)
+                .filter(cls -> AnnotationUtils.isAnnotationPresent(cls, ModuleFinderMarker.class))
                 .collect(Collectors.toSet());
     }
 

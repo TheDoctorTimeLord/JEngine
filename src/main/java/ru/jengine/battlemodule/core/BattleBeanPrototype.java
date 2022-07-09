@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.service.Constants.BeanStrategy;
+import ru.jengine.beancontainer.Constants.BeanStrategy;
 
 /**
  * Аннотация для разметки бинов внутри боевой системы. Аннотация обеспечивает создание новых объектов на каждый вызов

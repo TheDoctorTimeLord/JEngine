@@ -72,7 +72,8 @@ public class CollectionUtils {
         for (Object element : elements) {
             if (element instanceof Collection) {
                 result.addAll((Collection<? extends V>)element);
-            } else {
+            }
+            else {
                 result.add((V)element);
             }
         }

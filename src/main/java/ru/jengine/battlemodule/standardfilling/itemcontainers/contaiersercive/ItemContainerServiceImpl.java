@@ -21,7 +21,6 @@ import ru.jengine.battlemodule.core.modelattributes.BattleAttribute;
 import ru.jengine.battlemodule.core.models.BattleModel;
 import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.standardfilling.battleattributes.events.PutAttributeNotification;
-import ru.jengine.utils.AttributeUtils;
 
 /**
  * Реализация {@link UpdatableItemContainerService}
@@ -40,7 +39,7 @@ public class ItemContainerServiceImpl implements UpdatableItemContainerService {
     public Collection<ItemAggregator> getEquippedItems(int modelId) {
         AttributesContainer container = state.resolveId(modelId).getAttributes();
         return modelsContainerData.get(modelId).equippedItems.values().stream()
-                .map(path -> (ItemAggregator)AttributeUtils.extractLastAttributeInPath(container, path))
+                .map(path -> (ItemAggregator)container.getAttributeByPath(path))
                 .filter(Objects::nonNull)
                 .filter(itemAggregator -> itemAggregator.getItemData() != null)
                 .collect(Collectors.toList());
@@ -50,7 +49,7 @@ public class ItemContainerServiceImpl implements UpdatableItemContainerService {
     public Collection<ItemContainerAggregator> getEquippedContainers(int modelId) {
         AttributesContainer container = state.resolveId(modelId).getAttributes();
         return modelsContainerData.get(modelId).equippedContainers.values().stream()
-                .map(path -> (ItemContainerAggregator)AttributeUtils.extractLastAttributeInPath(container, path))
+                .map(path -> (ItemContainerAggregator)container.getAttributeByPath(path))
                 .filter(Objects::nonNull)
                 .filter(itemContainerAggregator -> itemContainerAggregator.getItemContainerData() != null)
                 .collect(Collectors.toList());
@@ -125,7 +124,7 @@ public class ItemContainerServiceImpl implements UpdatableItemContainerService {
 
         if (pathToItem != null) {
             AttributesContainer attributesContainer = state.resolveId(modelId).getAttributes();
-            ItemAggregator itemAggregator = AttributeUtils.extractLastAttributeInPath(attributesContainer, pathToItem);
+            ItemAggregator itemAggregator = attributesContainer.getAttributeByPath(pathToItem);
 
             if (itemAggregator != null) {
                 itemAggregator.setItemData(null);
@@ -173,7 +172,7 @@ public class ItemContainerServiceImpl implements UpdatableItemContainerService {
 
         if (pathToItem != null) {
             AttributesContainer attributesContainer = state.resolveId(modelId).getAttributes();
-            ItemContainerAggregator containerAggregator = AttributeUtils.extractLastAttributeInPath(attributesContainer, pathToItem);
+            ItemContainerAggregator containerAggregator = attributesContainer.getAttributeByPath(pathToItem);
 
             if (containerAggregator != null) {
                 containerAggregator.setItemContainerData(null);

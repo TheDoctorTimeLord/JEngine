@@ -23,7 +23,7 @@ import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.exceptions.InvocationMethodException;
 import ru.jengine.beancontainer.implementation.factories.beanstrategies.PrototypeBeanFactoryStrategy;
 import ru.jengine.beancontainer.implementation.factories.beanstrategies.SingletonBeanFactoryStrategy;
-import ru.jengine.beancontainer.service.Constants.BeanStrategy;
+import ru.jengine.beancontainer.Constants.BeanStrategy;
 import ru.jengine.utils.Logger;
 
 public class BeanUtils {

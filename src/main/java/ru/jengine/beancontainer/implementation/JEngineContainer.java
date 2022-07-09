@@ -27,8 +27,8 @@ import ru.jengine.beancontainer.implementation.factories.AutowireBeanFactory;
 import ru.jengine.beancontainer.implementation.factories.AutowireConfigurableBeanFactory;
 import ru.jengine.beancontainer.implementation.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer.implementation.moduleimpls.ExistBeansModule;
-import ru.jengine.beancontainer.service.Constants;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.Constants;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
 
@@ -89,9 +89,7 @@ public class JEngineContainer implements BeanContainer {
     private static Map<String, ContextPattern> groupModuleToPatterns(List<Module> groupingModules) {
         Map<String, ContextPattern> result = new HashMap<>();
         CollectionUtils.groupBy(groupingModules, Module::getContextName)
-                .forEach((name, modules) -> {
-                    result.put(name, new ModuleBasedContextPattern(modules));
-                });
+                .forEach((name, modules) -> result.put(name, new ModuleBasedContextPattern(modules)));
         return result;
     }
 
@@ -101,8 +99,14 @@ public class JEngineContainer implements BeanContainer {
     }
 
     @Override
-    public <T> T getBean(Class<?> beanClass) {
+    public <T> T getBean(Class<? extends T> beanClass) {
         BeanContext bean = beanContainerContext.getBean(beanClass);
+        return (T)BeanUtils.getBean(bean);
+    }
+
+    @Override
+    public <T> T getBean(String contextName, Class<? extends T> beanClass) {
+        BeanContext bean = beanContainerContext.getBean(contextName, beanClass);
         return (T)BeanUtils.getBean(bean);
     }
 
@@ -124,5 +128,10 @@ public class JEngineContainer implements BeanContainer {
     @Override
     public void loadContexts(List<String> patternNames) {
         patternsHandler.loadContexts(patternNames);
+    }
+
+    @Override
+    public void loadCopiedContext(String copiedPatternName, String loadedPatternName) {
+        patternsHandler.loadCopiedContext(copiedPatternName, loadedPatternName);
     }
 }

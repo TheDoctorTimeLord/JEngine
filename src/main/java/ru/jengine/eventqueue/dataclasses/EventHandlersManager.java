@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ru.jengine.beancontainer.service.HasPriority;
-import ru.jengine.beancontainer.service.SortedMultiset;
+import ru.jengine.utils.HasPriority;
+import ru.jengine.utils.SortedMultiset;
 import ru.jengine.eventqueue.EventHandlerRegistrar;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;

@@ -16,7 +16,7 @@ import ru.jengine.beancontainer.InitializableContextPatternHandler;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
 import ru.jengine.beancontainer.implementation.factories.SelectiveAutowireConfigurableBeanFactories;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
 import ru.jengine.utils.Logger;
@@ -31,7 +31,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
 
     @Override
     public void initialize() {
-        initializeExistingContext();
+        initializeExternalContext();
 
         patterns.entrySet().stream()
                 .filter(entry -> entry.getValue().needLoadOnContainerInitialize())
@@ -40,7 +40,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
                 .forEach(DefaultContextPatternsHandler::initializeContexts);
     }
 
-    private void initializeExistingContext() {
+    private void initializeExternalContext() {
         ContainerContext externalBeansContext = preLoadContext(Contexts.EXTERNAL_BEANS_CONTEXT);
         externalBeansContext = externalBeansContext == null ? new DefaultContainerContext() : externalBeansContext;
         initializeContexts(externalBeansContext);
@@ -50,8 +50,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
     public void registerPattern(String patternName, ContextPattern contextPattern) throws ContainerException {
         synchronized (this) {
             if (patterns.containsKey(patternName)) {
-                throw new ContainerException(
-                        "Context [" + patternName + "] was loaded. Stop loading [" + contextPattern + "]");
+                throw new ContainerException("Context [%s] was loaded. Stop loading [%s]".formatted(patternName, contextPattern));
             }
 
             patterns.put(patternName, contextPattern);
@@ -77,6 +76,17 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         contexts.forEach(this::preProcessBeans);
         contexts.forEach(ContainerContext::prepareBeans);
         newContexts.forEach(multiContext::registerContext);
+    }
+
+    @Override
+    public void loadCopiedContext(String copiedPatternName, String loadedPatternName) {
+        ContextPattern contextPattern = patterns.get(copiedPatternName);
+        if (contextPattern == null) {
+            throw new ContainerException("Pattern with name [%s] was not registered".formatted(copiedPatternName));
+        }
+
+        ContextPattern loadedPattern = contextPattern.cloneWithContext(loadedPatternName);
+        loadContext(loadedPatternName, loadedPattern);
     }
 
     private ContainerContext preLoadContext(String patternName) { //TODO синхронизовать
@@ -105,7 +115,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         ContextPattern pattern = patterns.get(patternName);
 
         if (pattern == null) {
-            throw new ContainerException("Context pattern [" + patternName + "] was not loaded");
+            throw new ContainerException("Context pattern [%s] was not registered".formatted(patternName));
         }
 
         pattern.setLoaded(true);
@@ -140,7 +150,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         try {
             loadAllSourceContexts(beanSources);
         } catch (ContainerException ex) {
-            throw new ContainerException("Any source for pattern [" + patternName + "] not registered", ex);
+            throw new ContainerException("Any source for pattern [%s] not registered".formatted(patternName), ex);
         }
     }
 
@@ -149,7 +159,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
             ContextPattern pattern = patterns.get(beanSource);
 
             if (pattern == null) {
-                throw new ContainerException("Pattern [" + beanSource + "] not registered");
+                throw new ContainerException("Pattern [%s] was not registered".formatted(beanSource));
             }
 
             if (pattern.wasLoaded()) {

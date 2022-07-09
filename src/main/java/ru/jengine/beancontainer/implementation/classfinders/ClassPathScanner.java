@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import ru.jengine.beancontainer.ClassFinder;
-import ru.jengine.utils.ClassUtils;
+import ru.jengine.utils.ReflectionUtils;
 
 public class ClassPathScanner implements ClassFinder {
     private Reflections reflections;
@@ -31,7 +30,7 @@ public class ClassPathScanner implements ClassFinder {
         Collection<String> annotationNames = reflections.getStore()
                 .get(TypeAnnotationsScannerExtensions.NAME)
                 .get(annotation.getName());
-        List<Class<?>> annotationClasses = ReflectionUtils.forNames(annotationNames, ClassLoader.getSystemClassLoader());
+        List<Class<?>> annotationClasses = org.reflections.ReflectionUtils.forNames(annotationNames, ClassLoader.getSystemClassLoader());
 
         return new HashSet<>(annotationClasses);
     }
@@ -39,7 +38,7 @@ public class ClassPathScanner implements ClassFinder {
     @Override
     public Set<Class<?>> getAnnotatedClasses(Class<? extends Annotation> annotation) {
         return getAnnotatedTypes(annotation).stream()
-                .filter(ClassUtils.IS_CLASS_PREDICATE)
+                .filter(ReflectionUtils.IS_CLASS_PREDICATE)
                 .collect(Collectors.toSet());
     }
 

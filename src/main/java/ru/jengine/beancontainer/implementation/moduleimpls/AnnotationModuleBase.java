@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,16 +11,24 @@ import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.annotations.ContainerModule;
-import ru.jengine.beancontainer.annotations.Context;
 import ru.jengine.beancontainer.annotations.ImportModule;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
-import ru.jengine.beancontainer.service.Constants.Contexts;
+import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 
-public abstract class AnnotationModuleBase implements Module {
-    private ClassFinder classFinder;
+public abstract class AnnotationModuleBase implements Module, Cloneable {
     private final List<BeanDefinitionReader> beanDefinitionReaders = new ArrayList<>();
-    private Context contextAnnotation;
+    private final ContainerModule containerModuleAnnotation;
+    private ClassFinder classFinder;
+    private String contextName;
+
+    public AnnotationModuleBase() {
+        this.containerModuleAnnotation = AnnotationUtils.getAnnotationSafe(getClass(), ContainerModule.class);
+        this.contextName = containerModuleAnnotation == null
+                ? Contexts.DEFAULT_CONTEXT
+                : containerModuleAnnotation.contextName();
+    }
 
     @Override
     public List<BeanDefinitionReader> getBeanDefinitionReaders() {
@@ -31,9 +38,19 @@ public abstract class AnnotationModuleBase implements Module {
     @Override
     public void configure(ModuleContext context) {
         this.classFinder = context.getClassFinder();
-        this.contextAnnotation = Objects.requireNonNull(AnnotationUtils.getAnnotationSafe(getClass(), Context.class));
-
         beanDefinitionReadersInit(context);
+    }
+
+    @Override
+    public Module cloneWithContext(String newContextName) {
+        try {
+            AnnotationModuleBase clonedModule = (AnnotationModuleBase)super.clone();
+            clonedModule.contextName = newContextName;
+            return clonedModule;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new ContainerException("Something went wrong", e);
+        }
     }
 
     protected abstract void beanDefinitionReadersInit(ModuleContext context);
@@ -44,17 +61,19 @@ public abstract class AnnotationModuleBase implements Module {
 
     @Override
     public String getContextName() {
-        return contextAnnotation == null ? Contexts.DEFAULT_CONTEXT : contextAnnotation.value();
+        return contextName;
     }
 
     @Override
     public List<String> getBeanSources() {
-        return contextAnnotation == null ? Collections.emptyList() : Arrays.asList(contextAnnotation.beanSources());
+        return containerModuleAnnotation == null
+                ? Collections.emptyList()
+                : Arrays.asList(containerModuleAnnotation.beanSources());
     }
 
     @Override
     public boolean needLoadOnContainerInitialize() {
-        return contextAnnotation != null && contextAnnotation.needLoadOnContextInitialize();
+        return containerModuleAnnotation != null && containerModuleAnnotation.needLoadOnContextInitialize();
     }
 
     @Override

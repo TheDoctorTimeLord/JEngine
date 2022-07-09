@@ -7,6 +7,7 @@ import ru.jengine.beancontainer.dataclasses.ModuleContext;
 public interface Module {
     List<BeanDefinitionReader> getBeanDefinitionReaders();
     void configure(ModuleContext context);
+    Module cloneWithContext(String newContextName);
 
     String getContextName();
     List<String> getBeanSources();

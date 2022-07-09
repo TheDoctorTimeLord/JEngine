@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.service.Constants.JsonFormatter;
+import ru.jengine.beancontainer.Constants.JsonFormatter;
 import ru.jengine.jsonconverter.jsonformatting.formatters.BaseGsonFormatter;
 
 import com.google.gson.JsonObject;

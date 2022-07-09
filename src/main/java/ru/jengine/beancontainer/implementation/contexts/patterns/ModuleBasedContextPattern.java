@@ -47,4 +47,12 @@ public class ModuleBasedContextPattern implements ContextPattern {
     public void setLoaded(boolean isLoaded) {
         this.wasLoaded = isLoaded;
     }
+
+    @Override
+    public ContextPattern cloneWithContext(String newContextName) {
+        List<Module> modulesInNewContextPattern = modules.stream()
+                .map(module -> module.cloneWithContext(newContextName))
+                .toList();
+        return new ModuleBasedContextPattern(modulesInNewContextPattern);
+    }
 }

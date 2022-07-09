@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.Constants;
 import ru.jengine.utils.CollectionUtils;
 
 import com.google.gson.JsonElement;
@@ -45,7 +45,7 @@ public class JsonFormattersManagerGson implements JsonFormattersManager<JsonObje
         Set<String> result = new HashSet<>();
 
         for (JsonFormatter<JsonObject> formatter : getAvailableFormatters(jsonObject)) {
-            result.addAll(formatter.extractJsonDependencies(jsonObject));
+            result.addAll(formatter.extractJsonDependencies(jsonObject)); //TODO подумать над разделением  зависимостей по форматорам, чтобы не лежали в одной куче
         }
 
         return new ArrayList<>(result);

@@ -8,4 +8,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContainerModule {
+    String contextName();
+    String[] beanSources() default {};
+    boolean needLoadOnContextInitialize() default true;
 }

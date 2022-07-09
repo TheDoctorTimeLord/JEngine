@@ -8,8 +8,8 @@ import ru.jengine.beancontainer.BeanDefinitionReader;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.implementation.beandefinitionreaders.ExistBeanDefinitionsReader;
-import ru.jengine.beancontainer.service.Constants.Contexts;
-import ru.jengine.utils.ClassUtils;
+import ru.jengine.beancontainer.Constants.Contexts;
+import ru.jengine.utils.ReflectionUtils;
 
 public class ExistBeansModule implements Module {
     private final List<Object> beans;
@@ -19,7 +19,7 @@ public class ExistBeansModule implements Module {
         this(beans, Contexts.EXTERNAL_BEANS_CONTEXT);
     }
 
-    public ExistBeansModule(List<Object> beans, String contextName) {
+    private ExistBeansModule(List<Object> beans, String contextName) {
         this.beans = beans;
         this.contextName = contextName;
     }
@@ -31,6 +31,11 @@ public class ExistBeansModule implements Module {
 
     @Override
     public void configure(ModuleContext context) { }
+
+    @Override
+    public Module cloneWithContext(String newContextName) {
+        return new ExistBeansModule(beans, newContextName);
+    }
 
     @Override
     public String getContextName() {
@@ -56,7 +61,7 @@ public class ExistBeansModule implements Module {
     public List<Class<?>> getImplementations(Class<?> interfaceCls) {
         return beans.stream()
                 .map(Object::getClass)
-                .filter(cls -> ClassUtils.hasInterface(cls, interfaceCls))
+                .filter(cls -> ReflectionUtils.hasInterface(cls, interfaceCls))
                 .collect(Collectors.toList());
     }
 }

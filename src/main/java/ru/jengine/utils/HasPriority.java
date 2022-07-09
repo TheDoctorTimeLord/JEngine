@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.service;
+package ru.jengine.utils;
 
 public interface HasPriority {
     int getPriority();

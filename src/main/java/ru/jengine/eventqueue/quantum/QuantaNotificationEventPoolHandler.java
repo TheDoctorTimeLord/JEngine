@@ -2,8 +2,8 @@ package ru.jengine.eventqueue.quantum;
 
 import java.util.Collections;
 
-import ru.jengine.beancontainer.service.Constants;
-import ru.jengine.beancontainer.service.SortedMultiset;
+import ru.jengine.beancontainer.Constants;
+import ru.jengine.utils.SortedMultiset;
 import ru.jengine.eventqueue.EventProcessor;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;

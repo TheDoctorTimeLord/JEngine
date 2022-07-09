@@ -3,7 +3,7 @@ package ru.jengine.eventqueue.asyncdispatcher;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ru.jengine.beancontainer.service.Constants;
+import ru.jengine.beancontainer.Constants;
 import ru.jengine.eventqueue.event.PostHandler;
 import ru.jengine.eventqueue.eventpool.AsyncEventPoolHandler;
 import ru.jengine.eventqueue.exceptions.EventQueueException;
@@ -19,7 +19,7 @@ public class AsyncDispatcherImpl extends Thread implements AsyncDispatcher {
 
     @Override
     public void registerEventPoolHandler(AsyncEventPoolHandler eventPoolHandler) {
-        asyncEventPoolHandlers.put(eventPoolHandler.getEventPoolCode(), (AsyncEventPoolHandler)eventPoolHandler);
+        asyncEventPoolHandlers.put(eventPoolHandler.getEventPoolCode(), eventPoolHandler);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class AsyncDispatcherImpl extends Thread implements AsyncDispatcher {
 
     @Override
     public void registerPostHandler(PostHandler<?> postHandler) {
-        asyncEventPoolHandlers.values().forEach(handler -> handler.registerPostHandler(postHandler));;
+        asyncEventPoolHandlers.values().forEach(handler -> handler.registerPostHandler(postHandler));
     }
 
     @Override

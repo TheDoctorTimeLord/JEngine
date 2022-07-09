@@ -18,12 +18,14 @@ import ru.jengine.beancontainer.InterfaceLocator;
 import ru.jengine.beancontainer.Module;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.implementation.InterfaceLocatorByResolver;
+import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.beancontainer.utils.ContainerModuleUtils;
 
 public class DefaultContainerContext implements ContainerContext {
     private BeanFactory beanFactory;
     private Map<Class<?>, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>();
-    private final InterfaceLocator interfaceLocator = new InterfaceLocatorByResolver(cls -> getBean(cls).getBean());
+    private final InterfaceLocator interfaceLocator =
+            new InterfaceLocatorByResolver(cls -> BeanUtils.getBean(getBean(cls)));
 
     @Override
     public void initialize(List<Module> modules, BeanFactory factory) {
@@ -72,8 +74,7 @@ public class DefaultContainerContext implements ContainerContext {
 
     @Override
     public void prepareToRemove() {
-        if (beanFactory instanceof ConfigurableBeanFactory) {
-            ConfigurableBeanFactory factory = (ConfigurableBeanFactory)beanFactory;
+        if (beanFactory instanceof ConfigurableBeanFactory factory) {
             beanDefinitions.values().stream()
                     .filter(bd -> bd.getBeanFactoryStrategy().needPrepare())
                     .map(bd -> bd.getBeanFactoryStrategy().getBean(beanFactory))

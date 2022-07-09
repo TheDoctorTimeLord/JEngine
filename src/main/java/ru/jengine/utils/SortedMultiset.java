@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.service;
+package ru.jengine.utils;
 
 import java.util.Collection;
 import java.util.Comparator;

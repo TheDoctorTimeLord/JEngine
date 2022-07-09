@@ -3,6 +3,7 @@ package ru.jengine.jsonconverter.jsonformatting;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.jsonconverter.JsonContext;
@@ -13,6 +14,7 @@ import ru.jengine.jsonconverter.jsonformatting.jsonparser.JsonParser;
 import ru.jengine.jsonconverter.jsonformatting.linking.JsonLinker;
 import ru.jengine.jsonconverter.resources.ResourceLoader;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @Bean
@@ -33,19 +35,33 @@ public class JsonFormatterModuleGson implements JsonFormatterModule {
             throws JsonConverterRuntimeException
     {
         JsonObject startedJson = parseAndCorrectJson(json);
-        JsonObject formattedJson = formattingJsonObject(startedJson, loader, inlineDependencies, new HashMap<>());
-        formattersManager.cleanResultObject(formattedJson);
-        return new JsonContext(formattedJson.toString());
+
+        if (!inlineDependencies) {
+            formattersManager.formatting(startedJson, new HashMap<>());
+        } else {
+            formattingJsonObjectWithFields(startedJson, loader, new HashMap<>());
+        }
+
+        formattersManager.cleanResultObject(startedJson);
+        return new JsonContext(startedJson.toString());
+    }
+
+    private void formattingJsonObjectWithFields(JsonObject jsonObject, ResourceLoader loader,
+            Map<String, JsonObject> filledJsons)
+    {
+        JsonObject formattedObject = formattingJsonObject(jsonObject, loader, filledJsons);
+
+        for (Entry<String, JsonElement> attrValue : formattedObject.entrySet()) {
+            JsonElement value = attrValue.getValue();
+            if (value.isJsonObject()) {
+                formattingJsonObjectWithFields(value.getAsJsonObject(), loader, filledJsons);
+            }
+        }
     }
 
     private JsonObject formattingJsonObject(JsonObject jsonObject, ResourceLoader loader,
-            boolean inlineDependencies, Map<String, JsonObject> filledJsons)
+            Map<String, JsonObject> filledJsons)
     {
-        if (!inlineDependencies) {
-            formattersManager.formatting(jsonObject, new HashMap<>());
-            return jsonObject;
-        }
-
         List<String> fieldsDependencies = formattersManager.extractJsonDependencies(jsonObject);
         Map<String, String> dependenciesJsons = linkDependencies(jsonObject, fieldsDependencies, loader);
         Map<String, JsonObject> dependenciesJsonObjects = new HashMap<>(dependenciesJsons.size());
@@ -53,7 +69,7 @@ public class JsonFormatterModuleGson implements JsonFormatterModule {
         for (Map.Entry<String, String> entry : dependenciesJsons.entrySet()) {
             if (!filledJsons.containsKey(entry.getKey())) {
                 JsonObject notFilledJson = parseAndCorrectJson(entry.getValue());
-                JsonObject formattedJson = formattingJsonObject(notFilledJson, loader, true, filledJsons);
+                JsonObject formattedJson = formattingJsonObject(notFilledJson, loader, filledJsons);
                 filledJsons.put(entry.getKey(), formattedJson);
             }
 
@@ -63,7 +79,7 @@ public class JsonFormatterModuleGson implements JsonFormatterModule {
 
         if (formattersManager.formatting(jsonObject, dependenciesJsonObjects)) {
             jsonObject = formattersManager.correct(jsonObject);
-            return formattingJsonObject(jsonObject, loader, true, filledJsons);
+            return formattingJsonObject(jsonObject, loader, filledJsons);
         }
         return jsonObject;
     }
