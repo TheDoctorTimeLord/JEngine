@@ -12,7 +12,7 @@ public class AsyncDispatcherImpl extends Thread implements AsyncDispatcher {
     private final Map<String, AsyncEventPoolHandler> asyncEventPoolHandlers;
 
     public AsyncDispatcherImpl(ConcurrentHashMap<String, AsyncEventPoolHandler> asyncEventPoolHandlers) {
-        this.asyncEventPoolHandlers = asyncEventPoolHandlers; //TODO понять кто должен инициализировать пулл хендлеры
+        this.asyncEventPoolHandlers = asyncEventPoolHandlers;
 
         setName(Constants.ASYNC_DISPATCHER_NAME);
     }
@@ -34,20 +34,20 @@ public class AsyncDispatcherImpl extends Thread implements AsyncDispatcher {
 
     @Override
     public void registerPostHandlerToPool(String eventPoolCode, PostHandler<?> postHandler) {
-        AsyncEventPoolHandler asyncEventPoolHandler = asyncEventPoolHandlers.get(eventPoolCode);
-        if (asyncEventPoolHandler == null) {
-            throw new EventQueueException("Pool with code [%s] is not found".formatted(eventPoolCode));
-        }
-        asyncEventPoolHandler.registerPostHandler(postHandler);
+        getPoolHandler(eventPoolCode).registerPostHandler(postHandler);
     }
 
     @Override
     public void removePostHandlerFromPool(String eventPoolCode, PostHandler<?> postHandler) {
+        getPoolHandler(eventPoolCode).removePostHandler(postHandler);
+    }
+
+    private AsyncEventPoolHandler getPoolHandler(String eventPoolCode) {
         AsyncEventPoolHandler asyncEventPoolHandler = asyncEventPoolHandlers.get(eventPoolCode);
         if (asyncEventPoolHandler == null) {
             throw new EventQueueException("Pool with code [%s] is not found".formatted(eventPoolCode));
         }
-        asyncEventPoolHandler.removePostHandler(postHandler);
+        return asyncEventPoolHandler;
     }
 
     @Override

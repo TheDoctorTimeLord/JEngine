@@ -2,13 +2,18 @@ package ru.jengine.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
+
+import ru.jengine.beancontainer.exceptions.ContainerException;
 
 public class CollectionUtils {
     /**
@@ -131,5 +136,44 @@ public class CollectionUtils {
      */
     public static <V> Collection<V> getOrEmpty(@Nullable Collection<V> collection) {
         return collection == null ? new ArrayList<>() : collection;
+    }
+
+    /**
+     * Конвертирует объект в {@link List список} или {@link Set множество}. Если объект - null, то возвращает пустую
+     * коллекцию. Если объект был коллекцией, то преобразовывает все его элементы в новую коллекцию
+     *
+     * @param object конвертируемый объект
+     * @param collectionClass класс коллекции, к которой нужно выполнить конвертирование
+     * @return объект новой коллекции
+     */
+    public static Object convertToCollection(@Nullable Object object, Class<?> collectionClass) {
+        Collection<?> beanInst;
+        if (object instanceof Collection) {
+            beanInst = (Collection<?>) object;
+        } else if (object == null) {
+            beanInst = Collections.emptyList();
+        } else  {
+            beanInst = Collections.singletonList(object);
+        }
+
+        if (List.class.isAssignableFrom(collectionClass)) {
+            return new ArrayList<>(beanInst);
+        } else if (Set.class.isAssignableFrom(collectionClass)) {
+            return new HashSet<>(beanInst);
+        } else {
+            throw new ContainerException("Collection with bean must be List or Set but was [" + collectionClass + "]");
+        }
+    }
+
+    /**
+     * Конвертирует объект в {@link List список}. Если object - то возвращает пустой список. Если object -
+     * коллекция, то возвращает список, содержащий элементы этой коллекции.
+     *
+     * @param object конвертируемый объект
+     * @return результирующий список
+     * @param <T> тип элементов списка
+     */
+    public static <T> List<T> toList(@Nullable Object object) {
+        return (List<T>)convertToCollection(object, List.class);
     }
 }

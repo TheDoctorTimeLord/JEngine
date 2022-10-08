@@ -55,9 +55,11 @@ public class TestBattle extends AnnotationModule {
                 .build()
         );
 
-        BattleMasterContext battle1 = createBattle(container);
-        BattleMasterContext battle2 = createBattle(container);
-        BattleMasterContext battle3 = createBattle(container);
+        int index = 0;
+
+        BattleMasterContext battle1 = createBattle(index++, container);
+        BattleMasterContext battle2 = createBattle(index++, container);
+        BattleMasterContext battle3 = createBattle(index, container);
 
         BattleMasterContext[] battles = new BattleMasterContext[] { battle1, battle2, battle3 };
 
@@ -90,10 +92,13 @@ public class TestBattle extends AnnotationModule {
         container.stop();
     }
 
-    private static BattleMasterContext createBattle(BeanContainer container) {
-        BattleMasterImpl battleMaster = container.getBean(BattleMasterImpl.class);
-        BattleCommandRegistrar registrar = container.getBean(BattleCommandRegistrar.class);
-        BehaviorObjectsManager behaviorsManager = container.getBean(BehaviorObjectsManager.class);
+    private static BattleMasterContext createBattle(int index, BeanContainer container) {
+        String battleContextName = Contexts.BATTLE_CONTEXT + index;
+        container.loadCopiedContext(Contexts.BATTLE_CONTEXT, battleContextName);
+
+        BattleMasterImpl battleMaster = container.getBean(battleContextName, BattleMasterImpl.class);
+        BattleCommandRegistrar registrar = container.getBean(battleContextName, BattleCommandRegistrar.class);
+        BehaviorObjectsManager behaviorsManager = container.getBean(battleContextName, BehaviorObjectsManager.class);
 
         battleMaster.prepareBattle(new SimpleBattleGenerator(), registrar, behaviorsManager);
 

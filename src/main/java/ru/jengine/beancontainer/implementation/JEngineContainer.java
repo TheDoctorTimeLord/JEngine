@@ -99,9 +99,9 @@ public class JEngineContainer implements BeanContainer {
     }
 
     @Override
-    public <T> T getBean(Class<? extends T> beanClass) {
+    public <T, R> R getBean(Class<? extends T> beanClass) {
         BeanContext bean = beanContainerContext.getBean(beanClass);
-        return (T)BeanUtils.getBean(bean);
+        return (R)BeanUtils.getBean(bean);
     }
 
     @Override

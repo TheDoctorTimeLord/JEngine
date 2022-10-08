@@ -4,7 +4,7 @@ import ru.jengine.beancontainer.dataclasses.ModuleContext;
 import ru.jengine.beancontainer.implementation.beandefinitionreaders.ClassPathBeanDefinitionReader;
 import ru.jengine.beancontainer.implementation.beandefinitionreaders.ImportingBeanDefinitionReader;
 
-public class AnnotationInfrastructureModule extends AnnotationModuleBase {
+public abstract class AnnotationInfrastructureModule extends AnnotationModuleBase {
     @Override
     protected void beanDefinitionReadersInit(ModuleContext context) {
         addBeanDefinitionReader(new ImportingBeanDefinitionReader(context.getModuleClass()));

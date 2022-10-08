@@ -1,15 +1,11 @@
 package ru.jengine.beancontainer.utils;
 
 import static ru.jengine.beancontainer.utils.BeanUtils.getBean;
+import static ru.jengine.utils.CollectionUtils.convertToCollection;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -40,28 +36,9 @@ public class AutowireUtils {
         }
 
         if (collectionClass != null) {
-            return convertCollection(getBean(beanContext), collectionClass);
+            return convertToCollection(getBean(beanContext), collectionClass);
         }
         return getBean(beanContext);
-    }
-
-    private static Object convertCollection(Object bean, Class<?> collectionClass) {
-        Collection<?> beanInst;
-        if (bean instanceof Collection) {
-            beanInst = (Collection<?>) bean;
-        } else if (bean == null) {
-            beanInst = Collections.emptyList();
-        } else  {
-            beanInst = Collections.singletonList(bean);
-        }
-
-        if (List.class.isAssignableFrom(collectionClass)) {
-            return new ArrayList<>(beanInst);
-        } else if (Set.class.isAssignableFrom(collectionClass)) {
-            return new HashSet<>(beanInst);
-        } else {
-            throw new ContainerException("Collection with bean must be List or Set and is not [" + collectionClass + "]");
-        }
     }
 
     private static Class<?> getFirstGenericType(Type type) {

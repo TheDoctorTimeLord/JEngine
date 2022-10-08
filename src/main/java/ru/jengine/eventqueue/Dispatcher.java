@@ -62,6 +62,15 @@ public class Dispatcher implements EventPoolProvider, PollableEventHandlerRegist
     }
 
     @Override
+    public void handleEvents(String eventPoolCode) {
+        EventPoolHandler eventPoolHandler = eventPoolHandlers.get(eventPoolCode);
+        if (eventPoolHandler == null) {
+            throw new EventQueueException("Pool with code [%s] is not found".formatted(eventPoolCode));
+        }
+        eventPoolHandler.handle();
+    }
+
+    @Override
     public void registerEventPoolHandler(List<EventInterceptor> eventInterceptors, EventPoolHandler eventPoolHandler,
             List<PreHandler<?>> additionalPreHandlers)
     {
