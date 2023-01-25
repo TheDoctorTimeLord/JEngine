@@ -15,17 +15,15 @@ public abstract class ResourceLoaderWithCache implements ResourceLoader {
             return cached;
         }
 
-        String resource = getResourceInt(metadata); //Не cached.computeIfAbsent(...) из-за throws у getResourceInt
-        resourcesCache.put(metadata, resource);
-
-        return resource;
+        //Не cached.computeIfAbsent(...) из-за throws у getResourceInt
+        return resourcesCache.put(metadata, getResourceInt(metadata));
     }
 
     protected abstract String getResourceInt(ResourceMetadata metadata) throws ResourceLoadingException;
 
     @Override
-    public void addResourceToCache(ResourceMetadata metadata, String resource) {
-        resourcesCache.put(metadata, resource);
+    public String addResourceToCache(ResourceMetadata metadata, String resource) {
+        return resourcesCache.put(metadata, resource);
     }
 
     @Override

@@ -1,8 +1,5 @@
 package ru.jengine.beancontainer;
 
-import ru.jengine.beancontainer.MainInfrastructureModule;
-import ru.jengine.beancontainer.MainModule;
-
 public interface Constants {
     Class<?> BEAN_CONTAINER_MAIN_MODULE = MainModule.class;
     Class<?> BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE = MainInfrastructureModule.class;
@@ -21,10 +18,5 @@ public interface Constants {
 
         String BATTLE_CONTEXT = "battle";
         String JSON_CONVERTER_CONTEXT = "jsonConverter";
-    }
-
-    interface JsonFormatter {
-        String OBJECT_TYPE_NAME = "objectType";
-        String UNKNOWN_OBJECT_TYPE = "UNKNOWN";
     }
 }

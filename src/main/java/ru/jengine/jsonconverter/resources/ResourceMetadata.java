@@ -1,5 +1,9 @@
 package ru.jengine.jsonconverter.resources;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.google.common.base.Objects;
@@ -7,13 +11,13 @@ import com.google.common.base.Objects;
 public class ResourceMetadata {
     private final String namespace;
     private final String objectType;
-    private final String path;
+    private final List<String> path;
 
-    public ResourceMetadata(String namespace, String path) {
-        this(namespace, null, path);
+    public ResourceMetadata(String namespace, @Nullable String objectType, String... path) {
+        this(namespace, objectType, Arrays.asList(path));
     }
 
-    public ResourceMetadata(String namespace, @Nullable String objectType, String path) {
+    public ResourceMetadata(String namespace, @Nullable String objectType, List<String> path) {
         this.namespace = namespace;
         this.objectType = objectType;
         this.path = path;
@@ -28,8 +32,8 @@ public class ResourceMetadata {
         return objectType;
     }
 
-    public String getPath() {
-        return path;
+    public List<String> getPath() {
+        return new ArrayList<>(path);
     }
 
     @Override
@@ -50,10 +54,6 @@ public class ResourceMetadata {
 
     @Override
     public String toString() {
-        return "ResourceMetadata{" +
-                "namespace='" + namespace + '\'' +
-                ", objectType='" + objectType + '\'' +
-                ", path='" + path + '\'' +
-                '}';
+        return namespace + ":" + (objectType == null ? "" : objectType) + ":" + String.join(".", path);
     }
 }

@@ -16,28 +16,34 @@ public class ContainerConfigurationImpl implements ContainerConfiguration, Conta
         this.mainModuleClass = mainModuleClass;
     }
 
+    @Override
     public List<Object> getAdditionalBeans() {
         return additionalBeans;
     }
 
+    @Override
     public Supplier<ClassFinder> getClassFinderConsumer() {
         return classFinderConsumer;
     }
 
+    @Override
     public Class<?> getMainModuleClass() {
         return mainModuleClass;
     }
 
+    @Override
     public ContainerConfigurationBuilder setAdditionalBeans(List<Object> additionalBeans) {
         this.additionalBeans = additionalBeans;
         return this;
     }
 
+    @Override
     public ContainerConfigurationBuilder addAdditionalBean(Object bean) {
         this.additionalBeans.add(bean);
         return this;
     }
 
+    @Override
     public ContainerConfigurationBuilder setClassFinderConsumer(Supplier<ClassFinder> classFinderConsumer) {
         this.classFinderConsumer = classFinderConsumer;
         return this;

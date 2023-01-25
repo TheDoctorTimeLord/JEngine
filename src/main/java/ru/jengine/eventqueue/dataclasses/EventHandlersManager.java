@@ -53,10 +53,18 @@ public class EventHandlersManager implements EventHandlerRegistrar {
     }
 
     public List<PreHandler<Event>> getPreHandlers(Event event) {
-        return preHandlers.getOrDefault(event.getClass(), Collections.emptyList());
+        return getPreHandlers(event.getClass());
+    }
+
+    protected List<PreHandler<Event>> getPreHandlers(Class<?> eventClass) {
+        return preHandlers.getOrDefault(eventClass, Collections.emptyList());
     }
 
     public SortedMultiset<PostHandler<Event>> getPostHandlers(Event event) {
-        return postHandlers.computeIfAbsent(event.getClass(), cls -> new SortedMultiset<>());
+        return getPostHandlers(event.getClass());
+    }
+
+    protected SortedMultiset<PostHandler<Event>> getPostHandlers(Class<?> eventClass) {
+        return postHandlers.computeIfAbsent(eventClass, cls -> new SortedMultiset<>());
     }
 }

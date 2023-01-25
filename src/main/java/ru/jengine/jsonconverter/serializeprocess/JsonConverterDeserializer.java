@@ -1,4 +1,4 @@
-package ru.jengine.jsonconverter.standardtools;
+package ru.jengine.jsonconverter.serializeprocess;
 
 import com.google.gson.JsonDeserializer;
 

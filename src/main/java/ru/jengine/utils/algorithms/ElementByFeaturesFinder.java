@@ -1,57 +1,65 @@
 package ru.jengine.utils.algorithms;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
 
 public class ElementByFeaturesFinder<Classified, Feature, Element> {
-    private final Map<Feature, Set<ElementContext<Element, Feature>>> elementsByFeatures = new HashMap<>();
-    private final Function<Element, Collection<Feature>> featuresFromElementExtractor;
+    private final Set<ElementContext<Element, Feature>> conditionedElements = new HashSet<>();
+    private final List<Element> commonElements = new ArrayList<>();
+
+    private final Function<Element, Set<Feature>> featuresFromElementExtractor;
     private final Function<Classified, Set<Feature>> featuresFromClassifiedExtractor;
     private final Function<Collection<Element>, Element> elementSelector;
+    private final Comparator<Element> elementSorter;
 
     public ElementByFeaturesFinder(
-            Function<Element, Collection<Feature>> featuresFromElementExtractor,
+            Function<Element, Set<Feature>> featuresFromElementExtractor,
             Function<Classified, Set<Feature>> featuresFromClassifiedExtractor)
     {
         this(featuresFromElementExtractor, featuresFromClassifiedExtractor,
-                elements -> elements.size() == 1 ? elements.iterator().next() : null);
+                elements -> elements.size() == 1 ? elements.iterator().next() : null,
+                (o1, o2) -> 0);
     }
 
     public ElementByFeaturesFinder(
-            Function<Element, Collection<Feature>> featuresFromElementExtractor,
+            Function<Element, Set<Feature>> featuresFromElementExtractor,
             Function<Classified, Set<Feature>> featuresFromClassifiedExtractor,
-            Function<Collection<Element>, Element> elementSelector)
+            Comparator<Element> elementSorter)
+    {
+        this(featuresFromElementExtractor, featuresFromClassifiedExtractor,
+                elements -> elements.size() == 1 ? elements.iterator().next() : null,
+                elementSorter);
+    }
+
+    public ElementByFeaturesFinder(
+            Function<Element, Set<Feature>> featuresFromElementExtractor,
+            Function<Classified, Set<Feature>> featuresFromClassifiedExtractor,
+            Function<Collection<Element>, Element> elementSelector, Comparator<Element> elementSorter)
     {
         this.featuresFromElementExtractor = featuresFromElementExtractor;
         this.featuresFromClassifiedExtractor = featuresFromClassifiedExtractor;
         this.elementSelector = elementSelector;
+        this.elementSorter = elementSorter;
     }
 
     public void addElement(Element element) {
-        addElement(element, feature -> false);
-    }
-
-    public void addElement(Element element, Predicate<Feature> isRequiredFeaturePredicate) {
-        Collection<Feature> features = featuresFromElementExtractor.apply(element);
-        ElementContext<Element, Feature> elementContext = new ElementContext<>(element, features.stream()
-                .filter(isRequiredFeaturePredicate)
-                .collect(Collectors.toSet()));
-
-        for (Feature feature : features) {
-            elementsByFeatures.computeIfAbsent(feature, f -> new HashSet<>()).add(elementContext);
+        Set<Feature> features = featuresFromElementExtractor.apply(element);
+        if (features == null || features.isEmpty()) {
+            commonElements.add(element);
+            return;
         }
+
+        conditionedElements.add(new ElementContext<>(element, features));
     }
 
     @Nullable
@@ -61,26 +69,13 @@ public class ElementByFeaturesFinder<Classified, Feature, Element> {
 
     public Collection<Element> findAvailableElements(Classified classified) {
         Set<Feature> classifiedFeatures = featuresFromClassifiedExtractor.apply(classified);
-        Set<ElementContext<Element, Feature>> availableElements = Collections.emptySet();
 
-        for (Feature classifiedFeature : classifiedFeatures) {
-            Set<ElementContext<Element, Feature>> availableElementsByFeature =
-                    elementsByFeatures.getOrDefault(classifiedFeature, Collections.emptySet());
-
-            if (availableElements.isEmpty()) {
-                availableElements = availableElementsByFeature;
-            } else {
-                availableElements = Sets.intersection(availableElements, availableElementsByFeature);
-            }
-
-            if (availableElements.isEmpty()) {
-                break;
-            }
-        }
-
-        return availableElements.stream()
+        Stream<Element> foundedElements = conditionedElements.stream()
                 .filter(element -> checkContainsRequiredFeatures(element.requiredFeatures, classifiedFeatures))
-                .map(ElementContext::element)
+                .map(ElementContext::element);
+
+        return Stream.concat(foundedElements, commonElements.stream())
+                .sorted(elementSorter)
                 .toList();
     }
 

@@ -29,9 +29,13 @@ public abstract class ComplexEventPoolQueueHandler implements EventPoolHandler, 
     public EventPool initialize(EventHandlingContext context) {
         this.eventProcessor = context.getEventProcessor();
         this.eventPool = new EventPoolQueue();
-        this.eventHandlersManager = new EventHandlersManager(context.getPreHandlers());
+        this.eventHandlersManager = prepareEventHandlersManager(context);
 
         return eventPool;
+    }
+
+    protected EventHandlersManager prepareEventHandlersManager(EventHandlingContext context) {
+        return new EventHandlersManager(context.getPreHandlers());
     }
 
     @Override

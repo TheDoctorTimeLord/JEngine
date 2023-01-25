@@ -32,6 +32,16 @@ public class SortedMultiset<E> {
         elements.add(element);
     }
 
+    public void addAll(Collection<E> elements) {
+        for (E element : elements) {
+            add(element);
+        }
+    }
+
+    public void addAll(SortedMultiset<E> otherMultiset) {
+        addAll(otherMultiset.getSortedElements());
+    }
+
     public void remove(E element) {
         Integer priority = priorityExtractor.apply(element);
         List<E> elements = container.get(priority);

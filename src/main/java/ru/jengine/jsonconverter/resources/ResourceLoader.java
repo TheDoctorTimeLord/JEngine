@@ -5,6 +5,8 @@ import ru.jengine.jsonconverter.exceptions.ResourceLoadingException;
 public interface ResourceLoader {
     String getResource(ResourceMetadata metadata) throws ResourceLoadingException;
 
-    void addResourceToCache(ResourceMetadata metadata, String resource);
+    boolean hasResourceByMetadata(ResourceMetadata metadata);
+
+    String addResourceToCache(ResourceMetadata metadata, String resource);
     void cleanCache();
 }
