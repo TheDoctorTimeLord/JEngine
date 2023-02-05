@@ -43,8 +43,8 @@ public abstract class Quadrant {
         }
     }
 
-    public static class SoulsQuadrant extends Quadrant {
-        public SoulsQuadrant(Point startFieldOfView) {
+    public static class SouthQuadrant extends Quadrant {
+        public SouthQuadrant(Point startFieldOfView) {
             super(startFieldOfView);
         }
 

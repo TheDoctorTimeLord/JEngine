@@ -16,7 +16,7 @@ import ru.jengine.utils.fieldofview.FieldOfViewCalculator;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.EastQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.NorthQuadrant;
-import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.SoulsQuadrant;
+import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.SouthQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.Quadrant.WestQuadrant;
 import ru.jengine.utils.fieldofview.shadowcasting.ShadowCastingCalculator;
 import ru.jengine.battlemodule.standardfilling.visible.outside.BaseSectorScanner;
@@ -71,7 +71,7 @@ public class VisionInformationServiceImpl implements UpdatableVisionInformationS
     private static Quadrant calculateQuadrant(Direction direction, Point position) {
         return switch (direction) {
             case UP -> new NorthQuadrant(position);
-            case DOWN -> new SoulsQuadrant(position);
+            case DOWN -> new SouthQuadrant(position);
             case LEFT -> new WestQuadrant(position);
             case RIGHT -> new EastQuadrant(position);
             default -> throw new BattleException(
