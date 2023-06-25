@@ -16,7 +16,7 @@ public abstract class ResourceLoaderWithCache implements ResourceLoader {
         }
 
         //Не cached.computeIfAbsent(...) из-за throws у getResourceInt
-        return resourcesCache.put(metadata, getResourceInt(metadata));
+        return addResourceToCache(metadata, getResourceInt(metadata));
     }
 
     protected abstract String getResourceInt(ResourceMetadata metadata) throws ResourceLoadingException;

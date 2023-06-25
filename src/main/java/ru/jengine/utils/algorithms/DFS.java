@@ -46,7 +46,7 @@ public class DFS {
      * @param neighbourVertexHandler обработчик, который выполняется для вершины, соседней с достигнутой вершиной
      *                               (1-й аргумент — соседняя вершина, 2-й аргумент — достигнутая вершина)
      *                               (может быть пропущен)
-     * @param backFromDfsHandler обработчик, вызываемый для вершины, у которой все соседи уже были обойдены
+     * @param backFromVertexHandler обработчик, вызываемый для вершины, у которой все соседи уже были обойдены
      * @param <V> Тип вершин графа, по которым выполняется обход в глубину. Вершины обязаны корректно определять
      *           методы {@link Object#equals(Object)} и {@link Object#hashCode()}
      * @return вершина, для которой было выполнено условие stopCondition, либо null, если ни для одной вершины это
@@ -54,7 +54,7 @@ public class DFS {
      */
     public static <V> V runAlgorithm(V startVertex, Function<V, Collection<V>> neighboursExtractor,
             @Nullable Function<V, Boolean> stopCondition, @Nullable Consumer<V> vertexReachedHandler,
-            @Nullable BiConsumer<V, V> neighbourVertexHandler, @Nullable BiConsumer<V, Collection<V>> backFromDfsHandler)
+            @Nullable BiConsumer<V, V> neighbourVertexHandler, @Nullable BiConsumer<V, Collection<V>> backFromVertexHandler)
     {
         stopCondition = stopCondition != null ? stopCondition : v -> false;
         vertexReachedHandler = vertexReachedHandler != null ? vertexReachedHandler : v -> {};
@@ -69,8 +69,8 @@ public class DFS {
             CommonVertex<V> reachedVertex = vertexStack.pollLast();
             V vertex = reachedVertex.vertex;
 
-            if (backFromDfsHandler != null && reachedVertex instanceof BackFromDfsVertex<V> backFromDfs) {
-                backFromDfsHandler.accept(vertex, backFromDfs.neighbours);
+            if (backFromVertexHandler != null && reachedVertex instanceof BackFromDfsVertex<V> backFromDfs) {
+                backFromVertexHandler.accept(vertex, backFromDfs.neighbours);
                 continue;
             }
 
@@ -87,7 +87,7 @@ public class DFS {
 
             Collection<V> neighbours = CollectionUtils.getOrEmpty(neighboursExtractor.apply(vertex));
 
-            if (backFromDfsHandler != null) {
+            if (backFromVertexHandler != null) {
                 vertexStack.addLast(new BackFromDfsVertex<>(vertex, neighbours));
             }
 
