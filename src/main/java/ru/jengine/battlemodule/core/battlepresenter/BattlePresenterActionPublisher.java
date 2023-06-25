@@ -8,20 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ru.jengine.utils.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Класс, реализующий компонент "Наблюдаемый" из шаблона проектирования "Наблюдаемый-Наблюдатель" для API получения
  * информации о бое
  */
 public class BattlePresenterActionPublisher {
+    private static final Logger LOG = LoggerFactory.getLogger(BattlePresenterActionPublisher.class);
     private final Map<SubscribeType, List<SubscriberContext>> subscribersByType =
             new ConcurrentHashMap<>();
-    private final Logger logger;
-
-    public BattlePresenterActionPublisher(Logger logger) {
-        this.logger = logger;
-    }
 
     /**
      * Подписывает внешнего получателя на события в бою
@@ -69,7 +66,7 @@ public class BattlePresenterActionPublisher {
                             new ArrayList<>(subscriber.strategy.filterAvailableAction(loggedActions))
                     );
                 } catch (Exception e) {
-                    logger.error("BattlePresenterActionPublisher", "Subscriber [%s] throw exception".formatted(subscriber), e);
+                    LOG.error("Subscriber [%s] throw exception".formatted(subscriber), e);
                 }
             }
             return subscribers;

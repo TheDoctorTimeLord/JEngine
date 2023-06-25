@@ -7,7 +7,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.jengine.beancontainer.BeanFactory;
+import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.ContainerMultiContext;
 import ru.jengine.beancontainer.ContextPattern;
@@ -16,12 +20,12 @@ import ru.jengine.beancontainer.InitializableContextPatternHandler;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.contexts.DefaultContainerContext;
 import ru.jengine.beancontainer.implementation.factories.SelectiveAutowireConfigurableBeanFactories;
-import ru.jengine.beancontainer.Constants.Contexts;
 import ru.jengine.beancontainer.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
-import ru.jengine.utils.Logger;
 
 public class DefaultContextPatternsHandler implements InitializableContextPatternHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultContextPatternsHandler.class);
+
     private final Map<String, ContextPattern> patterns = new ConcurrentHashMap<>();
     private final ContainerMultiContext multiContext;
 
@@ -136,11 +140,7 @@ public class DefaultContextPatternsHandler implements InitializableContextPatter
         if (infrastructureContext != null) {
             beanFactory.configure(infrastructureContext);
         } else {
-            Logger logger = BeanUtils.getLogger(multiContext);
-            if (logger != null) {
-                logger.error("DefaultContextPatternsHandler", ("Can not configure bean factory [%s]. "
-                        + "Infrastructure context is null").formatted(beanFactory));
-            }
+            LOG.error("Can not configure bean factory [%s]. Infrastructure context is null".formatted(beanFactory));
         }
 
         return beanFactory;
