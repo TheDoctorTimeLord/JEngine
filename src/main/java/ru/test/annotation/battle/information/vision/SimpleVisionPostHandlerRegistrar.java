@@ -28,11 +28,6 @@ public class SimpleVisionPostHandlerRegistrar implements VisionPostHandlerRegist
         }
 
         @Override
-        public Class<MoveEvent> getHandlingEventType() {
-            return MoveEvent.class;
-        }
-
-        @Override
         public void handle(MoveEvent event) {
             visionInformationService.recalculateFieldOfView(event.getModelId());
         }

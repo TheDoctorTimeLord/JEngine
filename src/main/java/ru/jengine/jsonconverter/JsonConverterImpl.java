@@ -14,11 +14,13 @@ import ru.jengine.jsonconverter.resources.JsonParser;
 import ru.jengine.jsonconverter.resources.ResourceMetadata;
 import ru.jengine.jsonconverter.serializeprocess.JsonConverterDeserializer;
 import ru.jengine.jsonconverter.serializeprocess.JsonConverterSerializer;
-import ru.jengine.utils.ReflectionUtils;
+import ru.jengine.utils.HierarchyWalkingUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 
 @Bean
@@ -56,7 +58,7 @@ public class JsonConverterImpl implements JsonConverter {
 
     private static void addSerializers(GsonBuilder builder, List<JsonConverterSerializer<?>> serializers) {
         for (JsonConverterSerializer<?> serializer : serializers) {
-            Class<?> type = ReflectionUtils.getGenericHierarchyInterfaceType(serializer.getClass(), JsonConverterDeserializer.class, 0);
+            Class<?> type = HierarchyWalkingUtils.getGenericType(serializer.getClass(), JsonSerializer.class, 0);
 
             if (serializer.inHierarchy()) {
                 builder.registerTypeHierarchyAdapter(type, serializer);
@@ -68,7 +70,7 @@ public class JsonConverterImpl implements JsonConverter {
 
     private static void addDeserializers(GsonBuilder builder, List<JsonConverterDeserializer<?>> deserializers) {
         for (JsonConverterDeserializer<?> deserializer : deserializers) {
-            Class<?> type = ReflectionUtils.getGenericHierarchyInterfaceType(deserializer.getClass(), JsonConverterDeserializer.class, 0);
+            Class<?> type = HierarchyWalkingUtils.getGenericType(deserializer.getClass(), JsonDeserializer.class, 0);
 
             if (deserializer.inHierarchy()) {
                 builder.registerTypeHierarchyAdapter(type, deserializer);

@@ -6,9 +6,4 @@ public class TestChangeDirectionHandler extends AbstractChangeDirectionHandler<T
     public TestChangeDirectionHandler(BattleState battleState) {
         super(battleState);
     }
-
-    @Override
-    public Class<TestChangeDirectionEvent> getHandlingEventType() {
-        return TestChangeDirectionEvent.class;
-    }
 }

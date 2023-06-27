@@ -14,11 +14,6 @@ public class MoveBattleActionNotifier implements PostHandler<MoveEvent> {
     }
 
     @Override
-    public Class<MoveEvent> getHandlingEventType() {
-        return MoveEvent.class;
-    }
-
-    @Override
     public void handle(MoveEvent event) {
         actionRegistrar.registerAction(new MoveBattleAction(event.getModelId(), event.getOldPosition(), event.getNewPosition()));
     }

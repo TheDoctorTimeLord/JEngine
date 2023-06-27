@@ -23,11 +23,6 @@ public class MovementHandler implements PostHandler<MoveEvent> {
     }
 
     @Override
-    public Class<MoveEvent> getHandlingEventType() {
-        return MoveEvent.class;
-    }
-
-    @Override
     public void handle(MoveEvent event) {
         int id = event.getModelId();
 

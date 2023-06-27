@@ -6,9 +6,4 @@ public class ChangeDirectionHandler extends AbstractChangeDirectionHandler<Chang
     public ChangeDirectionHandler(BattleState battleState) {
         super(battleState);
     }
-
-    @Override
-    public Class<ChangeDirectionEvent> getHandlingEventType() {
-        return ChangeDirectionEvent.class;
-    }
 }

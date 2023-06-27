@@ -19,11 +19,6 @@ public class RemoveAttributeNotificationHandler implements PostHandler<RemoveAtt
     }
 
     @Override
-    public Class<RemoveAttributeNotification> getHandlingEventType() {
-        return RemoveAttributeNotification.class;
-    }
-
-    @Override
     public void handle(RemoveAttributeNotification event) {
         BattleModel model = battleState.resolveId(event.getModelId());
         attributeRulesManager.processRemovedAttribute(model, event.getRemovedAttribute());

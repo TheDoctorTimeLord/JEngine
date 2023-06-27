@@ -13,11 +13,6 @@ public class TestHitNotifier implements PostHandler<TestHitEvent> {
     }
 
     @Override
-    public Class<TestHitEvent> getHandlingEventType() {
-        return TestHitEvent.class;
-    }
-
-    @Override
     public void handle(TestHitEvent event) {
         actionRegistrar.registerAction(new HitBattleAction(event.getAttacker(), event.getTarget(), event.getDamagePoint()));
     }

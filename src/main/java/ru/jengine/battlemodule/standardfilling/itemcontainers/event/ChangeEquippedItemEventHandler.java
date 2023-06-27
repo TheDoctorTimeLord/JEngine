@@ -12,11 +12,6 @@ public class ChangeEquippedItemEventHandler extends ItemContainerPostHandler<Cha
     }
 
     @Override
-    public Class<ChangeEquippedItemEvent> getHandlingEventType() {
-        return ChangeEquippedItemEvent.class;
-    }
-
-    @Override
     public void handle(ChangeEquippedItemEvent event) {
         ItemAggregator itemAggregator = itemContainerService.takeOffItem(
                 event.getModelId(),

@@ -11,11 +11,6 @@ public class TakeOffItemEventHandler extends ItemContainerPostHandler<TakeOffIte
     }
 
     @Override
-    public Class<TakeOffItemEvent> getHandlingEventType() {
-        return TakeOffItemEvent.class;
-    }
-
-    @Override
     public void handle(TakeOffItemEvent event) {
         itemContainerService.takeOffItem(event.getModelId(), event.getContainerCode(), event.getItemIndex());
     }

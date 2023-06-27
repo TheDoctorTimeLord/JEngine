@@ -19,11 +19,6 @@ public class PutAttributeNotificationHandler implements PostHandler<PutAttribute
     }
 
     @Override
-    public Class<PutAttributeNotification> getHandlingEventType() {
-        return PutAttributeNotification.class;
-    }
-
-    @Override
     public void handle(PutAttributeNotification event) {
         BattleModel model = battleState.resolveId(event.getModelId());
         attributeRulesManager.processPuttedAttribute(model, event.getPuttedAttribute());

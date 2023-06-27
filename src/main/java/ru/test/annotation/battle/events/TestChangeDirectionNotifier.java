@@ -13,11 +13,6 @@ public class TestChangeDirectionNotifier implements PostHandler<TestChangeDirect
     }
 
     @Override
-    public Class<TestChangeDirectionEvent> getHandlingEventType() {
-        return TestChangeDirectionEvent.class;
-    }
-
-    @Override
     public void handle(TestChangeDirectionEvent event) {
         actionRegistrar.registerAction(new RotateAction(event.getModelId(), event.getNewDirection()));
     }

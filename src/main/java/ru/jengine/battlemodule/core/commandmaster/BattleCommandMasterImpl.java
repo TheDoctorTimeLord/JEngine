@@ -6,6 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.jengine.battlemodule.core.BattleBeanPrototype;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.commands.AdditionalBattleCommand;
@@ -21,6 +24,7 @@ import com.google.common.collect.Multimap;
  */
 @BattleBeanPrototype
 public class BattleCommandMasterImpl implements BattleCommandMaster {
+    private static final Logger LOG = LoggerFactory.getLogger(BattleCommandMasterImpl.class);
     private final List<BattleCommandPerformElement<?>> commandsOnNextPhase = new ArrayList<>();
     private final Multimap<Integer, AdditionalBattleCommand<?>> registeredCommandOnNextPhase = HashMultimap.create();
 
@@ -77,7 +81,7 @@ public class BattleCommandMasterImpl implements BattleCommandMaster {
             try {
                 command.performCommand(commandContext);
             } catch (Exception e) {
-                logger.error("BattleCommandMasterImpl", "Command [%s] performs with error".formatted(command), e);
+                LOG.error("BattleCommandMasterImpl", "Command [%s] performs with error".formatted(command), e);
             }
         }
     }

@@ -11,11 +11,6 @@ public class EquipItemEventHandler extends ItemContainerPostHandler<EquipItemEve
     }
 
     @Override
-    public Class<EquipItemEvent> getHandlingEventType() {
-        return EquipItemEvent.class;
-    }
-
-    @Override
     public void handle(EquipItemEvent event) {
         itemContainerService.equipItem(event.getModelId(), event.getContainerPlaceName(), event.getEquippedPlace(),
                 event.getContainerCode(), event.getItemIndex());

@@ -22,11 +22,6 @@ public class TestHitHandler implements PostHandler<TestHitEvent> {
     }
 
     @Override
-    public Class<TestHitEvent> getHandlingEventType() {
-        return TestHitEvent.class;
-    }
-
-    @Override
     public void handle(TestHitEvent event) {
         BattleModel model = battleState.resolveId(event.getTarget());
         if (model instanceof HasHealth) {

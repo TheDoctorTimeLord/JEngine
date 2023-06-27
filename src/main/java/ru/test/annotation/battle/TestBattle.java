@@ -93,12 +93,12 @@ public class TestBattle extends AnnotationModule {
     }
 
     private static BattleMasterContext createBattle(int index, BeanContainer container) {
-        String battleContextName = Contexts.BATTLE_CONTEXT + index;
-        container.loadCopiedContext(Contexts.BATTLE_CONTEXT, battleContextName);
+        // String battleContextName = Contexts.BATTLE_CONTEXT + index;
+        // container.loadCopiedContext(Contexts.BATTLE_CONTEXT, battleContextName); //На загрузку контекстов не работаает
 
-        BattleMasterImpl battleMaster = container.getBean(battleContextName, BattleMasterImpl.class);
-        BattleCommandRegistrar registrar = container.getBean(battleContextName, BattleCommandRegistrar.class);
-        BehaviorObjectsManager behaviorsManager = container.getBean(battleContextName, BehaviorObjectsManager.class);
+        BattleMasterImpl battleMaster = container.getBean(/*battleContextName, */BattleMasterImpl.class);
+        BattleCommandRegistrar registrar = container.getBean(/*battleContextName, */BattleCommandRegistrar.class);
+        BehaviorObjectsManager behaviorsManager = container.getBean(/*battleContextName, */BehaviorObjectsManager.class);
 
         battleMaster.prepareBattle(new SimpleBattleGenerator(), registrar, behaviorsManager);
 
