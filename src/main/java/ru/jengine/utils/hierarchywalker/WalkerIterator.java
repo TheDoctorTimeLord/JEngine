@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,7 +15,79 @@ public class WalkerIterator implements Iterator<HierarchyElement> {
     private final Deque<WalkingContext> walkingStack = new ArrayDeque<>();
 
     public WalkerIterator(Class<?> startWalkingClass) {
-        walkingStack.addLast(new WalkingContext(startWalkingClass, Map.of()));
+        this(startWalkingClass, false);
+    }
+
+    public WalkerIterator(Class<?> startWalkingClass, boolean withTypeChecking, Class<?>... startGenericParameters) {
+        Type[] genericTypes = startWalkingClass.getTypeParameters();
+
+        if (genericTypes.length != startGenericParameters.length) {
+            throw new WalkingException("WalkerIterator for class [%s] must have initial parameters %s, but actual %s"
+                    .formatted(startWalkingClass, Arrays.toString(genericTypes), Arrays.toString(startGenericParameters)));
+        }
+
+        Map<String, Class<?>> typesMapping;
+        if (genericTypes.length == 0) {
+            typesMapping = Map.of();
+        }
+        else {
+            if (withTypeChecking) {
+                validateCastTypes(startWalkingClass, genericTypes, startGenericParameters);
+            }
+            typesMapping = new HashMap<>();
+            for (int i = 0; i < genericTypes.length; i++) {
+                typesMapping.put(genericTypes[i].getTypeName(), startGenericParameters[i]);
+            }
+        }
+
+        walkingStack.addLast(new WalkingContext(startWalkingClass, typesMapping));
+    }
+
+    private static void validateCastTypes(Class<?> startWalkingClass, Type[] genericTypes, Class<?>[] startGenericParameters)
+    {
+        Map<Type, Class<?>> currentMapping = new HashMap<>();
+        for (int i = 0; i < genericTypes.length; i++) {
+            Type genericType = genericTypes[i];
+            currentMapping.put(genericType, startGenericParameters[i]);
+
+            if (!(genericType instanceof TypeVariable<?>)) {
+                throw new WalkingException("Class [%s] at position [%s] has [%s] but expected TypeVariable"
+                        .formatted(startWalkingClass, i, genericType));
+            }
+        }
+
+        for (int i = 0; i < genericTypes.length; i++) {
+            Type genericType = genericTypes[i];
+            Class<?> startGenericParameter = startGenericParameters[i];
+            try {
+                validateCastTypes(startGenericParameter, new Type[]{genericType}, currentMapping);
+            }
+            catch (WalkingException e) {
+                throw new WalkingException("In type [%s] type %s with position [%s] is not casted to [%s]"
+                        .formatted(startWalkingClass, startGenericParameter, i, genericType), e);
+            }
+        }
+    }
+
+    private static void validateCastTypes(Class<?> casted, Type[] castingTo, Map<Type, Class<?>> currentMapping)
+    {
+        for (Type type : castingTo) {
+            Class<?> dependency;
+            if (type instanceof TypeVariable<?> typeVariable) {
+                dependency = currentMapping.get(typeVariable);
+                validateCastTypes(dependency, typeVariable.getBounds(), currentMapping);
+            }
+            else if (type instanceof Class<?> cls) {
+                dependency = cls;
+            }
+            else {
+                throw new WalkingException("Unknown type [%s]".formatted(type));
+            }
+
+            if (!dependency.isAssignableFrom(casted)) {
+                throw new WalkingException("Type [%s] is not extended [%s]".formatted(casted, dependency));
+            }
+        }
     }
 
     @Override
