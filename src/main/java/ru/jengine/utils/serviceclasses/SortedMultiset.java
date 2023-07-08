@@ -1,4 +1,4 @@
-package ru.jengine.utils;
+package ru.jengine.utils.serviceclasses;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class SortedMultiset<E> {
     private final SortedMap<Integer, List<E>> container;
@@ -51,11 +50,11 @@ public class SortedMultiset<E> {
         }
     }
 
-    public Collection<E> getSortedElements() {
+    public List<E> getSortedElements() {
         return container.values().stream()
                 .filter(list -> !list.isEmpty())
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean isEmpty() {

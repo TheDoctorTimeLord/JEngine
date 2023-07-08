@@ -5,8 +5,8 @@ import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ru.jengine.utils.Preconditions;
 import ru.jengine.eventqueue.event.Event;
+import ru.jengine.eventqueue.exceptions.EventQueueException;
 
 public class EventPoolQueueWithQuanta implements QuantaEventPool {
     private final Queue<Event> eventQueue = new ArrayDeque<>();
@@ -46,7 +46,9 @@ public class EventPoolQueueWithQuanta implements QuantaEventPool {
             Event pooledEvent = eventQueue.poll();
             if (pooledEvent instanceof QuantumEvent) {
                 countQuantumEvent--;
-                Preconditions.checkState(countQuantumEvent >= 0, "Count of QuantumEvents less then 0");
+                if (countQuantumEvent < 0) {
+                    throw new EventQueueException("Count of QuantumEvents less then 0");
+                }
             }
             return pooledEvent;
         } finally {

@@ -43,7 +43,7 @@ public class WalkerIteratorTest
     public void testWalkAroundHierarchy() {
         int currentHierarchyIndex = -1;
 
-        WalkerIterator walkerIterator = new WalkerIterator(Impl.class);
+        WalkerIterator walkerIterator = WalkerIteratorBuilder.builder(Impl.class).build();
         while (walkerIterator.hasNext()) {
             currentHierarchyIndex++;
 
@@ -66,7 +66,11 @@ public class WalkerIteratorTest
     @Test
     public void testClassWithInitialsGenerics() {
         Class<?>[] generics = new Class[] {Impl4.class, Impl3.class, Impl2.class, I12.class};
-        WalkerIterator walkerIterator = new WalkerIterator(Checked.class, true, generics);
+        WalkerIterator walkerIterator = WalkerIteratorBuilder.builder(Checked.class)
+                .withTypeChecking(true)
+                .withGenericMapping(true)
+                .initialGenericParameters(generics)
+                .build();
 
         Assert.assertTrue(walkerIterator.hasNext());
         Assert.assertArrayEquals(generics, walkerIterator.next().getElementTypeParameters());
@@ -80,7 +84,11 @@ public class WalkerIteratorTest
     @Test
     public void testClassWithFlatHierarchy() {
         Class<?>[] generics = new Class[] {Impl2.class, Impl2.class, Impl2.class, I3Impl.class};
-        WalkerIterator walkerIterator = new WalkerIterator(Checked.class, true, generics);
+        WalkerIterator walkerIterator = WalkerIteratorBuilder.builder(Checked.class)
+                .withTypeChecking(true)
+                .withGenericMapping(true)
+                .initialGenericParameters(generics)
+                .build();
 
         Assert.assertTrue(walkerIterator.hasNext());
         Assert.assertArrayEquals(generics, walkerIterator.next().getElementTypeParameters());
@@ -94,6 +102,10 @@ public class WalkerIteratorTest
     @Test(expected = WalkingException.class)
     public void testClassWithNonMatchedGenerics() {
         Class<?>[] generics = new Class[] {Impl2.class, Impl2.class, Impl3.class, I3Impl.class};
-        new WalkerIterator(Checked.class, true, generics);
+        WalkerIteratorBuilder.builder(Checked.class)
+                .withTypeChecking(true)
+                .withGenericMapping(true)
+                .initialGenericParameters(generics)
+                .build();
     }
 }

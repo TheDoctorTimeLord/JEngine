@@ -10,37 +10,48 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+
+import ru.jengine.utils.hierarchywalker.WalkingException.Qualification;
 
 public class WalkerIterator implements Iterator<HierarchyElement> {
     private final Deque<WalkingContext> walkingStack = new ArrayDeque<>();
+    private final boolean withGenericMapping;
+    private final Consumer<HierarchyElement> onGoBackByStarted;
 
-    public WalkerIterator(Class<?> startWalkingClass) {
-        this(startWalkingClass, false);
-    }
-
-    public WalkerIterator(Class<?> startWalkingClass, boolean withTypeChecking, Class<?>... startGenericParameters) {
+    WalkerIterator(Class<?> startWalkingClass, boolean withTypeChecking, boolean withGenericMapping,
+            Class<?>[] initialGenericParameters, Consumer<HierarchyElement> onGoBackByStarted)
+    {
         Type[] genericTypes = startWalkingClass.getTypeParameters();
 
-        if (genericTypes.length != startGenericParameters.length) {
+        if (genericTypes.length != initialGenericParameters.length) {
             throw new WalkingException("WalkerIterator for class [%s] must have initial parameters %s, but actual %s"
-                    .formatted(startWalkingClass, Arrays.toString(genericTypes), Arrays.toString(startGenericParameters)));
+                    .formatted(startWalkingClass, Arrays.toString(genericTypes), Arrays.toString(initialGenericParameters)));
         }
 
-        Map<String, Class<?>> typesMapping;
+        this.onGoBackByStarted = onGoBackByStarted;
+        this.withGenericMapping = withGenericMapping;
+        Map<String, Class<?>> typesMapping =
+                prepareTypesMapping(genericTypes, startWalkingClass, withTypeChecking, initialGenericParameters);
+        this.walkingStack.addLast(new WalkingContext(startWalkingClass, typesMapping));
+    }
+
+    private static Map<String, Class<?>> prepareTypesMapping(Type[] genericTypes, Class<?> startWalkingClass,
+            boolean withTypeChecking, Class<?>[] initialGenericParameters)
+    {
         if (genericTypes.length == 0) {
-            typesMapping = Map.of();
-        }
-        else {
-            if (withTypeChecking) {
-                validateCastTypes(startWalkingClass, genericTypes, startGenericParameters);
-            }
-            typesMapping = new HashMap<>();
-            for (int i = 0; i < genericTypes.length; i++) {
-                typesMapping.put(genericTypes[i].getTypeName(), startGenericParameters[i]);
-            }
+            return Map.of();
         }
 
-        walkingStack.addLast(new WalkingContext(startWalkingClass, typesMapping));
+        if (withTypeChecking) {
+            validateCastTypes(startWalkingClass, genericTypes, initialGenericParameters);
+        }
+
+        Map<String, Class<?>> result = new HashMap<>();
+        for (int i = 0; i < genericTypes.length; i++) {
+            result.put(genericTypes[i].getTypeName(), initialGenericParameters[i]);
+        }
+        return result;
     }
 
     private static void validateCastTypes(Class<?> startWalkingClass, Type[] genericTypes, Class<?>[] startGenericParameters)
@@ -108,7 +119,7 @@ public class WalkerIterator implements Iterator<HierarchyElement> {
         }
 
         markWalkStarted(currentStep);
-        goBackByMarked();
+        goBackByStartedNodes();
 
         return currentStep;
     }
@@ -118,67 +129,82 @@ public class WalkerIterator implements Iterator<HierarchyElement> {
         Type[] genericInterfaces = currentStep.getCurrentElement().getGenericInterfaces();
         for (int i = genericInterfaces.length - 1; i >= 0; i--) {
             Type genericInterface = genericInterfaces[i];
-            addGenericWalkingContext(genericInterface, currentStep);
+            walkingStack.addLast(generateGenericWalkingContext(genericInterface, currentStep));
         }
     }
 
-    private void goBackByMarked() {
+    private void goBackByStartedNodes() {
         while (!walkingStack.isEmpty()) {
             WalkingContext walkingContext = walkingStack.peekLast();
 
-            if (walkingContext.isStartWalking()) {
-                onPollWalkingContext(walkingStack.pollLast());
-            }
-            else {
+            if (!walkingContext.isStartWalking()) {
                 break;
             }
-        }
-    }
 
-    private void onPollWalkingContext(WalkingContext walkingContext) {
-        Class<?> currentStepClass = walkingContext.getCurrentElement();
-        if (!currentStepClass.isInterface()) {
-            Type superclass = currentStepClass.getGenericSuperclass();
-            if (superclass != null) {
-                addGenericWalkingContext(superclass, walkingContext);
+            onGoBackByStarted.accept(walkingContext);
+
+            walkingStack.pollLast();
+            Class<?> currentStepClass = walkingContext.getCurrentElement();
+            if (!currentStepClass.isInterface()) {
+                Type superclass = currentStepClass.getGenericSuperclass();
+                if (superclass != null) {
+                    walkingStack.addLast(generateGenericWalkingContext(superclass, walkingContext));
+                }
             }
         }
     }
 
-    private void addGenericWalkingContext(Type genericType, WalkingContext currentStep) {
+    private WalkingContext generateGenericWalkingContext(Type genericType, WalkingContext currentStep) {
         if (genericType instanceof ParameterizedType parameterized) {
-            walkingStack.addLast(generateContextByMapping(parameterized, currentStep.getGenericTypes()));
+            return generateContextByMapping(parameterized, currentStep.getGenericTypes());
         }
-        else if (genericType instanceof Class<?> cls) {
-            walkingStack.addLast(new WalkingContext(cls, Map.of()));
+        if (genericType instanceof Class<?> cls) {
+            return new WalkingContext(cls, Map.of());
         }
-        else {
-            throw new WalkingException("Unexpected type: [%s] in class [%s]".formatted(genericType, currentStep.getCurrentElement()));
-        }
+        throw new WalkingException("Unexpected type: [%s] in class [%s]".formatted(genericType, currentStep.getCurrentElement()));
     }
 
-    private static WalkingContext generateContextByMapping(ParameterizedType parameterized, Map<String, Class<?>> genericTypes) {
+    private WalkingContext generateContextByMapping(ParameterizedType parameterized, Map<String, Class<?>> genericTypes) {
         Class<?> parameterizedClass = (Class<?>) parameterized.getRawType();
         Type[] actualTypes = parameterized.getActualTypeArguments();
         Type[] typeParameters = parameterizedClass.getTypeParameters();
+
+        if (withGenericMapping) {
+            return new WalkingContext(parameterizedClass, Map.of());
+        }
+
         Map<String, Class<?>> actualMapping = new HashMap<>();
         for (int i = 0; i < parameterized.getActualTypeArguments().length; i++) {
             Type actualType = actualTypes[i];
-            String parameterName = typeParameters[i].getTypeName();
-            if (actualType instanceof Class<?> cls) {
-                actualMapping.put(parameterName, cls);
+            try {
+                Class<?> actualTypeValue = matchTypeParameter(actualType, genericTypes);
+                actualMapping.put(typeParameters[i].getTypeName(), actualTypeValue);
             }
-            else if (actualType instanceof TypeVariable<?> variable) {
-                Class<?> mappedClass = genericTypes.get(variable.getName());
-                if (mappedClass == null) {
-                    throw new WalkingException("Type [%s] does not have mapped type for variable [%s]".formatted(actualTypes, variable));
+            catch (WalkingException e) {
+                switch (e.getExceptionQualification()) {
+                case MAPPER_NOT_FOUND ->
+                        throw new WalkingException("Type [%s] does not have mapped type for variable [%s]".formatted(parameterized, actualType));
+                case UNKNOWN_TYPE ->
+                        throw new WalkingException("Unexpected type [%s] in type [%s] by index [%s]".formatted(actualType, parameterized, i));
+                default -> actualMapping.put(typeParameters[i].getTypeName(), Object.class);
                 }
-                actualMapping.put(parameterName, mappedClass);
-            }
-            else {
-                throw new WalkingException("Unexpected type [%s] in type [%s] by index [%s]".formatted(actualType, parameterized, i));
             }
         }
         return new WalkingContext(parameterizedClass, actualMapping);
+    }
+
+    private static Class<?> matchTypeParameter(Type actualType, Map<String, Class<?>> actualMatchingTypes)
+    {
+        if (actualType instanceof Class<?> cls) {
+            return cls;
+        }
+        if (actualType instanceof TypeVariable<?> variable) {
+            Class<?> mappedClass = actualMatchingTypes.get(variable.getName());
+            if (mappedClass == null) {
+                throw new WalkingException(Qualification.MAPPER_NOT_FOUND);
+            }
+            return mappedClass;
+        }
+        throw new WalkingException(Qualification.UNKNOWN_TYPE);
     }
 }

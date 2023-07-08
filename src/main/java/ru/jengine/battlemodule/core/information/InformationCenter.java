@@ -1,6 +1,6 @@
 package ru.jengine.battlemodule.core.information;
 
-import ru.jengine.utils.ServiceLocator;
+import ru.jengine.utils.serviceclasses.ServiceLocator;
 
 /**
  * С технической точки зрения, динамические объекты, находясь в бою, не знают ничего о происходящем вокруг них. Они

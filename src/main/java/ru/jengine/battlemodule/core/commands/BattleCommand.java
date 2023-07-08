@@ -2,7 +2,7 @@ package ru.jengine.battlemodule.core.commands;
 
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.models.BattleModel;
-import ru.jengine.utils.HasPriority;
+import ru.jengine.utils.serviceclasses.HasPriority;
 
 /**
  * Описывает команды, которые будут исполнять динамический объект. Команда описывает одно конкретное (возможно сложное)

@@ -1,10 +1,8 @@
 package ru.jengine.utils.algorithms;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -14,8 +12,10 @@ import javax.annotation.Nullable;
 import com.google.common.base.Objects;
 
 public class ElementByFeaturesFinder<Classified, Feature, Element> {
+    private static final Comparator<Object> DEFAULT_COMPARATOR = (o1, o2) -> 0;
+
     private final Set<ElementContext<Element, Feature>> conditionedElements = new HashSet<>();
-    private final List<Element> commonElements = new ArrayList<>();
+    private final Set<Element> commonElements = new HashSet<>();
 
     private final Function<Element, Set<Feature>> featuresFromElementExtractor;
     private final Function<Classified, Set<Feature>> featuresFromClassifiedExtractor;
@@ -28,7 +28,7 @@ public class ElementByFeaturesFinder<Classified, Feature, Element> {
     {
         this(featuresFromElementExtractor, featuresFromClassifiedExtractor,
                 elements -> elements.size() == 1 ? elements.iterator().next() : null,
-                (o1, o2) -> 0);
+                (Comparator<Element>)DEFAULT_COMPARATOR);
     }
 
     public ElementByFeaturesFinder(
@@ -56,10 +56,20 @@ public class ElementByFeaturesFinder<Classified, Feature, Element> {
         Set<Feature> features = featuresFromElementExtractor.apply(element);
         if (features == null || features.isEmpty()) {
             commonElements.add(element);
-            return;
         }
+        else {
+            conditionedElements.add(new ElementContext<>(element, features));
+        }
+    }
 
-        conditionedElements.add(new ElementContext<>(element, features));
+    public void removeElement(Element element) {
+        Set<Feature> features = featuresFromElementExtractor.apply(element);
+        if (features == null || features.isEmpty()) {
+            commonElements.remove(element);
+        }
+        else {
+            conditionedElements.remove(new ElementContext<>(element, features));
+        }
     }
 
     @Nullable
@@ -74,9 +84,14 @@ public class ElementByFeaturesFinder<Classified, Feature, Element> {
                 .filter(element -> checkContainsRequiredFeatures(element.requiredFeatures, classifiedFeatures))
                 .map(ElementContext::element);
 
-        return Stream.concat(foundedElements, commonElements.stream())
-                .sorted(elementSorter)
-                .toList();
+        if (!commonElements.isEmpty()) {
+            foundedElements = Stream.concat(foundedElements, commonElements.stream());
+        }
+        if (elementSorter != DEFAULT_COMPARATOR) {
+            foundedElements = foundedElements.sorted(elementSorter);
+        }
+
+        return foundedElements.toList();
     }
 
     private boolean checkContainsRequiredFeatures(Set<Feature> requiredFeatures, Set<Feature> allFeatures) {

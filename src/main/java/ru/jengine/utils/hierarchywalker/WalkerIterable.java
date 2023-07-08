@@ -10,6 +10,6 @@ public class WalkerIterable implements Iterable<HierarchyElement> {
     }
 
     public Iterator<HierarchyElement> iterator() {
-        return new WalkerIterator(startHierarchy);
+        return WalkerIteratorBuilder.builder(startHierarchy).build();
     }
 }

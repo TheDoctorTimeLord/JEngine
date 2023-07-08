@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import ru.jengine.battlemodule.core.serviceclasses.Point;
 import ru.jengine.utils.fieldofview.FieldOfViewCalculator;
-import ru.jengine.utils.Fraction;
+import ru.jengine.utils.serviceclasses.Fraction;
 
 public class ShadowCastingCalculator implements FieldOfViewCalculator {
     private final Function<Point, String> tileClassifier;

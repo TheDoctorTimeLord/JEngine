@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.jetbrains.annotations.NotNull;
 
-import ru.jengine.utils.Fraction;
+import ru.jengine.utils.serviceclasses.Fraction;
 
 public class Row implements Iterable<Tile> {
     private final int depth;

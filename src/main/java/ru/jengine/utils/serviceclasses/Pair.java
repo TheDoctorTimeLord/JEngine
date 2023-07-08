@@ -1,4 +1,4 @@
-package ru.jengine.utils;
+package ru.jengine.utils.serviceclasses;
 
 import com.google.common.base.Objects;
 

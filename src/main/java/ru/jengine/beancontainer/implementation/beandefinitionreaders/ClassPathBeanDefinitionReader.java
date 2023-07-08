@@ -10,7 +10,7 @@ import ru.jengine.beancontainer.BeanFactoryStrategy;
 import ru.jengine.beancontainer.ClassFinder;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.implementation.beandefinitions.JavaClassBeanDefinition;
-import ru.jengine.utils.Pair;
+import ru.jengine.utils.serviceclasses.Pair;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.BeanUtils;
 

@@ -6,7 +6,7 @@ import java.util.List;
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.jsonconverter.linking.JsonLinker;
 import ru.jengine.jsonconverter.resources.JsonLoader;
-import ru.jengine.utils.HasPriority;
+import ru.jengine.utils.serviceclasses.HasPriority;
 import ru.jengine.utils.algorithms.ElementByFeaturesFinder;
 
 import com.google.gson.JsonObject;

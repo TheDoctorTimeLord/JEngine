@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.EventProcessor;
 import ru.jengine.eventqueue.dataclasses.EventHandlersManager;
+import ru.jengine.eventqueue.dataclasses.EventHandlersManagerWithoutHierarchy;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;
@@ -34,8 +35,8 @@ public abstract class ComplexEventPoolQueueHandler implements EventPoolHandler, 
         return eventPool;
     }
 
-    protected EventHandlersManager prepareEventHandlersManager(EventHandlingContext context) {
-        return new EventHandlersManager(context.getPreHandlers());
+    protected EventHandlersManagerWithoutHierarchy prepareEventHandlersManager(EventHandlingContext context) {
+        return new EventHandlersManagerWithoutHierarchy(context.getPreHandlers());
     }
 
     @Override

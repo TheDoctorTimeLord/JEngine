@@ -1,4 +1,4 @@
-package ru.jengine.utils;
+package ru.jengine.utils.serviceclasses;
 
 public interface ServiceLocator<T> {
     <S extends T> void setService(Class<S> serviceType, S service);

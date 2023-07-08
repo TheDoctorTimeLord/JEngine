@@ -3,13 +3,11 @@ package ru.jengine.eventqueue.quantum;
 import java.util.Collections;
 
 import ru.jengine.beancontainer.Constants;
-import ru.jengine.utils.SortedMultiset;
 import ru.jengine.eventqueue.EventProcessor;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;
 
 public final class QuantaNotificationEventPoolHandler extends QuantumEventPoolHandler { //TODO починить события квантования
-    private static final SortedMultiset<PostHandler<Event>> EMPTY_POST_HANDLERS = new SortedMultiset<>();
 
     public QuantaNotificationEventPoolHandler(QuantumEventPoolRegistrar quantumEventPoolRegistrar) {
         super(quantumEventPoolRegistrar, Constants.QUANTA_NOTIFICATION_QUEUE_CODE);
@@ -22,7 +20,7 @@ public final class QuantaNotificationEventPoolHandler extends QuantumEventPoolHa
             return;
         }
 
-        getEventProcessor().process(Collections.emptyList(), EMPTY_POST_HANDLERS, eventPool.pool());
+        getEventProcessor().process(Collections.emptyList(), Collections.emptyList(), eventPool.pool());
     }
 
     @Override

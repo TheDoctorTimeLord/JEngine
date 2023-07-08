@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.EventProcessor;
 import ru.jengine.eventqueue.dataclasses.EventHandlersManager;
+import ru.jengine.eventqueue.dataclasses.EventHandlersManagerWithoutHierarchy;
 import ru.jengine.eventqueue.dataclasses.EventHandlingContext;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;
@@ -29,9 +30,13 @@ public abstract class FastComplexEventPoolHandler implements EventInterceptor, E
     @Override
     @Nullable
     public EventPool initialize(EventHandlingContext context) {
-        this.eventHandlersManager = new EventHandlersManager(context.getPreHandlers());
+        this.eventHandlersManager = prepareEventHandlersManager(context);
         this.eventProcessor = context.getEventProcessor();
         return null;
+    }
+
+    protected EventHandlersManagerWithoutHierarchy prepareEventHandlersManager(EventHandlingContext context) {
+        return new EventHandlersManagerWithoutHierarchy(context.getPreHandlers());
     }
 
     @Override

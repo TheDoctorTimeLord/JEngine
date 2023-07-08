@@ -2,7 +2,7 @@ package ru.jengine.jsonconverter.formatting;
 
 import java.util.Set;
 
-import ru.jengine.utils.HasPriority;
+import ru.jengine.utils.serviceclasses.HasPriority;
 
 import com.google.gson.JsonObject;
 
