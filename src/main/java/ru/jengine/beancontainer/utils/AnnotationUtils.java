@@ -1,5 +1,11 @@
 package ru.jengine.beancontainer.utils;
 
+import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.jengine.beancontainer.exceptions.ContainerException;
+
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -12,11 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ru.jengine.beancontainer.exceptions.UtilsException;
-
-import com.google.common.collect.ImmutableList;
-
 public class AnnotationUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationUtils.class);
     public static final List<Class<? extends Annotation>> systemAnnotations = ImmutableList.of(Target.class,
             Retention.class, Override.class, Documented.class);
 
@@ -69,10 +72,12 @@ public class AnnotationUtils {
             return resolveNotSystemAnnotation(Class.forName(annotationName));
         }
         catch (ClassNotFoundException e) {
-            return new ArrayList<>(); //TODO логировать отсутствие аннотации
+            LOG.error("Annotation [%s] is not found".formatted(annotationName), e);
+            return new ArrayList<>();
         }
     }
 
+    @Nullable
     public static <T extends Annotation> T getAnnotationSafe(Class<?> owner, Class<T> annotation) {
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
         for (Annotation innerAnnotation : allAnnotations) {
@@ -87,7 +92,7 @@ public class AnnotationUtils {
         T resultAnnotation = getAnnotationSafe(owner, annotation);
 
         if (resultAnnotation == null) {
-            throw new UtilsException("Class [" + owner + "] has not annotation [" + annotation + "]");
+            throw new ContainerException("Class [" + owner + "] has not annotation [" + annotation + "]");
         }
 
         return resultAnnotation;

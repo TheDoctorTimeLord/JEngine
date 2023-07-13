@@ -8,7 +8,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class WalkerIterator implements Iterator<HierarchyElement> {
+public class WalkerIterator implements Iterator<HierarchyElement> { //TODO научить работать с Cls1<Cls2<Cls3>> : Cls2 - ParameterType
     private final Deque<WalkingContext> walkingStack = new ArrayDeque<>();
     private final boolean withGenericMapping;
     private final Consumer<HierarchyElement> onGoBackByStarted;

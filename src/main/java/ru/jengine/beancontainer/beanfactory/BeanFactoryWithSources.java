@@ -1,0 +1,18 @@
+package ru.jengine.beancontainer.beanfactory;
+
+import ru.jengine.beancontainer.containercontext.BeanExtractor;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
+
+public class BeanFactoryWithSources extends DefaultBeanFactory {
+    private final String[] sources;
+
+    public BeanFactoryWithSources(BeanExtractor beanExtractor, String[] sources) {
+        super(beanExtractor);
+        this.sources = sources;
+    }
+
+    @Override
+    protected void customizeProperties(MethodParameter parameter, ResolvingPropertyDefinition properties) {
+        properties.beanContextSource(sources);
+    }
+}
