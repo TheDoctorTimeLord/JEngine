@@ -1,11 +1,9 @@
 package ru.jengine.utils;
 
+import ru.jengine.utils.hierarchywalker.*;
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import ru.jengine.utils.hierarchywalker.HierarchyElement;
-import ru.jengine.utils.hierarchywalker.WalkerIterable;
-import ru.jengine.utils.hierarchywalker.WalkingException;
 
 public class HierarchyWalkingUtils {
     public static <H> Class<?> getGenericType(Class<? extends H> startHierarchy, Class<H> targetType, int indexType) {
@@ -30,6 +28,16 @@ public class HierarchyWalkingUtils {
             }
 
             callback.accept(element);
+        }
+    }
+
+    public static void walkThroughHierarchyIgnoreGeneric(Class<?> startHierarchy, Consumer<HierarchyElement> callback) {
+        WalkerIterator iterator = WalkerIteratorBuilder.builder(startHierarchy)
+                .withGenericMapping(false)
+                .build();
+
+        while (iterator.hasNext()) {
+            callback.accept(iterator.next());
         }
     }
 }

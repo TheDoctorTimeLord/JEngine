@@ -1,34 +1,22 @@
 package ru.jengine.jsonconverter;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import ru.jengine.beancontainer.Constants.Contexts;
+import ru.jengine.beancontainer.JEngineContainer;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.Import;
-import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
-import ru.jengine.beancontainer.implementation.JEngineContainer;
-import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.jsonconverter.additional.A;
-import ru.jengine.jsonconverter.additional.B;
-import ru.jengine.jsonconverter.additional.C;
-import ru.jengine.jsonconverter.additional.CDeserializer;
-import ru.jengine.jsonconverter.additional.CustomFormatter;
-import ru.jengine.jsonconverter.additional.CustomResourceLoader;
-import ru.jengine.jsonconverter.additional.D;
-import ru.jengine.jsonconverter.additional.LinkExtractorImpl;
-import ru.jengine.jsonconverter.additional.ParentResolverFormatter;
+import ru.jengine.beancontainer.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer.modules.AnnotationModule;
+import ru.jengine.jsonconverter.additional.*;
 import ru.jengine.jsonconverter.modules.EnableJsonConverter;
 import ru.jengine.jsonconverter.resources.ResourceLoader;
 import ru.jengine.jsonconverter.resources.ResourceMetadata;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JsonConvertingTest {
 
@@ -37,11 +25,10 @@ public class JsonConvertingTest {
 
     @BeforeClass
     public static void setUp() {
-        JEngineContainer container = new JEngineContainer();
-        container.initializeCommonContexts(ContainerConfiguration.builder(ConvertingModule.class)
-                .addAdditionalBean(new CustomResourceLoader())
-                .build()
-        );
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(ConvertingModule.class)
+                .addBeans(new CustomResourceLoader())
+                .build());
+        container.initializeContainerByDefault();
 
         jsonConverter = container.getBean(JsonConverter.class);
         resourceLoader = container.getBean(ResourceLoader.class);

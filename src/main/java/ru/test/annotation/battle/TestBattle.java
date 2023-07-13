@@ -1,26 +1,10 @@
 package ru.test.annotation.battle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 import ru.jengine.battlemodule.EnableBattleCoreWithStandardFilling;
 import ru.jengine.battlemodule.core.BattleContext;
 import ru.jengine.battlemodule.core.BattleGenerator;
 import ru.jengine.battlemodule.core.BattleMasterImpl;
-import ru.jengine.battlemodule.core.battlepresenter.BattleAction;
-import ru.jengine.battlemodule.core.battlepresenter.BattleActionPresenter;
-import ru.jengine.battlemodule.core.battlepresenter.BattlePresenterActionSubscriber;
-import ru.jengine.battlemodule.core.battlepresenter.SubscribeStrategy;
-import ru.jengine.battlemodule.core.battlepresenter.SubscribeType;
+import ru.jengine.battlemodule.core.battlepresenter.*;
 import ru.jengine.battlemodule.core.behaviors.BehaviorObjectsManager;
 import ru.jengine.battlemodule.core.commands.BattleCommandRegistrar;
 import ru.jengine.battlemodule.core.models.BattleModel;
@@ -31,16 +15,19 @@ import ru.jengine.battlemodule.core.state.BattleState;
 import ru.jengine.battlemodule.core.state.BattleStateBuilder;
 import ru.jengine.battlemodule.core.state.BattlefieldLimiter;
 import ru.jengine.battlemodule.standardfilling.movement.CanMoved;
-import ru.jengine.beancontainer.BeanContainer;
+import ru.jengine.beancontainer.Constants.Contexts;
+import ru.jengine.beancontainer.JEngineContainer;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.PackageScan;
-import ru.jengine.beancontainer.dataclasses.ContainerConfiguration;
-import ru.jengine.beancontainer.implementation.JEngineContainer;
-import ru.jengine.beancontainer.implementation.moduleimpls.AnnotationModule;
-import ru.jengine.beancontainer.Constants.Contexts;
+import ru.jengine.beancontainer.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer.modules.AnnotationModule;
 import ru.jengine.utils.CollectionUtils;
 import ru.test.annotation.battle.model.BattleCharacter;
 import ru.test.annotation.battle.model.HasHealth;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @ContainerModule(contextName = Contexts.BATTLE_CONTEXT)
 @PackageScan("ru.test.annotation.battle")
@@ -49,11 +36,8 @@ public class TestBattle extends AnnotationModule {
     public static final int MAP_SIZE = 5;
 
     public static void main(String[] args) throws InterruptedException {
-        BeanContainer container = new JEngineContainer();
-        container.initializeCommonContexts(ContainerConfiguration.builder(TestBattle.class)
-                .addAdditionalBean(container)
-                .build()
-        );
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(TestBattle.class).build());
+        container.initializeContainerByDefault();
 
         int index = 0;
 
@@ -92,7 +76,7 @@ public class TestBattle extends AnnotationModule {
         container.stop();
     }
 
-    private static BattleMasterContext createBattle(int index, BeanContainer container) {
+    private static BattleMasterContext createBattle(int index, JEngineContainer container) {
         // String battleContextName = Contexts.BATTLE_CONTEXT + index;
         // container.loadCopiedContext(Contexts.BATTLE_CONTEXT, battleContextName); //На загрузку контекстов не работаает
 
