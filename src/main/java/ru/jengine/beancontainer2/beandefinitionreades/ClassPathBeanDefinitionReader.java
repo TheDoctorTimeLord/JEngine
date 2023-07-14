@@ -1,7 +1,6 @@
 package ru.jengine.beancontainer2.beandefinitionreades;
 
-import ru.jengine.beancontainer2.BeanDefinition;
-import ru.jengine.beancontainer2.BeanDefinitionReader;
+import ru.jengine.beancontainer2.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer2.classfinders.ClassFinder;
 import ru.jengine.beancontainer2.annotations.Bean;
 import ru.jengine.beancontainer2.beandefinitions.JavaClassBeanDefinition;

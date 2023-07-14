@@ -1,7 +1,6 @@
 package ru.jengine.beancontainer2.modulefinders;
 
 import ru.jengine.beancontainer2.modules.Module;
-import ru.jengine.beancontainer2.ModuleFinder;
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
 

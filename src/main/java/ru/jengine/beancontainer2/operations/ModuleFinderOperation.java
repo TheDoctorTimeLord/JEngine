@@ -1,11 +1,12 @@
 package ru.jengine.beancontainer2.operations;
 
+import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer2.utils.AnnotationUtils;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
 import ru.jengine.beancontainer2.Constants;
 import ru.jengine.beancontainer2.modules.Module;
-import ru.jengine.beancontainer2.ModuleFinder;
+import ru.jengine.beancontainer2.modulefinders.ModuleFinder;
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer2.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer2.utils.ReflectionContainerUtils;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 
 public class ModuleFinderOperation implements ContainerOperation<EmptyOperationResult> {
     @Override
-    public OperationResult apply(EmptyOperationResult emptyResult, ContainerOperationContext context) {
+    public OperationResult apply(EmptyOperationResult emptyResult, ContainerState context) {
         ContainerConfiguration configuration = context.getContainerConfiguration();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 

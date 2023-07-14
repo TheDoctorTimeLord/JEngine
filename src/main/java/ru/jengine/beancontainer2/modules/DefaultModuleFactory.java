@@ -45,7 +45,7 @@ public class DefaultModuleFactory implements ModuleFactory {
 
     private static Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
         try {
-            Module module = (Module) ReflectionContainerUtils.createObjectWithDefaultConstructor(moduleClass);
+            Module module = ReflectionContainerUtils.createComponentWithDefaultConstructor(moduleClass);
             module.configure(moduleContext);
             return module;
         } catch (ContainerException e) {

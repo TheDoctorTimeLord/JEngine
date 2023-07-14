@@ -1,6 +1,6 @@
 package ru.jengine.beancontainer2.modules;
 
-import ru.jengine.beancontainer2.BeanDefinitionReader;
+import ru.jengine.beancontainer2.beandefinitionreades.BeanDefinitionReader;
 import ru.jengine.beancontainer2.Constants.Contexts;
 import ru.jengine.beancontainer2.annotations.ContainerModule;
 import ru.jengine.beancontainer2.annotations.ImportModule;

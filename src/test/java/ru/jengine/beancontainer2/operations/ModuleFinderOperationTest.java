@@ -1,7 +1,9 @@
-package ru.jengine.beancontainer2;
+package ru.jengine.beancontainer2.operations;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.jengine.beancontainer2.Constants;
+import ru.jengine.beancontainer2.JEngineContainer;
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer2.intstructure.pac0.StartModule;
 import ru.jengine.beancontainer2.intstructure.pac1.Module1;
@@ -13,20 +15,16 @@ import ru.jengine.beancontainer2.intstructure.pac3.ModuleByFinder2;
 import ru.jengine.beancontainer2.modules.MainInfrastructureModule;
 import ru.jengine.beancontainer2.modules.MainModule;
 import ru.jengine.beancontainer2.modules.Module;
-import ru.jengine.beancontainer2.operations.ContainerOperation;
-import ru.jengine.beancontainer2.operations.EmptyOperationResult;
-import ru.jengine.beancontainer2.operations.ModuleFinderOperation;
-import ru.jengine.beancontainer2.operations.ModuleFinderOperation.OperationResultWithModules;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JEngineContainerTest {
+public class ModuleFinderOperationTest {
     @Test
     public void testModuleFinding() {
         JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModule.class).build());
-        container.executeOperations(new ModuleFinderOperation(), (ContainerOperation<OperationResultWithModules>) (operationResult, context) -> {
+        container.executeOperations(new ModuleFinderOperation(), (ContainerOperation<ModuleFinderOperation.OperationResultWithModules>) (operationResult, context) -> {
             Map<String, List<Module>> modulesByContext = operationResult.modulesByContext();
 
             Assert.assertEquals(5, modulesByContext.size());

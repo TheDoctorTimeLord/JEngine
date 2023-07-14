@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer2.classfinders;
 
 import org.reflections.scanners.TypeAnnotationsScanner;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.beancontainer2.utils.AnnotationUtils;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer2.utils;
 
 import com.google.common.collect.ImmutableList;
-import ru.jengine.beancontainer.exceptions.UtilsException;
+import ru.jengine.beancontainer2.exceptions.ContainerException;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -86,7 +86,7 @@ public class AnnotationUtils {
         T resultAnnotation = getAnnotationSafe(owner, annotation);
 
         if (resultAnnotation == null) {
-            throw new UtilsException("Class [" + owner + "] has not annotation [" + annotation + "]");
+            throw new ContainerException("Class [" + owner + "] has not annotation [" + annotation + "]");
         }
 
         return resultAnnotation;

@@ -1,7 +1,6 @@
 package ru.jengine.beancontainer2.beandefinitions;
 
 import com.google.common.base.Objects;
-import ru.jengine.beancontainer2.BeanDefinition;
 
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;

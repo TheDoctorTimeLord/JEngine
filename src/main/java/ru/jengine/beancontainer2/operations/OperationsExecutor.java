@@ -1,13 +1,14 @@
 package ru.jengine.beancontainer2.operations;
 
+import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 
 public class OperationsExecutor {
     private final ContainerOperation<?>[] operationChain;
-    private final ContainerOperationContext containerOperationContext;
+    private final ContainerState containerState;
 
-    public OperationsExecutor(ContainerOperationContext containerOperationContext, ContainerOperation<?>... operationChain) {
-        this.containerOperationContext = containerOperationContext;
+    public OperationsExecutor(ContainerState containerState, ContainerOperation<?>... operationChain) {
+        this.containerState = containerState;
         this.operationChain = operationChain;
     }
 
@@ -19,7 +20,7 @@ public class OperationsExecutor {
             ContainerOperation<OperationResult> operation = (ContainerOperation<OperationResult>) containerOperation;
 
             try {
-                lastOperationResult = operation.apply(lastOperationResult, containerOperationContext);
+                lastOperationResult = operation.apply(lastOperationResult, containerState);
                 lastOperation = operation;
             } catch (ClassCastException e) {
                 String message = "Operation [%s] has unexpected 'beforeOperationResult' - [%s] from operation [%s]"
