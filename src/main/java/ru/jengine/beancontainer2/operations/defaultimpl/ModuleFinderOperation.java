@@ -1,7 +1,10 @@
-package ru.jengine.beancontainer2.operations;
+package ru.jengine.beancontainer2.operations.defaultimpl;
 
 import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.annotations.ModuleFinderMarker;
+import ru.jengine.beancontainer2.operations.ContainerOperation;
+import ru.jengine.beancontainer2.operations.EmptyOperationResult;
+import ru.jengine.beancontainer2.operations.OperationResult;
 import ru.jengine.beancontainer2.utils.AnnotationUtils;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
 import ru.jengine.beancontainer2.Constants;

@@ -1,5 +1,11 @@
 package ru.jengine.beancontainer2.containercontext;
 
-public interface BeanCreationScope {
-    Object getBean(ResolvingProperties properties);
+import java.util.List;
+
+public interface BeanCreationScope extends BeanExtractor {
+    void prepareStart();
+    void postProcess();
+    void prepareStop();
+
+    List<Class<?>> getBeanClasses();
 }

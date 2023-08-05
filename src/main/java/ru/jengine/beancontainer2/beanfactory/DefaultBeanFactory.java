@@ -2,7 +2,7 @@ package ru.jengine.beancontainer2.beanfactory;
 
 import ru.jengine.beancontainer2.annotations.Inject;
 import ru.jengine.beancontainer2.containercontext.BeanExtractor;
-import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 import ru.jengine.beancontainer2.utils.ReflectionContainerUtils;
 
@@ -25,7 +25,8 @@ public class DefaultBeanFactory implements BeanFactory {
         try {
             Constructor<?> availableConstructor = findAppropriateConstructor(beanClass);
             Object[] args = findArgs(availableConstructor);
-            return ReflectionContainerUtils.createObject(availableConstructor, args);
+            Object builtBean = ReflectionContainerUtils.createObject(availableConstructor, args);
+            return autowire(builtBean);
         } catch (Exception ex) {
             throw new ContainerException("Exception while creating bean [" + beanClass + "]", ex);
         }
@@ -68,24 +69,23 @@ public class DefaultBeanFactory implements BeanFactory {
 
     private Object resolve(MethodParameter parameter) {
         Class<?> resultType = castToClass(parameter.getParameterType());
-        ResolvingProperties properties;
+        ResolvingPropertyDefinition properties;
 
         if (ReflectionContainerUtils.isAvailableCollection(resultType)) {
-            properties = ResolvingProperties
+            properties = ResolvingPropertyDefinition
                     .properties(getCollectionGenericType(resultType))
                     .collectionClass(resultType);
         }
         else {
-            properties = ResolvingProperties.properties(resultType);
+            properties = ResolvingPropertyDefinition.properties(resultType);
         }
 
         return resolve(parameter, properties);
     }
 
-    protected Object resolve(MethodParameter parameter, ResolvingProperties properties) {
-        return getBeanExtractor().getBean(
-                properties.annotated(parameter.getParameterAnnotations())
-        );
+    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
+        properties.annotated(parameter.getParameterAnnotations());
+        return getBeanExtractor().getBean(properties);
     }
 
     private static Class<?> getCollectionGenericType(Type type) {

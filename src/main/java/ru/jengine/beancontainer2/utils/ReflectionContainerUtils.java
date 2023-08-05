@@ -2,12 +2,14 @@ package ru.jengine.beancontainer2.utils;
 
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ReflectionContainerUtils {
+    public static final List<Class<?>> AVAILABLE_COLLECTIONS = List.of(Collection.class, List.class, Set.class);
+
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
         try {
             Constructor<?> defaultConstructor = cls.getDeclaredConstructor();
@@ -36,6 +38,33 @@ public class ReflectionContainerUtils {
     }
 
     public static boolean isAvailableCollection(Class<?> checkedClass) {
-        return List.class.isAssignableFrom(checkedClass) || Set.class.isAssignableFrom(checkedClass);
+        return AVAILABLE_COLLECTIONS.stream().anyMatch(cls -> cls.isAssignableFrom(checkedClass));
+    }
+
+    /**
+     * Конвертирует объект в {@link List список} или {@link Set множество}. Если объект - null, то возвращает пустую
+     * коллекцию. Если объект был коллекцией, то преобразовывает все его элементы в новую коллекцию
+     *
+     * @param object конвертируемый объект
+     * @param collectionClass класс коллекции, к которой нужно выполнить конвертирование
+     * @return объект новой коллекции
+     */
+    public static Object convertToCollection(@Nullable Object object, Class<?> collectionClass) {
+        Collection<?> beanInst;
+        if (object instanceof Collection) {
+            beanInst = (Collection<?>) object;
+        } else if (object == null) {
+            beanInst = Collections.emptyList();
+        } else  {
+            beanInst = Collections.singletonList(object);
+        }
+
+        if (List.class.isAssignableFrom(collectionClass) || Collection.class.isAssignableFrom(collectionClass)) {
+            return new ArrayList<>(beanInst);
+        } else if (Set.class.isAssignableFrom(collectionClass)) {
+            return new HashSet<>(beanInst);
+        } else {
+            throw new ru.jengine.beancontainer.exceptions.ContainerException("Collection with bean must be List or Set but was [" + collectionClass + "]");
+        }
     }
 }

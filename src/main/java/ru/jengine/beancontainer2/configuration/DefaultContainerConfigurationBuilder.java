@@ -2,6 +2,8 @@ package ru.jengine.beancontainer2.configuration;
 
 import ru.jengine.beancontainer2.classfinders.ClassFinder;
 import ru.jengine.beancontainer2.classfinders.ClassPathScanner;
+import ru.jengine.beancontainer2.extentions.ContainerContextFactory;
+import ru.jengine.beancontainer2.extentions.ContextMetainfoFactory;
 import ru.jengine.beancontainer2.modules.DefaultModuleFactory;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
 
@@ -11,6 +13,8 @@ public class DefaultContainerConfigurationBuilder {
     private final Class<?> mainModuleClass;
     private Supplier<ClassFinder> classFinderFactory = ClassPathScanner::new;
     private ModuleFactory moduleFactory = new DefaultModuleFactory();
+    private ContextMetainfoFactory contextMetainfoFactory; //TODO добавить дефолтную реализацию
+    private ContainerContextFactory containerContextFactory; //TODO добавить дефолтную реализацию
 
     DefaultContainerConfigurationBuilder(Class<?> mainModuleClass) {
         this.mainModuleClass = mainModuleClass;
@@ -26,7 +30,18 @@ public class DefaultContainerConfigurationBuilder {
         return this;
     }
 
+    public DefaultContainerConfigurationBuilder contextMetainfoFactory(ContextMetainfoFactory contextMetainfoFactory) {
+        this.contextMetainfoFactory = contextMetainfoFactory;
+        return this;
+    }
+
+    public DefaultContainerConfigurationBuilder containerContextFactory(ContainerContextFactory containerContextFactory) {
+        this.containerContextFactory = containerContextFactory;
+        return this;
+    }
+
     public ContainerConfiguration build() {
-        return new DefaultContainerConfiguration(mainModuleClass, classFinderFactory, moduleFactory);
+        return new DefaultContainerConfiguration(mainModuleClass, classFinderFactory, moduleFactory,
+                contextMetainfoFactory, containerContextFactory);
     }
 }

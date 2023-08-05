@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer2.contextmetainfo;
 
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
-import ru.jengine.beancontainer2.containercontext.ContainerContextFacade;
+import ru.jengine.beancontainer2.containercontext.contexts.ContainerContextFacade;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 
 import java.util.HashMap;

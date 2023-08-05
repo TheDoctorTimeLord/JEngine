@@ -15,6 +15,7 @@ import ru.jengine.beancontainer2.intstructure.pac3.ModuleByFinder2;
 import ru.jengine.beancontainer2.modules.MainInfrastructureModule;
 import ru.jengine.beancontainer2.modules.MainModule;
 import ru.jengine.beancontainer2.modules.Module;
+import ru.jengine.beancontainer2.operations.defaultimpl.ModuleFinderOperation;
 
 import java.util.List;
 import java.util.Map;

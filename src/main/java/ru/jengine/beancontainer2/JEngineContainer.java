@@ -1,29 +1,35 @@
 package ru.jengine.beancontainer2;
 
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
-import ru.jengine.beancontainer2.containercontext.ContainerContextFacade;
+import ru.jengine.beancontainer2.containercontext.contexts.ContainerContextFacade;
+import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer2.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
 import ru.jengine.beancontainer2.operations.OperationsExecutor;
 import ru.jengine.beancontainer2.statepublisher.ContainerStatePublisher;
 
+import java.util.Collection;
+
 public class JEngineContainer {
-    private final ContainerState operationContext;
+    private final ContainerState operationState;
 
     public JEngineContainer(ContainerConfiguration configuration) {
         ContainerContextFacade facade = new ContainerContextFacade();
         ContextMetainfoManager metainfoManager = new ContextMetainfoManager(configuration, facade);
         ContainerStatePublisher containerStatePublisher = new ContainerStatePublisher();
 
-        this.operationContext = new ContainerState(configuration, facade, metainfoManager, containerStatePublisher);
+        this.operationState = new ContainerState(configuration, facade, metainfoManager, containerStatePublisher);
     }
 
     public void executeOperations(ContainerOperation<?>... operationsChain) {
-        new OperationsExecutor(operationContext, operationsChain).runOperationChain();
+        new OperationsExecutor(operationState, operationsChain).runOperationChain();
     }
 
     public <R> R getBean(Class<?> beanClass) {
-        return null; //TODO реализовать получение бина
+        return (R) operationState.getContainerContextFacade().getBean(ResolvingPropertyDefinition
+                .properties(beanClass)
+                .collectionClass(Collection.class.isAssignableFrom(beanClass) ? beanClass : null)
+        );
     }
 
     public <R> R getBean(String beanName) {
@@ -31,7 +37,10 @@ public class JEngineContainer {
     }
 
     public <R> R getBean(String contextName, Class<?> beanClass) {
-        return null; //TODO реализовать получение по контексту
+        return (R) operationState.getContainerContextFacade().getBean(ResolvingPropertyDefinition
+                .properties(beanClass)
+                .beanContextSource(contextName)
+        );
     }
 
     public <R> R getBean(String contextName, String beanName) {

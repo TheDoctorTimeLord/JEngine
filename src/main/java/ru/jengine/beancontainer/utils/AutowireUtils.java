@@ -1,18 +1,17 @@
 package ru.jengine.beancontainer.utils;
 
-import static ru.jengine.beancontainer.utils.BeanUtils.getBean;
-import static ru.jengine.utils.CollectionUtils.convertToCollection;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
-
-import javax.annotation.Nullable;
-
 import ru.jengine.beancontainer.ContainerContext;
 import ru.jengine.beancontainer.dataclasses.BeanContext;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.implementation.factories.MethodParameter;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
+
+import static ru.jengine.beancontainer.utils.BeanUtils.getBean;
+import static ru.jengine.beancontainer2.utils.ReflectionContainerUtils.convertToCollection;
 
 public class AutowireUtils {
     public static Object autowire(MethodParameter parameter, ContainerContext context) {
