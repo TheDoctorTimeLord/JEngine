@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bean {
     boolean isInfrastructure() default false;
-    String strategyCode() default Constants.BeanStrategy.SINGLETON;
+    String scopeName() default Constants.BeanScope.SINGLETON;
 }

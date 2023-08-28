@@ -2,6 +2,7 @@ package ru.jengine.beancontainer2.beanfactory;
 
 import ru.jengine.beancontainer2.annotations.Inject;
 import ru.jengine.beancontainer2.containercontext.BeanExtractor;
+import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
 import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 import ru.jengine.beancontainer2.utils.ReflectionContainerUtils;
@@ -72,20 +73,21 @@ public class DefaultBeanFactory implements BeanFactory {
         ResolvingPropertyDefinition properties;
 
         if (ReflectionContainerUtils.isAvailableCollection(resultType)) {
-            properties = ResolvingPropertyDefinition
+            properties = ResolvingProperties
                     .properties(getCollectionGenericType(resultType))
                     .collectionClass(resultType);
         }
         else {
-            properties = ResolvingPropertyDefinition.properties(resultType);
+            properties = ResolvingProperties.properties(resultType);
         }
 
         return resolve(parameter, properties);
     }
 
-    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
+    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) { //TODO обработать null
         properties.annotated(parameter.getParameterAnnotations());
-        return getBeanExtractor().getBean(properties);
+        Object extractedBean = getBeanExtractor().getBean(properties);
+        return extractedBean == BeanExtractor.NOT_RESOLVED ? null : extractedBean;
     }
 
     private static Class<?> getCollectionGenericType(Type type) {

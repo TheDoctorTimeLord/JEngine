@@ -1,13 +1,13 @@
 package ru.jengine.beancontainer2.modules;
 
-import ru.jengine.beancontainer2.beandefinitionreades.BeanDefinitionReader;
 import ru.jengine.beancontainer2.Constants.Contexts;
 import ru.jengine.beancontainer2.annotations.ContainerModule;
 import ru.jengine.beancontainer2.annotations.ImportModule;
+import ru.jengine.beancontainer2.beandefinitionreades.BeanDefinitionReader;
 import ru.jengine.beancontainer2.classfinders.ClassFinder;
-import ru.jengine.beancontainer2.exceptions.ContainerException;
 import ru.jengine.beancontainer2.utils.AnnotationUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 public abstract class AnnotationModuleBase implements Module, Cloneable {
     private final List<BeanDefinitionReader> beanDefinitionReaders = new ArrayList<>();
+    @Nullable
     private final ContainerModule containerModuleAnnotation;
     private ClassFinder classFinder;
     private String contextName;
@@ -28,6 +29,10 @@ public abstract class AnnotationModuleBase implements Module, Cloneable {
                 : containerModuleAnnotation.contextName();
     }
 
+    protected void setContextName(String contextName) {
+        this.contextName = contextName;
+    }
+
     @Override
     public List<BeanDefinitionReader> getBeanDefinitionReaders() {
         return beanDefinitionReaders;
@@ -37,18 +42,6 @@ public abstract class AnnotationModuleBase implements Module, Cloneable {
     public void configure(ModuleContext context) {
         this.classFinder = context.classFinder();
         beanDefinitionReadersInit(context);
-    }
-
-    @Override
-    public Module cloneWithContext(String newContextName) {
-        try {
-            AnnotationModuleBase clonedModule = (AnnotationModuleBase)super.clone();
-            clonedModule.contextName = newContextName;
-            return clonedModule;
-        }
-        catch (CloneNotSupportedException e) {
-            throw new ContainerException("Something went wrong", e);
-        }
     }
 
     protected abstract void beanDefinitionReadersInit(ModuleContext context);
@@ -76,8 +69,10 @@ public abstract class AnnotationModuleBase implements Module, Cloneable {
 
     @Override
     public List<Class<?>> getSubmodules() {
-        Stream<Class<?>> submodulesByAnnotation = classFinder.getAnnotatedClasses(ContainerModule.class).stream()
-                .filter(cls -> !getClass().equals(cls));
+        Stream<Class<?>> submodulesByAnnotation = Stream.concat(
+                classFinder.getAnnotatedClasses(ContainerModule.class).stream(),
+                classFinder.getSubclasses(AnnotationInfrastructureModule.class).stream()
+        ).filter(cls -> !getClass().equals(cls));
 
         Stream<Class<?>> submodulesByImports = handleImportModuleAnnotation();
 

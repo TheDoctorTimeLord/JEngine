@@ -4,35 +4,37 @@ import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 
 public class OperationsExecutor {
-    private final ContainerOperation<?>[] operationChain;
+    private final ContainerOperation[] operationChain;
     private final ContainerState containerState;
 
-    public OperationsExecutor(ContainerState containerState, ContainerOperation<?>... operationChain) {
+    public OperationsExecutor(ContainerState containerState, ContainerOperation... operationChain) {
         this.containerState = containerState;
         this.operationChain = operationChain;
     }
 
     public void runOperationChain() {
-        ContainerOperation<?> lastOperation = null;
-        OperationResult lastOperationResult = EmptyOperationResult.INSTANCE;
+        ContainerOperation lastOperation = null;
+        OperationResult operationResult = new OperationResult();
 
-        for (ContainerOperation<?> containerOperation : operationChain) {
-            ContainerOperation<OperationResult> operation = (ContainerOperation<OperationResult>) containerOperation;
-
+        for (ContainerOperation operation : operationChain) {
             try {
-                lastOperationResult = operation.apply(lastOperationResult, containerState);
+                operation.apply(operationResult, containerState);
                 lastOperation = operation;
-            } catch (ClassCastException e) {
-                String message = "Operation [%s] has unexpected 'beforeOperationResult' - [%s] from operation [%s]"
-                        .formatted(
-                                operation.getClass(),
-                                lastOperationResult.getClass(),
-                                lastOperation == null ? null : lastOperation.getClass()
-                        );
-                throw new ContainerException(message, e);
+            } catch (ContainerException e) {
+                if (ContainerOperation.CHECK_EXCEPTION_CODE.equals(e.getSpecialCode())) {
+                    String message = e.getMessage() + ". Previous operations [%s]"
+                            .formatted(lastOperation == null ? null : lastOperation.getClass());
+                    throw new ContainerException(message, e);
+                }
+
+                throwUnknownException(operation, e);
             } catch (Exception e) {
-                throw new ContainerException("Operation [%s] throws exception".formatted(operation.getClass()), e);
+                throwUnknownException(operation, e);
             }
         }
+    }
+
+    private void throwUnknownException(ContainerOperation operation, Throwable cause) {
+        throw new ContainerException("Operation [%s] throws exception".formatted(operation.getClass()), cause);
     }
 }

@@ -2,10 +2,7 @@ package ru.jengine.beancontainer2.containercontext.contexts;
 
 import ru.jengine.beancontainer2.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer2.beanfactory.BeanFactory;
-import ru.jengine.beancontainer2.containercontext.BeanCreationScope;
-import ru.jengine.beancontainer2.containercontext.ClassAliasManager;
-import ru.jengine.beancontainer2.containercontext.ContainerContext;
-import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
+import ru.jengine.beancontainer2.containercontext.*;
 import ru.jengine.beancontainer2.extentions.BeanCreationScopeResolver;
 import ru.jengine.beancontainer2.extentions.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer2.extentions.BeanProcessor;
@@ -25,7 +22,7 @@ public class ScopableContainerContext implements ContainerContext {
         this.scopes = CollectionUtils.groupBy(beanDefinitions, BeanDefinition::getScopeName)
                 .entrySet()
                 .stream()
-                .map(e -> scopeResolver.resolve(e.getKey(), e.getValue(), beanFactory, beanProcessors, preRemoveProcessors))
+                .map(e -> scopeResolver.resolve(e.getKey(), e.getValue(), beanFactory, this, beanProcessors, preRemoveProcessors))
                 .toList();
 
         this.scopes.stream()
@@ -55,7 +52,7 @@ public class ScopableContainerContext implements ContainerContext {
     }
 
     @Override
-    public Object getBean(ResolvingPropertyDefinition properties) {
+    public Object getBean(ResolvingProperties properties) {
         ResolvingPropertyDefinition[] aliased = classAliasManager.getForAlias(properties);
         if (aliased != null && aliased.length != 0) {
             return BeanUtils.resolveBeansAsCollection(scopes, aliased, properties.getCollectionClass());

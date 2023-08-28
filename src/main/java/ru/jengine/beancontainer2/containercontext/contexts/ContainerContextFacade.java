@@ -3,7 +3,6 @@ package ru.jengine.beancontainer2.containercontext.contexts;
 import ru.jengine.beancontainer2.containercontext.BeanExtractor;
 import ru.jengine.beancontainer2.containercontext.ContainerContext;
 import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
-import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 import ru.jengine.beancontainer2.utils.BeanUtils;
 import ru.jengine.utils.serviceclasses.Stoppable;
@@ -22,9 +21,26 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
         containedContexts.put(contextName, context);
     }
 
+    public boolean hasContext(String contextName) {
+        return containedContexts.containsKey(contextName);
+    }
+
+    public void constructBeans(List<String> contextNames) {
+        for (String contextName : contextNames) {
+            ContainerContext context = containedContexts.get(contextName);
+            context.constructBeans();
+        }
+
+        //Отдельный цикл для разделения друг от друга фаз construct и postConstruct
+        for (String contextName : contextNames) {
+            ContainerContext context = containedContexts.get(contextName);
+            context.postConstructBeans();
+        }
+    }
+
     @Override
     @Nullable
-    public Object getBean(ResolvingPropertyDefinition properties) {
+    public Object getBean(ResolvingProperties properties) {
         return BeanUtils.resolveBeansMayBeCollection(
                 getBeanSources(properties.getBeanContextSources()),
                 properties

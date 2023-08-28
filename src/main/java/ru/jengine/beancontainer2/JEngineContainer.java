@@ -1,11 +1,13 @@
 package ru.jengine.beancontainer2;
 
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer2.containercontext.BeanExtractor;
+import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
 import ru.jengine.beancontainer2.containercontext.contexts.ContainerContextFacade;
-import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer2.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
 import ru.jengine.beancontainer2.operations.OperationsExecutor;
+import ru.jengine.beancontainer2.operations.defaultimpl.*;
 import ru.jengine.beancontainer2.statepublisher.ContainerStatePublisher;
 
 import java.util.Collection;
@@ -15,29 +17,44 @@ public class JEngineContainer {
 
     public JEngineContainer(ContainerConfiguration configuration) {
         ContainerContextFacade facade = new ContainerContextFacade();
-        ContextMetainfoManager metainfoManager = new ContextMetainfoManager(configuration, facade);
-        ContainerStatePublisher containerStatePublisher = new ContainerStatePublisher();
+        ContainerStatePublisher publisher = new ContainerStatePublisher();
+        ContextMetainfoManager metainfoManager = new ContextMetainfoManager(configuration, facade, publisher);
 
-        this.operationState = new ContainerState(configuration, facade, metainfoManager, containerStatePublisher);
+        this.operationState = new ContainerState(configuration, facade, metainfoManager, publisher);
     }
 
-    public void executeOperations(ContainerOperation<?>... operationsChain) {
+    public void initializeContainerByDefault() {
+        executeOperations(
+                new ModuleFinderOperation(),
+                new CreateInfrastructureContextOperation(),
+                new ContainerMetainfoRegistrarOperation(),
+                new StartingInitializeContextOperation(),
+                new FinishingInitializeContextOperation()
+        );
+    }
+
+    public void executeOperations(ContainerOperation... operationsChain) {
         new OperationsExecutor(operationState, operationsChain).runOperationChain();
     }
 
+    @SuppressWarnings("unchecked")
     public <R> R getBean(Class<?> beanClass) {
-        return (R) operationState.getContainerContextFacade().getBean(ResolvingPropertyDefinition
+        ResolvingProperties properties = ResolvingProperties
                 .properties(beanClass)
-                .collectionClass(Collection.class.isAssignableFrom(beanClass) ? beanClass : null)
-        );
+                .collectionClass(Collection.class.isAssignableFrom(beanClass) ? beanClass : null);
+
+        Object searchResult = operationState.getContainerContextFacade().getBean(properties);
+
+        return searchResult != BeanExtractor.NOT_RESOLVED ? (R) searchResult : null;
     }
 
     public <R> R getBean(String beanName) {
         return null; //TODO реализовать получение по имени
     }
 
+    @SuppressWarnings("unchecked")
     public <R> R getBean(String contextName, Class<?> beanClass) {
-        return (R) operationState.getContainerContextFacade().getBean(ResolvingPropertyDefinition
+        return (R) operationState.getContainerContextFacade().getBean(ResolvingProperties
                 .properties(beanClass)
                 .beanContextSource(contextName)
         );
@@ -52,6 +69,6 @@ public class JEngineContainer {
     }
 
     public void stop() {
-        //TODO реализовать остановку
+        operationState.getContainerContextFacade().stop();
     }
 }

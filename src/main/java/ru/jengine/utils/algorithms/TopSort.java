@@ -57,7 +57,7 @@ public class TopSort {
                     null,
                     unhandledVertexes::remove,
                     null,
-                    (vertex, neighbours) -> TopSort.handleBackFormDependedVertexes(sortedGraph, vertex, sortedVertexHandler)
+                    (vertex, neighbours) -> handleBackFormDependedVertexes(sortedGraph, vertex, sortedVertexHandler)
             );
         }
 

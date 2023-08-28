@@ -15,6 +15,7 @@ public class ContainerStatePublisher {
         listeners.getOrDefault(eventListener.getListenedEventClass(), Collections.emptySet()).remove(eventListener);
     }
 
+    @SuppressWarnings("unchecked")
     public void publish(ContainerEvent event, ContainerState containerState) {
         for (ContainerListener<?> listener : listeners.getOrDefault(event.getClass(), Collections.emptySet())) {
             ((ContainerListener<ContainerEvent>)listener).handle(event, containerState);

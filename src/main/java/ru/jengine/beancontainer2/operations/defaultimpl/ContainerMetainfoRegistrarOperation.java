@@ -7,27 +7,26 @@ import ru.jengine.beancontainer2.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer2.extentions.ContextMetainfoFactory;
 import ru.jengine.beancontainer2.modules.Module;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
-import ru.jengine.beancontainer2.operations.EmptyOperationResult;
 import ru.jengine.beancontainer2.operations.OperationResult;
-import ru.jengine.beancontainer2.operations.defaultimpl.ModuleFinderOperation.OperationResultWithModules;
+import ru.jengine.beancontainer2.operations.ResultConstants;
 
 import java.util.List;
 import java.util.Map;
 
-public class ContainerMetainfoRegistrarOperation implements ContainerOperation<OperationResultWithModules> {
+public class ContainerMetainfoRegistrarOperation extends ContainerOperation {
     @Override
-    public OperationResult apply(OperationResultWithModules beforeOperationResult, ContainerState context) {
-        ContainerConfiguration containerConfiguration = context.getContainerConfiguration();
-        ContextMetainfoFactory contextMetainfoFactory = containerConfiguration.getContextMetainfoFactory();
-        ContextMetainfoManager contextMetainfoManager = context.getContextMetainfoManager();
+    public void apply(OperationResult result, ContainerState state) {
+        Map<String, List<Module>> modulesByContext = poolResult(result, ResultConstants.MODULES_BY_CONTEXT, Map.class);
 
-        for (Map.Entry<String, List<Module>> entry : beforeOperationResult.modulesByContext().entrySet()) {
+        ContainerConfiguration containerConfiguration = state.getContainerConfiguration();
+        ContextMetainfoFactory contextMetainfoFactory = containerConfiguration.getContextMetainfoFactory();
+        ContextMetainfoManager contextMetainfoManager = state.getContextMetainfoManager();
+
+        for (Map.Entry<String, List<Module>> entry : modulesByContext.entrySet()) {
             ContextMetainfo contextMetainfo =
                     contextMetainfoFactory.build(entry.getKey(), entry.getValue(), containerConfiguration);
 
             contextMetainfoManager.registerContextMetainfo(entry.getKey(), contextMetainfo);
         }
-
-        return EmptyOperationResult.INSTANCE;
     }
 }

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.jengine.beancontainer2.containercontext.BeanExtractor;
-import ru.jengine.beancontainer2.containercontext.ResolvingPropertyDefinition;
+import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 import ru.jengine.beancontainer2.intstructure.factory.*;
 
@@ -52,7 +52,7 @@ public class DefaultBeanFactoryTest {
 
         @Nullable
         @Override
-        public Object getBean(ResolvingPropertyDefinition properties) {
+        public Object getBean(ResolvingProperties properties) {
             return mapping.getOrDefault(properties.getRequestedClass(), NOT_RESOLVED);
         }
     }

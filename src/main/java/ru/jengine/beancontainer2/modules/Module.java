@@ -7,7 +7,6 @@ import java.util.List;
 public interface Module {
     List<BeanDefinitionReader> getBeanDefinitionReaders();
     void configure(ModuleContext context);
-    Module cloneWithContext(String newContextName);
 
     String getContextName();
     List<String> getBeanSources();

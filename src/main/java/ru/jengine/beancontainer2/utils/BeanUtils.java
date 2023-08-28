@@ -38,7 +38,7 @@ public class BeanUtils { //TODO вынести в отдельный объек�
                     .formatted(properties.getRequestedClass(), resolvedBeans));
         }
 
-        return resolvedBeans.isEmpty() ? null : resolvedBeans.get(0);
+        return resolvedBeans.isEmpty() ? NOT_RESOLVED : resolvedBeans.get(0);
     }
 
     public static List<Object> resolveBeans(Collection<? extends BeanExtractor> extractors,

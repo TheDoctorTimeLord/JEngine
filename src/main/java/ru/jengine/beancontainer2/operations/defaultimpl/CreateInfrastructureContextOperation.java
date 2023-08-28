@@ -10,18 +10,20 @@ import ru.jengine.beancontainer2.contextmetainfo.ContextMetainfo;
 import ru.jengine.beancontainer2.modules.Module;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
 import ru.jengine.beancontainer2.operations.OperationResult;
-import ru.jengine.beancontainer2.operations.defaultimpl.ModuleFinderOperation.OperationResultWithModules;
+import ru.jengine.beancontainer2.operations.ResultConstants;
 
 import java.util.List;
+import java.util.Map;
 
-public class CreateInfrastructureContextOperation implements ContainerOperation<OperationResultWithModules> {
+public class CreateInfrastructureContextOperation extends ContainerOperation {
     @Override
-    public OperationResult apply(OperationResultWithModules beforeOperationResult, ContainerState context) {
-        ContainerConfiguration containerConfiguration = context.getContainerConfiguration();
-        ContainerContextFacade containerContextFacade = context.getContainerContextFacade();
+    public void apply(OperationResult result, ContainerState state) {
+        Map<String, List<Module>> modulesByContext = extractResult(result, ResultConstants.MODULES_BY_CONTEXT, Map.class);
 
-        List<Module> infrastructureModules =
-                beforeOperationResult.modulesByContext().remove(Contexts.INFRASTRUCTURE_CONTEXT);
+        ContainerConfiguration containerConfiguration = state.getContainerConfiguration();
+        ContainerContextFacade containerContextFacade = state.getContainerContextFacade();
+
+        List<Module> infrastructureModules = modulesByContext.remove(Contexts.INFRASTRUCTURE_CONTEXT);
         ContextMetainfo infrastructureMetainfo = containerConfiguration.getContextMetainfoFactory().build(
                 Contexts.INFRASTRUCTURE_CONTEXT,
                 infrastructureModules,
@@ -31,9 +33,7 @@ public class CreateInfrastructureContextOperation implements ContainerOperation<
 
         containerContextFacade.registerContext(
                 Contexts.INFRASTRUCTURE_CONTEXT,
-                containerConfiguration.getContainerContextFactory().build(infrastructureMetainfo, beanFactory)
+                containerConfiguration.getContainerContextFactory().build(infrastructureMetainfo, beanFactory, state)
         );
-
-        return beforeOperationResult;
     }
 }

@@ -9,7 +9,7 @@ public interface Constants {
     String QUANTA_NOTIFICATION_QUEUE_CODE = "quantaNotificationQueueCode";
     String ASYNC_DISPATCHER_NAME = "asyncDispatcher";
 
-    interface BeanStrategy {
+    interface BeanScope {
         String SINGLETON = "singleton";
         String PROTOTYPE = "prototype";
     }

@@ -3,8 +3,8 @@ package ru.jengine.beancontainer2.operations.defaultimpl;
 import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
-import ru.jengine.beancontainer2.operations.EmptyOperationResult;
 import ru.jengine.beancontainer2.operations.OperationResult;
+import ru.jengine.beancontainer2.operations.ResultConstants;
 import ru.jengine.beancontainer2.utils.AnnotationUtils;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
 import ru.jengine.beancontainer2.Constants;
@@ -20,10 +20,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ModuleFinderOperation implements ContainerOperation<EmptyOperationResult> {
+public class ModuleFinderOperation extends ContainerOperation {
     @Override
-    public OperationResult apply(EmptyOperationResult emptyResult, ContainerState context) {
-        ContainerConfiguration configuration = context.getContainerConfiguration();
+    public void apply(OperationResult operationResult, ContainerState state) {
+        ContainerConfiguration configuration = state.getContainerConfiguration();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 
         syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE);
@@ -33,7 +33,7 @@ public class ModuleFinderOperation implements ContainerOperation<EmptyOperationR
         List<Module> foundedModules = findAllModules(syntheticModuleFinder, configuration);
         Map<String, List<Module>> modulesByContext = CollectionUtils.groupBy(foundedModules, Module::getContextName);
 
-        return new OperationResultWithModules(modulesByContext);
+        operationResult.putResult(ResultConstants.MODULES_BY_CONTEXT, modulesByContext);
     }
 
     private static List<Module> findAllModules(ModuleFinder mainModuleFinder, ContainerConfiguration configuration) {
@@ -115,6 +115,4 @@ public class ModuleFinderOperation implements ContainerOperation<EmptyOperationR
                 .filter(cls -> AnnotationUtils.isAnnotationPresent(cls, ModuleFinderMarker.class))
                 .collect(Collectors.toSet());
     }
-
-    public record OperationResultWithModules(Map<String, List<Module>> modulesByContext) implements OperationResult { }
 }

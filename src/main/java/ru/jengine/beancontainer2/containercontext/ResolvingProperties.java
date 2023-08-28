@@ -14,4 +14,8 @@ public interface ResolvingProperties {
 
     @Nullable
     String[] getBeanContextSources();
+
+    static ResolvingPropertyDefinition properties(Class<?> requestedClass) {
+        return new ResolvingPropertyDefinition(requestedClass);
+    }
 }

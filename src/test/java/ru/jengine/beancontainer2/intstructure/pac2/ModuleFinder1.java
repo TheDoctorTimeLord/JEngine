@@ -1,6 +1,6 @@
 package ru.jengine.beancontainer2.intstructure.pac2;
 
-import ru.jengine.beancontainer.annotations.ModuleFinderMarker;
+import ru.jengine.beancontainer2.annotations.ModuleFinderMarker;
 import ru.jengine.beancontainer2.modules.Module;
 import ru.jengine.beancontainer2.modulefinders.ModuleFinder;
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;

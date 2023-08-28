@@ -6,5 +6,5 @@ public interface BeanExtractor {
     Object NOT_RESOLVED = new Object();
 
     @Nullable
-    Object getBean(ResolvingPropertyDefinition properties);
+    Object getBean(ResolvingProperties properties);
 }

@@ -9,11 +9,7 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
     private Annotation[] annotations;
     private String[] beanContextSource;
 
-    public static ResolvingPropertyDefinition properties(Class<?> requestedClass) {
-        return new ResolvingPropertyDefinition(requestedClass);
-    }
-
-    private ResolvingPropertyDefinition(Class<?> requestedClass) {
+    ResolvingPropertyDefinition(Class<?> requestedClass) {
         this.requestedClass = requestedClass;
     }
 
