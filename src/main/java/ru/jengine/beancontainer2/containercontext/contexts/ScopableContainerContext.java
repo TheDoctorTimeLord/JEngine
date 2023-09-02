@@ -6,19 +6,21 @@ import ru.jengine.beancontainer2.containercontext.*;
 import ru.jengine.beancontainer2.extentions.BeanCreationScopeResolver;
 import ru.jengine.beancontainer2.extentions.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer2.extentions.BeanProcessor;
-import ru.jengine.beancontainer2.utils.BeanUtils;
 import ru.jengine.utils.CollectionUtils;
 
 import java.util.List;
 
 public class ScopableContainerContext implements ContainerContext {
+    private final BeanResolver beanResolver;
     private final List<BeanCreationScope> scopes;
     private final ClassAliasManager classAliasManager = new ClassAliasManager();
 
-    public ScopableContainerContext(BeanFactory beanFactory, List<BeanDefinition> beanDefinitions,
-            BeanCreationScopeResolver scopeResolver, List<BeanProcessor> beanProcessors,
-            List<BeanPreRemoveProcessor> preRemoveProcessors)
+    public ScopableContainerContext(BeanFactory beanFactory, BeanResolver beanResolver,
+            List<BeanDefinition> beanDefinitions, BeanCreationScopeResolver scopeResolver,
+            List<BeanProcessor> beanProcessors, List<BeanPreRemoveProcessor> preRemoveProcessors)
     {
+        this.beanResolver = beanResolver;
+
         this.scopes = CollectionUtils.groupBy(beanDefinitions, BeanDefinition::getScopeName)
                 .entrySet()
                 .stream()
@@ -55,9 +57,9 @@ public class ScopableContainerContext implements ContainerContext {
     public Object getBean(ResolvingProperties properties) {
         ResolvingPropertyDefinition[] aliased = classAliasManager.getForAlias(properties);
         if (aliased != null && aliased.length != 0) {
-            return BeanUtils.resolveBeansAsCollection(scopes, aliased, properties.getCollectionClass());
+            return beanResolver.resolveBeansAsCollection(scopes, aliased, properties.getCollectionClass());
         }
 
-        return BeanUtils.resolveBeansMayBeCollection(scopes, properties);
+        return beanResolver.resolveBeansMayBeCollection(scopes, properties);
     }
 }

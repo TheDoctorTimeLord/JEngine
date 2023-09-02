@@ -1,8 +1,7 @@
-package ru.jengine.beancontainer2.utils;
+package ru.jengine.beancontainer2.containercontext;
 
-import ru.jengine.beancontainer2.containercontext.BeanExtractor;
-import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
+import ru.jengine.beancontainer2.utils.ReflectionContainerUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,8 +9,10 @@ import java.util.List;
 
 import static ru.jengine.beancontainer2.containercontext.BeanExtractor.NOT_RESOLVED;
 
-public class BeanUtils { //TODO вынести в отдельный объект
-    public static Object resolveBeansAsCollection(Collection<? extends BeanExtractor> extractors,
+public class BeanResolver {
+    //TODO Получать процессоры разрешения бинов (такие как Primal или бины, которые перезатирают другие)
+
+    public Object resolveBeansAsCollection(Collection<? extends BeanExtractor> extractors,
             ResolvingProperties[] properties, Class<?> collectionClass)
     {
         if (!ReflectionContainerUtils.isAvailableCollection(collectionClass)) {
@@ -19,11 +20,11 @@ public class BeanUtils { //TODO вынести в отдельный объек�
                     .formatted(collectionClass, ReflectionContainerUtils.AVAILABLE_COLLECTIONS));
         }
 
-        List<Object> resolvedBeans = BeanUtils.resolveBeans(extractors, properties);
+        List<Object> resolvedBeans = resolveBeans(extractors, properties);
         return ReflectionContainerUtils.convertToCollection(resolvedBeans, collectionClass);
     }
 
-    public static Object resolveBeansMayBeCollection(Collection<? extends BeanExtractor> extractors,
+    public Object resolveBeansMayBeCollection(Collection<? extends BeanExtractor> extractors,
             ResolvingProperties properties)
     {
         Class<?> collectionClass = properties.getCollectionClass();
@@ -31,7 +32,7 @@ public class BeanUtils { //TODO вынести в отдельный объек�
             return resolveBeansAsCollection(extractors, new ResolvingProperties[] { properties }, collectionClass);
         }
 
-        List<Object> resolvedBeans = BeanUtils.resolveBeans(extractors, properties);
+        List<Object> resolvedBeans = resolveBeans(extractors, properties);
 
         if (resolvedBeans.size() > 1) {
             throw new ContainerException("Too many candidates for [%s]. Candidates: %s"
@@ -41,7 +42,7 @@ public class BeanUtils { //TODO вынести в отдельный объек�
         return resolvedBeans.isEmpty() ? NOT_RESOLVED : resolvedBeans.get(0);
     }
 
-    public static List<Object> resolveBeans(Collection<? extends BeanExtractor> extractors,
+    public List<Object> resolveBeans(Collection<? extends BeanExtractor> extractors,
             ResolvingProperties... propertiesForResolve) {
         Class<?> currentResolvedBeanClass = null;
         try {

@@ -55,10 +55,11 @@ public class ContextMetainfoManager {
                         beanSources.stream()
                 ),
                 configuration.getPreloadedContextNames().stream()
-        ).toArray(String[]::new);
+        ).distinct().toArray(String[]::new);
 
         BeanFactoryWithSources beanFactory = new BeanFactoryWithSources(contextFacade, extendedBeanSources);
-        ContainerContext containerContext = configuration.getContainerContextFactory().build(metainfo, beanFactory, state);
+        ContainerContext containerContext = configuration.getContainerContextFactory()
+                .build(newContextName, metainfo, beanFactory, state);
 
         contextFacade.registerContext(newContextName, containerContext);
 

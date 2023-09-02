@@ -4,7 +4,6 @@ import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public abstract class ContainerOperation {
     public static final String CHECK_EXCEPTION_CODE = "[check]";
@@ -12,7 +11,7 @@ public abstract class ContainerOperation {
     public abstract void apply(OperationResult previouseOperationResult, ContainerState state);
 
     @SuppressWarnings("unchecked")
-    protected <T, R extends T> R extractResult(OperationResult operationResult, String resultKey, Class<T> expectedResultType) {
+    protected <T, R extends T> R getResult(OperationResult operationResult, String resultKey, Class<T> expectedResultType) {
         return (R) checkResult(operationResult, resultKey, expectedResultType, OperationResult::getResult);
     }
 

@@ -30,7 +30,7 @@ public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
         return beanClasses.stream()
                 .map(cls -> Map.entry(cls, AnnotationUtils.getAnnotation(cls, Bean.class)))
                 .filter(entry -> findInfrastructureBeans == entry.getValue().isInfrastructure())
-                .map(entry -> new JavaClassBeanDefinition(entry.getKey(), entry.getValue().scopeName(), null))
+                .map(entry -> new JavaClassBeanDefinition(entry.getKey(), entry.getValue().scopeName()))
                 .collect(Collectors.toList());
     }
 }

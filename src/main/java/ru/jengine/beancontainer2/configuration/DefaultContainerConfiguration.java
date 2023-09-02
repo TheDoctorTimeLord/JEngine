@@ -5,11 +5,14 @@ import ru.jengine.beancontainer2.extentions.BeanCreationScopeResolver;
 import ru.jengine.beancontainer2.extentions.ContainerContextFactory;
 import ru.jengine.beancontainer2.extentions.ContextMetainfoFactory;
 import ru.jengine.beancontainer2.modules.ModuleFactory;
+import ru.jengine.beancontainer2.modules.Module;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class DefaultContainerConfiguration implements ContainerConfiguration {
+    private final Map<String, List<Module>> externalSetModules;
     private final Class<?> mainModuleClass;
     private final Supplier<ClassFinder> classFinderFactory;
     private final ModuleFactory moduleFactory;
@@ -18,11 +21,12 @@ public class DefaultContainerConfiguration implements ContainerConfiguration {
     private final BeanCreationScopeResolver beanCreationScopeResolver;
     private final List<String> preloadedContextNames;
 
-    DefaultContainerConfiguration(Class<?> mainModuleClass, Supplier<ClassFinder> classFinderFactory,
-            ModuleFactory moduleFactory, ContextMetainfoFactory contextMetainfoFactory,
-            ContainerContextFactory containerContextFactory, BeanCreationScopeResolver beanCreationScopeResolver,
-            List<String> preloadedContextNames)
+    DefaultContainerConfiguration(Map<String, List<Module>> externalSetModules, Class<?> mainModuleClass,
+            Supplier<ClassFinder> classFinderFactory, ModuleFactory moduleFactory,
+            ContextMetainfoFactory contextMetainfoFactory, ContainerContextFactory containerContextFactory,
+            BeanCreationScopeResolver beanCreationScopeResolver, List<String> preloadedContextNames)
     {
+        this.externalSetModules = externalSetModules;
         this.mainModuleClass = mainModuleClass;
         this.classFinderFactory = classFinderFactory;
         this.moduleFactory = moduleFactory;
@@ -30,6 +34,11 @@ public class DefaultContainerConfiguration implements ContainerConfiguration {
         this.containerContextFactory = containerContextFactory;
         this.beanCreationScopeResolver = beanCreationScopeResolver;
         this.preloadedContextNames = preloadedContextNames;
+    }
+
+    @Override
+    public Map<String, List<Module>> getExternalSetModules() {
+        return externalSetModules;
     }
 
     @Override

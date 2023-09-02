@@ -13,6 +13,10 @@ import ru.jengine.beancontainer2.intstructure.pac5.StartModuleWithProcessors;
 import ru.jengine.beancontainer2.intstructure.pac6.F;
 import ru.jengine.beancontainer2.intstructure.pac6.G;
 import ru.jengine.beancontainer2.intstructure.pac6.StartModuleWithImportBean;
+import ru.jengine.beancontainer2.intstructure.pac7.H;
+import ru.jengine.beancontainer2.intstructure.pac7.I;
+import ru.jengine.beancontainer2.intstructure.pac7.J;
+import ru.jengine.beancontainer2.intstructure.pac7.StartModuleWithExistingBeans;
 
 public class CreatingBeansTest {
     @Test
@@ -58,5 +62,31 @@ public class CreatingBeansTest {
         Assert.assertNotNull(actualG);
 
         Assert.assertSame(actualF, actualG.getF());
+    }
+
+    @Test
+    public void testExistingBeans() {
+        H externalH = new H();
+        I externalI = new I(externalH);
+
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithExistingBeans.class)
+                .addBeans(externalH)
+                .addBeans(Constants.Contexts.DEFAULT_CONTEXT, externalI)
+                .build());
+        container.initializeContainerByDefault(); //TODO реализовать систему перезатираний BeanDefinition или выбора кандидатов
+
+        H actualH = container.getBean(H.class);
+        I actualI = container.getBean(Constants.Contexts.DEFAULT_CONTEXT, I.class);
+        J actualJ = container.getBean(J.class);
+
+        Assert.assertNotNull(actualH);
+        Assert.assertNotNull(actualI);
+        Assert.assertNotNull(actualJ);
+
+        Assert.assertSame(externalH, actualH);
+        Assert.assertSame(externalI, actualI);
+
+        Assert.assertSame(externalH, actualJ.getH());
+        Assert.assertSame(externalI, actualJ.getI());
     }
 }

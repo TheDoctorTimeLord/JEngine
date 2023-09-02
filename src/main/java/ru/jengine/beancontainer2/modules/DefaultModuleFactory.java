@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class DefaultModuleFactory implements ModuleFactory {
     @Override
-    public Module createModule(Class<?> moduleClass, ContainerConfiguration configuration) {
+    public Module createAnnotatedModule(Class<?> moduleClass, ContainerConfiguration configuration) {
         ModuleContext context = createModuleContext(moduleClass, configuration);
         return createModule(moduleClass, context);
     }
@@ -43,15 +43,21 @@ public class DefaultModuleFactory implements ModuleFactory {
         return classFinder;
     }
 
-    private static Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
+    private Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {
         try {
             Module module = ReflectionContainerUtils.createComponentWithDefaultConstructor(moduleClass);
-            module.configure(moduleContext);
+            configureModule(module, moduleContext);
             return module;
         } catch (ContainerException e) {
             throw new ContainerException("Module [" + moduleClass + "] must have default constructor", e);
         } catch (ClassCastException e) {
             throw new ContainerException("Module [" + moduleClass + "] must implement interface Module", e);
         }
+    }
+
+    @Override
+    public Module configureModule(Module module, ModuleContext moduleContext) {
+        module.configure(moduleContext);
+        return module;
     }
 }

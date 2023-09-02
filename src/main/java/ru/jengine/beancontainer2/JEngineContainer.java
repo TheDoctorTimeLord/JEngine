@@ -26,7 +26,8 @@ public class JEngineContainer {
     public void initializeContainerByDefault() {
         executeOperations(
                 new ModuleFinderOperation(),
-                new CreateInfrastructureContextOperation(),
+                new PreloadContextOperation(Constants.Contexts.INFRASTRUCTURE_CONTEXT),
+                new PreloadContextOperation(Constants.Contexts.EXTERNAL_BEANS_CONTEXT),
                 new ContainerMetainfoRegistrarOperation(),
                 new StartingInitializeContextOperation(),
                 new FinishingInitializeContextOperation()

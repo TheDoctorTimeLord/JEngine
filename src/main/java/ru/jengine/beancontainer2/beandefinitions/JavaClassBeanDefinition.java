@@ -1,14 +1,18 @@
 package ru.jengine.beancontainer2.beandefinitions;
 
-import com.google.common.base.Objects;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;
     private final String scopeName;
     private final Supplier<Object> beanProducer;
+
+    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName) {
+        this(beanClass, scopeName, null);
+    }
 
     public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, @Nullable Supplier<Object> beanProducer) {
         this.beanClass = beanClass;
@@ -34,21 +38,22 @@ public class JavaClassBeanDefinition implements BeanDefinition {
 
     @Override
     public String toString() {
-        return "beanClass=" + beanClass.getSimpleName();
+        return "{beanClass=" + beanClass +
+                ", scopeName='" + scopeName + '\'' +
+                ", withProducer=" + (beanProducer != null) +
+                '}';
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        JavaClassBeanDefinition that = (JavaClassBeanDefinition)o;
-        return Objects.equal(beanClass, that.beanClass);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        JavaClassBeanDefinition that = (JavaClassBeanDefinition) object;
+        return Objects.equals(beanClass, that.beanClass) && Objects.equals(scopeName, that.scopeName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(beanClass);
+        return Objects.hash(beanClass, scopeName);
     }
 }

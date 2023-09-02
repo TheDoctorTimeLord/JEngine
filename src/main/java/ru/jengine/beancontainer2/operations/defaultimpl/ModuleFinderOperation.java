@@ -2,16 +2,17 @@ package ru.jengine.beancontainer2.operations.defaultimpl;
 
 import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.annotations.ModuleFinderMarker;
+import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer2.exceptions.ContainerException;
+import ru.jengine.beancontainer2.modulefinders.ModuleFinder;
+import ru.jengine.beancontainer2.modulefinders.SyntheticModuleFinder;
+import ru.jengine.beancontainer2.modules.Module;
+import ru.jengine.beancontainer2.modules.ModuleContext;
+import ru.jengine.beancontainer2.modules.ModuleFactory;
 import ru.jengine.beancontainer2.operations.ContainerOperation;
 import ru.jengine.beancontainer2.operations.OperationResult;
 import ru.jengine.beancontainer2.operations.ResultConstants;
 import ru.jengine.beancontainer2.utils.AnnotationUtils;
-import ru.jengine.beancontainer2.modules.ModuleFactory;
-import ru.jengine.beancontainer2.Constants;
-import ru.jengine.beancontainer2.modules.Module;
-import ru.jengine.beancontainer2.modulefinders.ModuleFinder;
-import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
-import ru.jengine.beancontainer2.modulefinders.SyntheticModuleFinder;
 import ru.jengine.beancontainer2.utils.ReflectionContainerUtils;
 import ru.jengine.utils.CollectionUtils;
 import ru.jengine.utils.ReflectionUtils;
@@ -26,12 +27,12 @@ public class ModuleFinderOperation extends ContainerOperation {
         ContainerConfiguration configuration = state.getContainerConfiguration();
         SyntheticModuleFinder syntheticModuleFinder = new SyntheticModuleFinder();
 
-        syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_INFRASTRUCTURE_MODULE);
-        syntheticModuleFinder.addModuleClass(Constants.BEAN_CONTAINER_MAIN_MODULE);
         syntheticModuleFinder.addModuleClass(configuration.getMainModuleClass());
 
         List<Module> foundedModules = findAllModules(syntheticModuleFinder, configuration);
         Map<String, List<Module>> modulesByContext = CollectionUtils.groupBy(foundedModules, Module::getContextName);
+
+        addExternalSetModules(modulesByContext, configuration);
 
         operationResult.putResult(ResultConstants.MODULES_BY_CONTEXT, modulesByContext);
     }
@@ -72,15 +73,15 @@ public class ModuleFinderOperation extends ContainerOperation {
                 .collect(Collectors.toList());
     }
 
-    private static List<Module> getAllSubmodules(Module mainModule, ContainerConfiguration configuration) {
+    private static List<Module> getAllSubmodules(Module masterModule, ContainerConfiguration configuration) {
         List<Module> result = new ArrayList<>();
 
         ModuleFactory moduleFactory = configuration.getModuleFactory();
         Set<Class<?>> moduleClasses = new HashSet<>();
         Queue<Module> notHandledModules = new ArrayDeque<>();
 
-        notHandledModules.add(mainModule);
-        moduleClasses.add(mainModule.getClass());
+        notHandledModules.add(masterModule);
+        moduleClasses.add(masterModule.getClass());
 
         while (!notHandledModules.isEmpty()) {
             Module module = notHandledModules.poll();
@@ -90,7 +91,7 @@ public class ModuleFinderOperation extends ContainerOperation {
                     .toList();
             moduleClasses.addAll(submodules);
             submodules.stream()
-                    .map(moduleClass -> moduleFactory.createModule(moduleClass, configuration))
+                    .map(moduleClass -> moduleFactory.createAnnotatedModule(moduleClass, configuration))
                     .forEach(submodule -> {
                         notHandledModules.add(submodule);
                         result.add(submodule);
@@ -104,7 +105,18 @@ public class ModuleFinderOperation extends ContainerOperation {
         Set<Class<?>> moduleFinderClasses = extractAllModuleFinderClasses(uniqueModules);
 
         return moduleFinderClasses.stream()
-                .map(cls -> (ModuleFinder)ReflectionContainerUtils.createObjectWithDefaultConstructor(cls))
+                .map(cls -> {
+                    try {
+                        return (ModuleFinder) ReflectionContainerUtils.createObjectWithDefaultConstructor(cls);
+                    } catch (ClassCastException e) {
+                        throw new ContainerException("Class [%s] is not implemented ModuleFinder".formatted(cls), e);
+                    } catch (ContainerException e) {
+                        throw new ContainerException(("Exception during creating ModuleFinder [%s]. WARNING! " +
+                                "ModuleFinder must have default constructor").formatted(cls), e);
+                    } catch (Exception e) {
+                        throw new ContainerException("Exception during creating ModuleFinder [%s]".formatted(cls), e);
+                    }
+                })
                 .toList();
     }
 
@@ -114,5 +126,22 @@ public class ModuleFinderOperation extends ContainerOperation {
                 .filter(ReflectionUtils.IS_CLASS_PREDICATE)
                 .filter(cls -> AnnotationUtils.isAnnotationPresent(cls, ModuleFinderMarker.class))
                 .collect(Collectors.toSet());
+    }
+
+    //TODO сделать protected для внешней модификации операции
+    private void addExternalSetModules(Map<String, List<Module>> modules, ContainerConfiguration configuration) {
+        Map<String, List<Module>> externalSetModules = configuration.getExternalSetModules();
+        ModuleFactory moduleFactory = configuration.getModuleFactory();
+
+        externalSetModules.values().stream()
+                .flatMap(Collection::stream)
+                .forEach(module -> moduleFactory.configureModule(module, new ModuleContext(
+                        configuration.getClassFinderFactory().get(),
+                        module.getClass()
+                )));
+
+        for (Map.Entry<String, List<Module>> entry : externalSetModules.entrySet()) {
+            modules.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).addAll(entry.getValue());
+        }
     }
 }

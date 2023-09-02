@@ -84,7 +84,7 @@ public class DefaultBeanFactory implements BeanFactory {
         return resolve(parameter, properties);
     }
 
-    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) { //TODO обработать null
+    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
         properties.annotated(parameter.getParameterAnnotations());
         Object extractedBean = getBeanExtractor().getBean(properties);
         return extractedBean == BeanExtractor.NOT_RESOLVED ? null : extractedBean;

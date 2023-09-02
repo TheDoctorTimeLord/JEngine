@@ -6,5 +6,6 @@ import ru.jengine.beancontainer2.containercontext.ContainerContext;
 import ru.jengine.beancontainer2.contextmetainfo.ContextMetainfo;
 
 public interface ContainerContextFactory {
-    ContainerContext build(ContextMetainfo metainfo, BeanFactory beanFactory, ContainerState containerState);
+    ContainerContext build(String builtContextName, ContextMetainfo metainfo, BeanFactory beanFactory,
+            ContainerState containerState);
 }

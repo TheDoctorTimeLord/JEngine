@@ -16,9 +16,9 @@ public class ModuleFinder1 implements ModuleFinder {
     public List<Module> find(ContainerConfiguration configuration) {
         ModuleFactory moduleFactory = configuration.getModuleFactory();
         return List.of(
-                moduleFactory.createModule(ModuleByFinder1.class, configuration),
-                moduleFactory.createModule(ModuleByFinder2.class, configuration),
-                moduleFactory.createModule(ModuleByFinder1.class, configuration)
+                moduleFactory.createAnnotatedModule(ModuleByFinder1.class, configuration),
+                moduleFactory.createAnnotatedModule(ModuleByFinder2.class, configuration),
+                moduleFactory.createAnnotatedModule(ModuleByFinder1.class, configuration)
         );
     }
 }

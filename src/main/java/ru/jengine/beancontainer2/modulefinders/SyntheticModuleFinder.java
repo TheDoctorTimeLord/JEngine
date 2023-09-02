@@ -19,7 +19,7 @@ public class SyntheticModuleFinder implements ModuleFinder {
     public List<Module> find(ContainerConfiguration configuration) {
         ModuleFactory moduleFactory = configuration.getModuleFactory();
         return mainModuleClasses.stream()
-                .map(moduleClass -> moduleFactory.createModule(moduleClass, configuration))
+                .map(moduleClass -> moduleFactory.createAnnotatedModule(moduleClass, configuration))
                 .collect(Collectors.toList());
     }
 }

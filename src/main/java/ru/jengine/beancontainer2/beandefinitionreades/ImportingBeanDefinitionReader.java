@@ -16,7 +16,7 @@ public class ImportingBeanDefinitionReader implements BeanDefinitionReader {
         List<Import> importAnnotations = AnnotationUtils.getAnnotations(moduleClass, Import.class);
         this.importingBeanDefinitions = importAnnotations.stream()
                 .flatMap(i -> Stream.of(i.value()))
-                .map(beanClass -> new JavaClassBeanDefinition(beanClass, Constants.BeanScope.SINGLETON, null))
+                .map(beanClass -> new JavaClassBeanDefinition(beanClass, Constants.BeanScope.SINGLETON))
                 .toList();
     }
 

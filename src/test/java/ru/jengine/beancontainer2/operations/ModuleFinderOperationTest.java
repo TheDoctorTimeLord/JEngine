@@ -2,7 +2,6 @@ package ru.jengine.beancontainer2.operations;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.jengine.beancontainer2.Constants;
 import ru.jengine.beancontainer2.ContainerState;
 import ru.jengine.beancontainer2.JEngineContainer;
 import ru.jengine.beancontainer2.configuration.ContainerConfiguration;
@@ -13,8 +12,6 @@ import ru.jengine.beancontainer2.intstructure.pac1.Module3;
 import ru.jengine.beancontainer2.intstructure.pac2.ModuleInOtherPackage;
 import ru.jengine.beancontainer2.intstructure.pac3.ModuleByFinder1;
 import ru.jengine.beancontainer2.intstructure.pac3.ModuleByFinder2;
-import ru.jengine.beancontainer2.modules.MainInfrastructureModule;
-import ru.jengine.beancontainer2.modules.MainModule;
 import ru.jengine.beancontainer2.modules.Module;
 import ru.jengine.beancontainer2.operations.defaultimpl.ModuleFinderOperation;
 
@@ -31,10 +28,8 @@ public class ModuleFinderOperationTest {
             public void apply(OperationResult result, ContainerState state) {
                 Map<String, List<Module>> modulesByContext = poolResult(result, ResultConstants.MODULES_BY_CONTEXT, Map.class);
 
-                Assert.assertEquals(5, modulesByContext.size());
+                Assert.assertEquals(3, modulesByContext.size());
 
-                equals(modulesByContext, Constants.Contexts.INFRASTRUCTURE_CONTEXT, MainInfrastructureModule.class);
-                equals(modulesByContext, Constants.Contexts.DEFAULT_CONTEXT, MainModule.class);
                 equals(modulesByContext, "1", StartModule.class, Module1.class, Module3.class);
                 equals(modulesByContext, "2", Module2.class, ModuleInOtherPackage.class, ModuleByFinder1.class);
                 equals(modulesByContext, "3", ModuleByFinder2.class);

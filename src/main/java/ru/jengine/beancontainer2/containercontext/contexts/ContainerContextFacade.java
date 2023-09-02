@@ -1,16 +1,19 @@
 package ru.jengine.beancontainer2.containercontext.contexts;
 
+import ru.jengine.beancontainer2.Constants;
 import ru.jengine.beancontainer2.containercontext.BeanExtractor;
+import ru.jengine.beancontainer2.containercontext.BeanResolver;
 import ru.jengine.beancontainer2.containercontext.ContainerContext;
 import ru.jengine.beancontainer2.containercontext.ResolvingProperties;
 import ru.jengine.beancontainer2.exceptions.ContainerException;
-import ru.jengine.beancontainer2.utils.BeanUtils;
 import ru.jengine.utils.serviceclasses.Stoppable;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 public class ContainerContextFacade implements BeanExtractor, Stoppable {
+    private volatile List<BeanExtractor> infrastructureBeanExtractor;
+    private final BeanResolver beanResolver = new BeanResolver(); //TODO подумать над инициализацией
     private final Map<String, ContainerContext> containedContexts = new HashMap<>();
 
     public void registerContext(String contextName, ContainerContext context) {
@@ -41,7 +44,7 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
     @Override
     @Nullable
     public Object getBean(ResolvingProperties properties) {
-        return BeanUtils.resolveBeansMayBeCollection(
+        return beanResolver.resolveBeansMayBeCollection(
                 getBeanSources(properties.getBeanContextSources()),
                 properties
         );
@@ -50,6 +53,10 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
     private Collection<? extends BeanExtractor> getBeanSources(String[] beanContextSources) {
         if (beanContextSources == null) {
             return containedContexts.values();
+        }
+
+        if (beanContextSources.length == 1 && Constants.Contexts.INFRASTRUCTURE_CONTEXT.equals(beanContextSources[0])) {
+            return getInfrastructureBeanExtractor();
         }
 
         List<ContainerContext> beanSources = new ArrayList<>(beanContextSources.length);
@@ -72,5 +79,21 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
                 stoppedContexts.add(context);
             }
         }
+    }
+
+    private List<BeanExtractor> getInfrastructureBeanExtractor() {
+        if (infrastructureBeanExtractor == null) {
+            synchronized (this) {
+                if (infrastructureBeanExtractor == null) {
+                    ContainerContext context = containedContexts.get(Constants.Contexts.INFRASTRUCTURE_CONTEXT);
+                    if (context == null) {
+                        throw new ContainerException("Context [%s] is not found".formatted(Constants.Contexts.INFRASTRUCTURE_CONTEXT));
+                    }
+
+                    infrastructureBeanExtractor = List.of(context);
+                }
+            }
+        }
+        return infrastructureBeanExtractor;
     }
 }
