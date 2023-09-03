@@ -1,5 +1,8 @@
 package ru.jengine.beancontainer.utils;
 
+import com.google.common.collect.ImmutableList;
+import ru.jengine.beancontainer.exceptions.ContainerException;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -11,10 +14,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import ru.jengine.beancontainer.exceptions.UtilsException;
-
-import com.google.common.collect.ImmutableList;
 
 public class AnnotationUtils {
     public static final List<Class<? extends Annotation>> systemAnnotations = ImmutableList.of(Target.class,
@@ -87,7 +86,7 @@ public class AnnotationUtils {
         T resultAnnotation = getAnnotationSafe(owner, annotation);
 
         if (resultAnnotation == null) {
-            throw new UtilsException("Class [" + owner + "] has not annotation [" + annotation + "]");
+            throw new ContainerException("Class [" + owner + "] has not annotation [" + annotation + "]");
         }
 
         return resultAnnotation;

@@ -1,7 +1,5 @@
 package ru.jengine.utils.serviceclasses;
 
-import ru.jengine.beancontainer.exceptions.UtilsException;
-
 import com.google.common.base.Objects;
 
 public class Fraction {
@@ -89,7 +87,7 @@ public class Fraction {
 
     private static void checkDenominator(int denominator) {
         if (denominator <= 0) {
-            throw new UtilsException("Denominator must be greater then 0");
+            throw new IllegalStateException("Denominator must be greater then 0");
         }
     }
 }
