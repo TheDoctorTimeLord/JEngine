@@ -2,8 +2,10 @@ package ru.jengine.beancontainer.operations;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.jengine.beancontainer.Constants;
 import ru.jengine.beancontainer.ContainerState;
 import ru.jengine.beancontainer.JEngineContainer;
+import ru.jengine.beancontainer.StandardContainerToolsModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.intstructure.pac0.StartModule;
 import ru.jengine.beancontainer.intstructure.pac1.Module1;
@@ -28,8 +30,9 @@ public class ModuleFinderOperationTest {
             public void apply(OperationResult result, ContainerState state) {
                 Map<String, List<Module>> modulesByContext = poolResult(result, ResultConstants.MODULES_BY_CONTEXT, Map.class);
 
-                Assert.assertEquals(3, modulesByContext.size());
+                Assert.assertEquals(4, modulesByContext.size());
 
+                equals(modulesByContext, Constants.Contexts.DEFAULT_CONTEXT, StandardContainerToolsModule.class);
                 equals(modulesByContext, "1", StartModule.class, Module1.class, Module3.class);
                 equals(modulesByContext, "2", Module2.class, ModuleInOtherPackage.class, ModuleByFinder1.class);
                 equals(modulesByContext, "3", ModuleByFinder2.class);
