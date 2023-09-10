@@ -1,5 +1,6 @@
 package ru.jengine.beancontainer;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
@@ -17,6 +18,13 @@ import ru.jengine.beancontainer.intstructure.pac7.H;
 import ru.jengine.beancontainer.intstructure.pac7.I;
 import ru.jengine.beancontainer.intstructure.pac7.J;
 import ru.jengine.beancontainer.intstructure.pac7.StartModuleWithExistingBeans;
+import ru.jengine.beancontainer.intstructure.pac8.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 
 public class CreatingBeansTest {
     @Test
@@ -88,5 +96,30 @@ public class CreatingBeansTest {
 
         Assert.assertSame(externalH, actualJ.getH());
         Assert.assertSame(externalI, actualJ.getI());
+    }
+
+    @Test
+    public void testImplementationOfInterface() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithImplementations.class).build());
+        container.initializeContainerByDefault();
+
+        K actualK = container.getBean(K.class);
+        L actualL = container.getBean(L.class);
+        M actualM = container.getBean(M.class);
+        N actualN = container.getBean(N.class);
+
+        List<Int> actualImplementations = container.getBean(Int.class, List.class);
+
+        Assert.assertEquals(4, actualImplementations.size());
+
+        MatcherAssert.assertThat(actualImplementations, hasItem(actualK));
+        MatcherAssert.assertThat(actualImplementations, hasItem(actualL));
+        MatcherAssert.assertThat(actualImplementations, hasItem(actualN));
+        MatcherAssert.assertThat(actualImplementations, not(hasItem(actualM)));
+
+        List<Class<?>> actualClasses = actualImplementations.stream()
+                .map(Object::getClass)
+                .collect(Collectors.toList());
+        MatcherAssert.assertThat(actualClasses, hasItem(M.class));
     }
 }

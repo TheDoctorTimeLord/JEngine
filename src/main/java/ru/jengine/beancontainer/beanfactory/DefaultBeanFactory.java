@@ -87,7 +87,7 @@ public class DefaultBeanFactory implements BeanFactory {
     protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
         properties.annotated(parameter.getParameterAnnotations());
         Object extractedBean = getBeanExtractor().getBean(properties);
-        return extractedBean == BeanExtractor.NOT_RESOLVED ? null : extractedBean;
+        return BeanExtractor.isResolved(extractedBean) ? extractedBean : null;
     }
 
     private static Class<?> getCollectionGenericType(Type type) {

@@ -9,11 +9,12 @@ import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.BeanProcessor;
 import ru.jengine.utils.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ScopableContainerContext implements ContainerContext {
     private final BeanResolver beanResolver;
-    private final List<BeanCreationScope> scopes;
+    private final BeanCreationScope[] scopes;
     private final ClassAliasManager classAliasManager = new ClassAliasManager();
 
     public ScopableContainerContext(BeanFactory beanFactory, BeanResolver beanResolver,
@@ -26,9 +27,9 @@ public class ScopableContainerContext implements ContainerContext {
                 .entrySet()
                 .stream()
                 .map(e -> scopeResolver.resolve(e.getKey(), e.getValue(), beanFactory, this, beanProcessors, preRemoveProcessors))
-                .toList();
+                .toArray(BeanCreationScope[]::new);
 
-        this.scopes.stream()
+        Arrays.stream(this.scopes)
                 .flatMap(scope -> scope.getBeanClasses().stream())
                 .forEach(classAliasManager::registerAliases);
     }
@@ -56,7 +57,7 @@ public class ScopableContainerContext implements ContainerContext {
 
     @Override
     public Object getBean(ResolvingProperties properties) {
-        ResolvingPropertyDefinition[] aliased = classAliasManager.getForAlias(properties);
+        ResolvingProperties[] aliased = classAliasManager.getForAlias(properties);
         if (aliased != null && aliased.length != 0) {
             //TODO добавить механизм адекватного резолва с учётом дополнительных средств
             Class<?> collectionClass = properties.getCollectionClass();

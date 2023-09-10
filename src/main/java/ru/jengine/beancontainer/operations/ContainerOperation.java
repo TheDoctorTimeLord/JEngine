@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer.operations;
 
 import ru.jengine.beancontainer.ContainerState;
-import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.exceptions.ContainerOperationException;
 
 import java.util.function.BiFunction;
 
@@ -25,11 +25,9 @@ public abstract class ContainerOperation {
     {
         Object result = extractResultOperation.apply(operationResult, resultKey);
         if (!expectedResultType.isInstance(result)) {
-            throw new ContainerException(
+            throw new ContainerOperationException(
                     "Operation [%s] expected the prepared result with code [%s] and type [%s]"
-                            .formatted(getClass(), resultKey, expectedResultType),
-                    CHECK_EXCEPTION_CODE
-            );
+                            .formatted(getClass(), resultKey, expectedResultType));
         }
         return result;
     }

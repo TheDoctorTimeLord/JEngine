@@ -12,7 +12,7 @@ import static ru.jengine.beancontainer.containercontext.BeanExtractor.NOT_RESOLV
 public class BeanResolver {
     //TODO Получать процессоры разрешения бинов (такие как Primal или бины, которые перезатирают другие)
 
-    public Object resolveBeansAsCollection(Collection<? extends BeanExtractor> extractors,
+    public Object resolveBeansAsCollection(BeanExtractor[] extractors,
             ResolvingProperties[] properties, Class<?> collectionClass)
     {
         if (!ReflectionContainerUtils.isAvailableCollection(collectionClass)) {
@@ -24,7 +24,7 @@ public class BeanResolver {
         return ReflectionContainerUtils.convertToCollection(resolvedBeans, collectionClass);
     }
 
-    public Object resolveBeansMayBeCollection(Collection<? extends BeanExtractor> extractors,
+    public Object resolveBeansMayBeCollection(BeanExtractor[] extractors,
             ResolvingProperties properties)
     {
         Class<?> collectionClass = properties.getCollectionClass();
@@ -42,20 +42,18 @@ public class BeanResolver {
         return resolvedBeans.isEmpty() ? NOT_RESOLVED : resolvedBeans.get(0);
     }
 
-    public List<Object> resolveBeans(Collection<? extends BeanExtractor> extractors,
+    private List<Object> resolveBeans(BeanExtractor[] extractors,
             ResolvingProperties... propertiesForResolve) {
         Class<?> currentResolvedBeanClass = null;
         try {
             List<Object> resolvedBeans = new ArrayList<>();
 
-            for (BeanExtractor beanContextSource : extractors) {
-                for (ResolvingProperties properties : propertiesForResolve) {
+            for (ResolvingProperties properties : propertiesForResolve) {
+                for (BeanExtractor beanExtractor : extractors) {
                     currentResolvedBeanClass = properties.getRequestedClass();
-                    Object resolvedBean = beanContextSource.getBean(properties);
-                    if (resolvedBean != NOT_RESOLVED) {
-                        if (resolvedBean instanceof Collection<?> collection
-                                && !properties.getRequestedClass().isAssignableFrom(collection.getClass()))
-                        {
+                    Object resolvedBean = beanExtractor.getBean(properties);
+                    if (BeanExtractor.isResolved(resolvedBean)) {
+                        if (resolvedBean instanceof Collection<?> collection) {
                             resolvedBeans.addAll(collection);
                         } else {
                             resolvedBeans.add(resolvedBean);

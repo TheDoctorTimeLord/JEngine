@@ -39,18 +39,23 @@ public class JEngineContainer {
     }
 
     @SuppressWarnings("unchecked")
-    public <R> R getBean(Class<?> beanClass) {
-        ResolvingProperties properties = ResolvingProperties
-                .properties(beanClass)
-                .collectionClass(Collection.class.isAssignableFrom(beanClass) ? beanClass : null);
+    public <T, R extends T> R getBean(Class<T> beanClass) {
+        ResolvingProperties properties = ResolvingProperties.properties(beanClass);
 
         Object searchResult = operationState.getContainerContextFacade().getBean(properties);
 
-        return searchResult != BeanExtractor.NOT_RESOLVED ? (R) searchResult : null;
+        return BeanExtractor.isResolved(searchResult) ? (R) searchResult : null;
     }
 
-    public <R> R getBean(String beanName) {
-        return null; //TODO реализовать получение по имени
+    @SuppressWarnings("unchecked")
+    public <R, C extends Collection<?>> R getBean(Class<?> beanClass, Class<C> collectionClass) {
+        ResolvingProperties properties = ResolvingProperties
+                .properties(beanClass)
+                .collectionClass(collectionClass);
+
+        Object searchResult = operationState.getContainerContextFacade().getBean(properties);
+
+        return BeanExtractor.isResolved(searchResult) ? (R) searchResult : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -59,10 +64,6 @@ public class JEngineContainer {
                 .properties(beanClass)
                 .beanContextSource(contextName)
         );
-    }
-
-    public <R> R getBean(String contextName, String beanName) {
-        return null; //TODO реализовать получение из контекста по имени
     }
 
     public <B> B autowire(B bean) {

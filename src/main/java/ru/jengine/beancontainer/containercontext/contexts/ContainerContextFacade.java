@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class ContainerContextFacade implements BeanExtractor, Stoppable {
-    private volatile List<BeanExtractor> infrastructureBeanExtractor;
+    private volatile BeanExtractor[] infrastructureBeanExtractor;
     private final BeanResolver beanResolver = new BeanResolver(); //TODO подумать над инициализацией
     private final Map<String, ContainerContext> containedContexts = new HashMap<>();
 
@@ -50,24 +50,24 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
         );
     }
 
-    private Collection<? extends BeanExtractor> getBeanSources(String[] beanContextSources) {
+    private BeanExtractor[] getBeanSources(String[] beanContextSources) {
         if (beanContextSources == null) {
-            return containedContexts.values();
+            return containedContexts.values().toArray(BeanExtractor[]::new);
         }
 
         if (beanContextSources.length == 1 && Constants.Contexts.INFRASTRUCTURE_CONTEXT.equals(beanContextSources[0])) {
             return getInfrastructureBeanExtractor();
         }
 
-        List<ContainerContext> beanSources = new ArrayList<>(beanContextSources.length);
-        for (String beanContextSource : beanContextSources) {
-            ContainerContext containerContext = containedContexts.get(beanContextSource);
-            if (containerContext == null) {
-                throw new ContainerException("Context [%s] is not found".formatted(beanContextSource));
-            }
-            beanSources.add(containerContext);
-        }
-        return beanSources;
+        return Arrays.stream(beanContextSources)
+                .map(beanContextSource -> {
+                    ContainerContext containerContext = containedContexts.get(beanContextSource);
+                    if (containerContext == null) {
+                        throw new ContainerException("Context [%s] is not found".formatted(beanContextSource));
+                    }
+                    return containerContext;
+                })
+                .toArray(BeanExtractor[]::new);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
         }
     }
 
-    private List<BeanExtractor> getInfrastructureBeanExtractor() {
+    private BeanExtractor[] getInfrastructureBeanExtractor() {
         if (infrastructureBeanExtractor == null) {
             synchronized (this) {
                 if (infrastructureBeanExtractor == null) {
@@ -90,7 +90,7 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
                         throw new ContainerException("Context [%s] is not found".formatted(Constants.Contexts.INFRASTRUCTURE_CONTEXT));
                     }
 
-                    infrastructureBeanExtractor = List.of(context);
+                    infrastructureBeanExtractor = new BeanExtractor[] {context};
                 }
             }
         }

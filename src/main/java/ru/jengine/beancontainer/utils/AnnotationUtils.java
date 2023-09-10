@@ -1,6 +1,8 @@
 package ru.jengine.beancontainer.utils;
 
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 
 import java.lang.annotation.Annotation;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnnotationUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationUtils.class);
     public static final List<Class<? extends Annotation>> systemAnnotations = ImmutableList.of(Target.class,
             Retention.class, Override.class, Documented.class);
 
@@ -68,7 +71,8 @@ public class AnnotationUtils {
             return resolveNotSystemAnnotation(Class.forName(annotationName));
         }
         catch (ClassNotFoundException e) {
-            return new ArrayList<>(); //TODO логировать отсутствие аннотации
+            LOG.error("Annotation [%s] is not found".formatted(annotationName), e);
+            return new ArrayList<>();
         }
     }
 

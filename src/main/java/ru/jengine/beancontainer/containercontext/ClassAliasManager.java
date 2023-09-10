@@ -20,7 +20,7 @@ public class ClassAliasManager {
     }
 
     @Nullable
-    public ResolvingPropertyDefinition[] getForAlias(ResolvingProperties properties) {
+    public ResolvingProperties[] getForAlias(ResolvingProperties properties) {
         Collection<Class<?>> aliased = aliases.get(properties.getRequestedClass());
         if (aliased == null) {
             return null;
@@ -28,10 +28,10 @@ public class ClassAliasManager {
 
         return aliased.stream()
                 .map(cls -> wrapClassProperties(cls, properties))
-                .toArray(ResolvingPropertyDefinition[]::new);
+                .toArray(ResolvingProperties[]::new);
     }
 
-    private static ResolvingPropertyDefinition wrapClassProperties(Class<?> implementation, ResolvingProperties properties) {
+    private static ResolvingProperties wrapClassProperties(Class<?> implementation, ResolvingProperties properties) {
         return ResolvingProperties.properties(implementation).fill(properties);
     }
 }

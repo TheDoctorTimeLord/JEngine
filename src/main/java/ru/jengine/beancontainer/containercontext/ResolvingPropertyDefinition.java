@@ -14,21 +14,25 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
         this.requestedClass = requestedClass;
     }
 
+    @Override
     public Class<?> getRequestedClass() {
         return requestedClass;
     }
 
     @Nullable
+    @Override
     public Class<?> getCollectionClass() {
         return collectionClass;
     }
 
     @Nullable
+    @Override
     public Annotation[] getAnnotations() {
         return annotations;
     }
 
     @Nullable
+    @Override
     public String[] getBeanContextSources() {
         return beanContextSource;
     }
