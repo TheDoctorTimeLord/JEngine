@@ -1,18 +1,12 @@
 package ru.jengine.utils.hierarchywalker;
 
+import ru.jengine.utils.hierarchywalker.WalkingException.Qualification;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Consumer;
-
-import ru.jengine.utils.hierarchywalker.WalkingException.Qualification;
 
 public class WalkerIterator implements Iterator<HierarchyElement> {
     private final Deque<WalkingContext> walkingStack = new ArrayDeque<>();
@@ -169,7 +163,7 @@ public class WalkerIterator implements Iterator<HierarchyElement> {
         Type[] actualTypes = parameterized.getActualTypeArguments();
         Type[] typeParameters = parameterizedClass.getTypeParameters();
 
-        if (withGenericMapping) {
+        if (!withGenericMapping) {
             return new WalkingContext(parameterizedClass, Map.of());
         }
 
