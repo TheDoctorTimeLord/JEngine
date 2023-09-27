@@ -1,13 +1,12 @@
 package ru.jengine.beancontainer.containercontext.scopes;
 
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
-import ru.jengine.beancontainer.containercontext.BeanExtractor;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.extentions.BeanProcessor;
 
 import java.util.ArrayList;
@@ -55,23 +54,17 @@ public class PrototypeBeanScope extends AbstractBeanScope {
         return new ArrayList<>(beanDefinitions.keySet());
     }
 
-    @Nullable
     @Override
-    public Object getBean(ResolvingProperties properties) {
+    public ResolvedBeanData getBean(ResolvingProperties properties) {
         BeanDefinition definition = beanDefinitions.get(properties.getRequestedClass());
         if (definition == null) {
-            return BeanExtractor.NOT_RESOLVED;
+            return ResolvedBeanData.NOT_RESOLVED;
         }
 
-        Class<?> beanClass = definition.getBeanClass();
-        Object createdBean = createBean(definition, LOG);
+        ResolvedBeanData createdBean = constructBean(beanProcessors, definition, parent, LOG);
 
         for (BeanProcessor beanProcessor : beanProcessors) {
-            createdBean = runConstruct(beanProcessor, createdBean, beanClass, parent, LOG);
-        }
-
-        for (BeanProcessor beanProcessor : beanProcessors) {
-            runPostConstruct(beanProcessor, createdBean, beanClass, parent, LOG);
+            runPostConstruct(beanProcessor, createdBean, parent, LOG);
         }
 
         return createdBean;

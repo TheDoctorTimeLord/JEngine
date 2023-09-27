@@ -1,5 +1,6 @@
 package ru.jengine.beancontainer.containercontext;
 
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.utils.HierarchyWalkingUtils;
 
 import javax.annotation.Nullable;

@@ -2,6 +2,7 @@ package ru.jengine.beancontainer.intstructure.pac5;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
+import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.extentions.BeanProcessor;
 
@@ -13,18 +14,18 @@ public class DBeanProcessor implements BeanProcessor {
     public void preConstructProcess(BeanDefinition beanDefinition, ContainerContext context) { }
 
     @Override
-    public Object constructProcess(Object bean, Class<?> beanClass, ContainerContext context) {
-        if (D.class.equals(beanClass)) {
-            setTestedField(bean, beanClass, "test1");
+    public Object constructProcess(BeanData bean, ContainerContext context) {
+        if (D.class.equals(bean.getBeanBaseClass())) {
+            setTestedField(bean.getBeanValue(), bean.getBeanBaseClass(), "test1");
         }
 
         return bean;
     }
 
     @Override
-    public void postConstructProcess(Object bean, Class<?> beanClass, ContainerContext context) {
-        if (D.class.equals(beanClass)) {
-            setTestedField(bean, beanClass, "test2");
+    public void postConstructProcess(BeanData bean, ContainerContext context) {
+        if (D.class.equals(bean.getBeanBaseClass())) {
+            setTestedField(bean.getBeanValue(), bean.getBeanBaseClass(), "test2");
         }
     }
 

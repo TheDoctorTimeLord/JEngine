@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer.beanfactory;
 
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
-import ru.jengine.beancontainer.containercontext.ResolvingPropertyDefinition;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
 
 public class BeanFactoryWithSources extends DefaultBeanFactory {
     private final String[] sources;
@@ -12,8 +12,7 @@ public class BeanFactoryWithSources extends DefaultBeanFactory {
     }
 
     @Override
-    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
+    protected void customizeProperties(MethodParameter parameter, ResolvingPropertyDefinition properties) {
         properties.beanContextSource(sources);
-        return super.resolve(parameter, properties);
     }
 }

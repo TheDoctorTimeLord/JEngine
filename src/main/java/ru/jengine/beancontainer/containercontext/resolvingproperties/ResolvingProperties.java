@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.containercontext;
+package ru.jengine.beancontainer.containercontext.resolvingproperties;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;

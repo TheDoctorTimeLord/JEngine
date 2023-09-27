@@ -4,10 +4,13 @@ import org.slf4j.Logger;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.BeanCreationScope;
+import ru.jengine.beancontainer.containercontext.BeanData;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.BeanProcessor;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class AbstractBeanScope implements BeanCreationScope {
@@ -29,41 +32,50 @@ public abstract class AbstractBeanScope implements BeanCreationScope {
         }
     }
 
-    protected Object runConstruct(BeanProcessor beanProcessor, Object createdBean, Class<?> beanClass,
+    protected ResolvedBeanData constructBean(List<BeanProcessor> beanProcessors, BeanDefinition beanDefinition,
             ContainerContext parent, Logger logger)
     {
+        Object beanValue = createBean(beanDefinition, logger);
+        ResolvedBeanData createdBean = new ResolvedBeanData(beanValue, beanDefinition.getBeanClass());
+
+        for (BeanProcessor beanProcessor : beanProcessors) {
+            try {
+                beanProcessor.constructProcess(createdBean, parent);
+            } catch (Exception e) {
+                logger.error("Exception during construct processing [%s] by [%s]"
+                        .formatted(beanDefinition.getBeanClass(), beanProcessor), e);
+                throw e;
+            }
+        }
+
+        return createdBean;
+    }
+
+    protected void runPostConstruct(BeanProcessor beanProcessor, BeanData createdBean, ContainerContext parent,
+            Logger logger)
+    {
         try {
-            return beanProcessor.constructProcess(createdBean, beanClass, parent);
+            beanProcessor.postConstructProcess(createdBean, parent);
         }
         catch (Exception e) {
-            logger.error("Exception during construct processing [%s] by [%s]".formatted(beanClass, beanProcessor), e);
+            logger.error("Exception during postprocessing [%s] by [%s]"
+                    .formatted(createdBean.getBeanBaseClass(), beanProcessor), e);
             throw e;
         }
     }
 
-    protected void runPostConstruct(BeanProcessor beanProcessor, Object createdBean, Class<?> beanClass,
+    protected void runPreRemove(BeanPreRemoveProcessor preRemoveProcessor, BeanData createdBean,
             ContainerContext parent, Logger logger)
     {
         try {
-            beanProcessor.postConstructProcess(createdBean, beanClass, parent);
-        }
-        catch (Exception e) {
-            logger.error("Exception during postprocessing [%s] by [%s]".formatted(beanClass, beanProcessor), e);
-            throw e;
-        }
-    }
-
-    protected void runPreRemove(BeanPreRemoveProcessor preRemoveProcessor, Object createdBean, Class<?> beanClass,
-            ContainerContext parent, Logger logger)
-    {
-        try {
-            preRemoveProcessor.preRemoveProcess(createdBean, beanClass, parent);
+            preRemoveProcessor.preRemoveProcess(createdBean, parent);
         } catch (Exception e) {
-            logger.error("Exception during pre remove [%s] by [%s]".formatted(beanClass, preRemoveProcessor), e);
+            logger.error("Exception during pre remove [%s] by [%s]"
+                    .formatted(createdBean.getBeanBaseClass(), preRemoveProcessor), e);
         }
     }
 
-    protected Object createBean(BeanDefinition definition, Logger logger) {
+    private Object createBean(BeanDefinition definition, Logger logger) {
         Supplier<Object> beanProducer = definition.getBeanProducer();
         try {
             return beanProducer == null

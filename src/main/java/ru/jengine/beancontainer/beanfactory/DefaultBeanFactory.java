@@ -1,9 +1,10 @@
 package ru.jengine.beancontainer.beanfactory;
 
 import ru.jengine.beancontainer.annotations.Inject;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
-import ru.jengine.beancontainer.containercontext.ResolvingPropertyDefinition;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
@@ -81,14 +82,13 @@ public class DefaultBeanFactory implements BeanFactory {
             properties = ResolvingProperties.properties(resultType);
         }
 
-        return resolve(parameter, properties);
+        properties.annotated(parameter.getParameterAnnotations());
+        customizeProperties(parameter, properties);
+        ResolvedBeanData extractedBean = getBeanExtractor().getBean(properties);
+        return extractedBean.isResolved() ? extractedBean.getBeanValue() : null;
     }
 
-    protected Object resolve(MethodParameter parameter, ResolvingPropertyDefinition properties) {
-        properties.annotated(parameter.getParameterAnnotations());
-        Object extractedBean = getBeanExtractor().getBean(properties);
-        return BeanExtractor.isResolved(extractedBean) ? extractedBean : null;
-    }
+    protected void customizeProperties(MethodParameter parameter, ResolvingPropertyDefinition properties) { }
 
     private static Class<?> getCollectionGenericType(Type type) {
         if (type instanceof ParameterizedType parameterizedType) {

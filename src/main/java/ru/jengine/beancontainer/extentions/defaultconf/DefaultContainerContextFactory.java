@@ -6,7 +6,7 @@ import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.BeanResolver;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade;
 import ru.jengine.beancontainer.containercontext.contexts.ScopableContainerContext;
 import ru.jengine.beancontainer.contextmetainfo.ContextMetainfo;
@@ -50,7 +50,8 @@ public class DefaultContainerContextFactory implements ContainerContextFactory {
                 .getBean(ResolvingProperties
                         .properties(handlersClass)
                         .beanContextSource(Constants.Contexts.INFRASTRUCTURE_CONTEXT)
-                        .collectionClass(List.class));
+                        .collectionClass(List.class))
+                .getBeanValue();
     }
 
     private BeanResolver getBeanResolver(String builtContextName) {

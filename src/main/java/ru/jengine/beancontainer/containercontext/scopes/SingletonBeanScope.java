@@ -1,13 +1,12 @@
 package ru.jengine.beancontainer.containercontext.scopes;
 
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
-import ru.jengine.beancontainer.containercontext.BeanExtractor;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.BeanProcessor;
@@ -73,9 +72,13 @@ public class SingletonBeanScope extends AbstractBeanScope {
         for (BeanProcessor beanProcessor : beanProcessors) {
             for (Map.Entry<Class<?>, Object> entry : beans.entrySet()) {
                 Object createdBean = entry.getValue();
-                if (!(createdBean instanceof BeanDefinition)) {
-                    runPostConstruct(beanProcessor, createdBean, entry.getKey(), parent, LOG);
+                if (createdBean instanceof BeanDefinition) {
+                    throw new ContainerException("Scope has not created beans! Bean definition: " + createdBean);
                 }
+                if (!(createdBean instanceof ResolvedBeanData resolvedBeanData)) {
+                    throw new ContainerException("Scope has beans in incorrect format: " + createdBean);
+                }
+                runPostConstruct(beanProcessor, resolvedBeanData, parent, LOG);
             }
         }
     }
@@ -85,8 +88,8 @@ public class SingletonBeanScope extends AbstractBeanScope {
         for (BeanPreRemoveProcessor preRemoveProcessor : preRemoveProcessors) {
             for (Map.Entry<Class<?>, Object> entry : beans.entrySet()) {
                 Object createdBean = entry.getValue();
-                if (!(createdBean instanceof BeanDefinition)) {
-                    runPreRemove(preRemoveProcessor, createdBean, entry.getKey(), parent, LOG);
+                if (createdBean instanceof ResolvedBeanData resolvedBeanData) {
+                    runPreRemove(preRemoveProcessor, resolvedBeanData, parent, LOG);
                 }
             }
         }
@@ -97,31 +100,25 @@ public class SingletonBeanScope extends AbstractBeanScope {
         return new ArrayList<>(beans.keySet());
     }
 
-    @Nullable
     @Override
-    public Object getBean(ResolvingProperties properties) {
+    public ResolvedBeanData getBean(ResolvingProperties properties) {
         Class<?> requestedClass = properties.getRequestedClass();
 
-        Object createdBean = beans.getOrDefault(requestedClass, BeanExtractor.NOT_RESOLVED);
+        Object createdBean = beans.getOrDefault(requestedClass, ResolvedBeanData.NOT_RESOLVED);
         if (createdBean instanceof BeanDefinition) {
             createdBean = safeCreateBean(requestedClass);
         }
-
-        return createdBean;
+        if (createdBean instanceof ResolvedBeanData resolvedBeanData) {
+            return resolvedBeanData;
+        }
+        throw new ContainerException("Bean has unavailable type: " + createdBean.getClass());
     }
 
-    private Object safeCreateBean(Class<?> beanClass) {
-        return beans.compute(beanClass,
+    private ResolvedBeanData safeCreateBean(Class<?> beanClass) {
+        return (ResolvedBeanData) beans.compute(beanClass,
                 (k, v) -> v instanceof BeanDefinition definition
-                        ? constructProcessing(createBean(definition, LOG), k)
+                        ? constructBean(beanProcessors, definition, parent, LOG)
                         : v
         );
-    }
-
-    private Object constructProcessing(Object createdBean, Class<?> beanClass) {
-        for (BeanProcessor beanProcessor : beanProcessors) {
-            createdBean = runConstruct(beanProcessor, createdBean, beanClass, parent, LOG);
-        }
-        return createdBean;
     }
 }

@@ -1,8 +1,8 @@
 package ru.jengine.beancontainer;
 
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
-import ru.jengine.beancontainer.containercontext.BeanExtractor;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade;
 import ru.jengine.beancontainer.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer.operations.ContainerOperation;
@@ -42,9 +42,9 @@ public class JEngineContainer {
     public <T, R extends T> R getBean(Class<T> beanClass) {
         ResolvingProperties properties = ResolvingProperties.properties(beanClass);
 
-        Object searchResult = operationState.getContainerContextFacade().getBean(properties);
+        ResolvedBeanData searchResult = operationState.getContainerContextFacade().getBean(properties);
 
-        return BeanExtractor.isResolved(searchResult) ? (R) searchResult : null;
+        return searchResult.isResolved() ? (R) searchResult.getBeanValue() : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -53,9 +53,9 @@ public class JEngineContainer {
                 .properties(beanClass)
                 .collectionClass(collectionClass);
 
-        Object searchResult = operationState.getContainerContextFacade().getBean(properties);
+        ResolvedBeanData searchResult = operationState.getContainerContextFacade().getBean(properties);
 
-        return BeanExtractor.isResolved(searchResult) ? (R) searchResult : null;
+        return searchResult.isResolved() ? (R) searchResult.getBeanValue() : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public class JEngineContainer {
         return (R) operationState.getContainerContextFacade().getBean(ResolvingProperties
                 .properties(beanClass)
                 .beanContextSource(contextName)
-        );
+        ).getBeanValue();
     }
 
     public <B> B autowire(B bean) {

@@ -44,6 +44,16 @@ public class ReflectionContainerUtils {
         return AVAILABLE_COLLECTIONS.stream().anyMatch(cls -> cls.isAssignableFrom(checkedClass));
     }
 
+    public static Collection<Object> createCollection(Class<?> collectionClass) {
+        if (List.class.isAssignableFrom(collectionClass) || Collection.class.isAssignableFrom(collectionClass)) {
+            return new ArrayList<>();
+        } else if (Set.class.isAssignableFrom(collectionClass)) {
+            return new HashSet<>();
+        } else {
+            throw new ContainerException("Collection with bean must be List, Set or another Collection but was [" + collectionClass + "]");
+        }
+    }
+
     /**
      * Конвертирует объект в {@link List список} или {@link Set множество}. Если объект - null, то возвращает пустую
      * коллекцию. Если объект был коллекцией, то преобразовывает все его элементы в новую коллекцию
@@ -67,7 +77,7 @@ public class ReflectionContainerUtils {
         } else if (Set.class.isAssignableFrom(collectionClass)) {
             return new HashSet<>(beanInst);
         } else {
-            throw new ru.jengine.beancontainer.exceptions.ContainerException("Collection with bean must be List or Set but was [" + collectionClass + "]");
+            throw new ContainerException("Collection with bean must be List or Set but was [" + collectionClass + "]");
         }
     }
 }

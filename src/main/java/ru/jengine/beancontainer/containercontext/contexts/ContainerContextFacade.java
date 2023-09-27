@@ -1,14 +1,15 @@
 package ru.jengine.beancontainer.containercontext.contexts;
 
 import ru.jengine.beancontainer.Constants;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
 import ru.jengine.beancontainer.containercontext.BeanResolver;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.containercontext.ResolvingProperties;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 import ru.jengine.utils.serviceclasses.Stoppable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class ContainerContextFacade implements BeanExtractor, Stoppable {
@@ -29,25 +30,47 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
     }
 
     public void constructBeans(List<String> contextNames) {
-        for (String contextName : contextNames) {
-            ContainerContext context = containedContexts.get(contextName);
+        ContainerContext[] contexts = contextNames.stream()
+                .map(containedContexts::get)
+                .toArray(ContainerContext[]::new);
+
+        for (ContainerContext context : contexts) {
             context.constructBeans();
         }
 
         //Отдельный цикл для разделения друг от друга фаз construct и postConstruct
-        for (String contextName : contextNames) {
-            ContainerContext context = containedContexts.get(contextName);
+        for (ContainerContext context : contexts) {
             context.postConstructBeans();
         }
     }
 
     @Override
-    @Nullable
-    public Object getBean(ResolvingProperties properties) {
-        return beanResolver.resolveBeansMayBeCollection(
+    public ResolvedBeanData getBean(ResolvingProperties properties) {
+        List<ResolvedBeanData> beans = beanResolver.resolveBeans(
                 getBeanSources(properties.getBeanContextSources()),
                 properties
         );
+
+        Class<?> collectionClass = properties.getCollectionClass();
+        if (collectionClass != null) {
+            Collection<Object> beansCollection = beans.stream()
+                    .map(ResolvedBeanData::getBeanValue)
+                    .collect(
+                            () -> ReflectionContainerUtils.createCollection(collectionClass),
+                            Collection::add,
+                            Collection::addAll
+                    );
+            return new ResolvedBeanData(beansCollection, collectionClass, false);
+        }
+
+        if (beans.isEmpty()) {
+            return ResolvedBeanData.NOT_RESOLVED;
+        }
+        if (beans.size() > 1) {
+            throw new ContainerException("Too many candidates for [%s]. Candidates: %s"
+                    .formatted(properties.getRequestedClass(), beans));
+        }
+        return beans.get(0);
     }
 
     private BeanExtractor[] getBeanSources(String[] beanContextSources) {
