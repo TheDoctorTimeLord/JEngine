@@ -3,6 +3,7 @@ package ru.jengine.beancontainer;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
+import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.intstructure.pac4.A;
 import ru.jengine.beancontainer.intstructure.pac4.B;
@@ -19,6 +20,8 @@ import ru.jengine.beancontainer.intstructure.pac7.I;
 import ru.jengine.beancontainer.intstructure.pac7.J;
 import ru.jengine.beancontainer.intstructure.pac7.StartModuleWithExistingBeans;
 import ru.jengine.beancontainer.intstructure.pac8.*;
+import ru.jengine.beancontainer.intstructure.pac9.*;
+import ru.jengine.beancontainer.modules.AnnotationModule;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,7 +84,7 @@ public class CreatingBeansTest {
                 .addBeans(externalH)
                 .addBeans(Constants.Contexts.DEFAULT_CONTEXT, externalI)
                 .build());
-        container.initializeContainerByDefault(); //TODO реализовать систему перезатираний BeanDefinition или выбора кандидатов
+        container.initializeContainerByDefault();
 
         H actualH = container.getBean(H.class);
         I actualI = container.getBean(Constants.Contexts.DEFAULT_CONTEXT, I.class);
@@ -122,4 +125,42 @@ public class CreatingBeansTest {
                 .collect(Collectors.toList());
         MatcherAssert.assertThat(actualClasses, hasItem(M.class));
     }
+
+    @Test
+    public void testNoImplementationsOfInterface() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(EmptyModule.class).build());
+        container.initializeContainerByDefault();
+
+        List<Int> actualImplementations = container.getBean(Int.class, List.class);
+
+        Assert.assertNotNull(actualImplementations);
+        Assert.assertEquals(0, actualImplementations.size());
+    }
+
+    @Test
+    public void testOrderingElementsInList() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithOrdering.class).build());
+        container.initializeContainerByDefault();
+
+        List<Ordered> actualImplementations = container.getBean(Ordered.class, List.class);
+
+        Assert.assertEquals(3, actualImplementations.size());
+        Assert.assertSame(Q.class, actualImplementations.get(0).getClass());
+        Assert.assertSame(P.class, actualImplementations.get(1).getClass());
+        Assert.assertSame(O.class, actualImplementations.get(2).getClass());
+    }
+
+    @Test
+    public void testGetCandidateWithMinimalOrder() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithOrdering.class).build());
+        container.initializeContainerByDefault();
+
+        Ordered actual = container.getBean(Ordered.class);
+
+        Assert.assertNotNull(actual);
+        Assert.assertSame(Q.class, actual.getClass());
+    }
+
+    @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)
+    private static class EmptyModule extends AnnotationModule { }
 }

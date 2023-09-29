@@ -13,6 +13,7 @@ public class ReflectionContainerUtils {
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
         try {
             Constructor<?> defaultConstructor = cls.getDeclaredConstructor();
+            defaultConstructor.setAccessible(true);
             return defaultConstructor.newInstance();
         } catch (NoSuchMethodException e) {
             throw new ContainerException("[" + cls + "] has not constructor without parameters", e);

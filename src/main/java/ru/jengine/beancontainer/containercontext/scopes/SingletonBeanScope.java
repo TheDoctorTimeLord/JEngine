@@ -8,8 +8,8 @@ import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;

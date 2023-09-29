@@ -9,8 +9,8 @@ import ru.jengine.beancontainer.containercontext.scopes.PrototypeBeanScope;
 import ru.jengine.beancontainer.containercontext.scopes.SingletonBeanScope;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.BeanCreationScopeResolver;
-import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.util.List;
 

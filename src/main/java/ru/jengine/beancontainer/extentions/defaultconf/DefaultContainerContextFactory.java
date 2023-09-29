@@ -11,8 +11,8 @@ import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade
 import ru.jengine.beancontainer.containercontext.contexts.ScopableContainerContext;
 import ru.jengine.beancontainer.contextmetainfo.ContextMetainfo;
 import ru.jengine.beancontainer.extentions.BeanCreationScopeResolver;
-import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 import ru.jengine.beancontainer.extentions.ContainerContextFactory;
 
 import java.util.List;

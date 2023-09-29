@@ -1,4 +1,4 @@
-package ru.jengine.beancontainer.extentions;
+package ru.jengine.beancontainer.extentions.infrastrucure;
 
 import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;

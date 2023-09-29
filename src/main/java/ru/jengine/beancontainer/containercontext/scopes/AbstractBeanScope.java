@@ -7,8 +7,8 @@ import ru.jengine.beancontainer.containercontext.BeanCreationScope;
 import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.extentions.BeanPreRemoveProcessor;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.util.List;
 import java.util.function.Supplier;

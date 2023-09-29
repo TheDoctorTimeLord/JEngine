@@ -4,7 +4,7 @@ import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.lang.reflect.Field;
 

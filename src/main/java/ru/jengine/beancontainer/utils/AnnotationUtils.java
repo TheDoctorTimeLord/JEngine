@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -76,6 +77,7 @@ public class AnnotationUtils {
         }
     }
 
+    @Nullable
     public static <T extends Annotation> T getAnnotationSafe(Class<?> owner, Class<T> annotation) {
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
         for (Annotation innerAnnotation : allAnnotations) {

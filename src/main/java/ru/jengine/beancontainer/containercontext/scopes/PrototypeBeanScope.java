@@ -7,7 +7,7 @@ import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
-import ru.jengine.beancontainer.extentions.BeanProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.util.ArrayList;
 import java.util.List;

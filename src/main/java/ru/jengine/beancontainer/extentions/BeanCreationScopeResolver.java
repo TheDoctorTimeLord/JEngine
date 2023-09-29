@@ -4,6 +4,8 @@ import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.BeanCreationScope;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
 import java.util.List;
 

@@ -1,12 +1,14 @@
 package ru.jengine.beancontainer.containercontext.contexts;
 
 import ru.jengine.beancontainer.Constants;
-import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
 import ru.jengine.beancontainer.containercontext.BeanResolver;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.infrastructuretools.BeanCandidatesService;
+import ru.jengine.beancontainer.infrastructuretools.StubBeanCandidatesService;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 import ru.jengine.utils.serviceclasses.Stoppable;
 
@@ -14,8 +16,13 @@ import java.util.*;
 
 public class ContainerContextFacade implements BeanExtractor, Stoppable {
     private volatile BeanExtractor[] infrastructureBeanExtractor;
-    private final BeanResolver beanResolver = new BeanResolver(); //TODO подумать над инициализацией
+    private final BeanResolver beanResolver = new BeanResolver();
     private final Map<String, ContainerContext> containedContexts = new HashMap<>();
+    private BeanCandidatesService candidatesService = new StubBeanCandidatesService();
+
+    public void setBeanCandidatesService(BeanCandidatesService beanCandidatesService) {
+        this.candidatesService = beanCandidatesService;
+    }
 
     public void registerContext(String contextName, ContainerContext context) {
         if (containedContexts.containsKey(contextName)) {
@@ -51,6 +58,8 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
                 properties
         );
 
+        beans = candidatesService.transformCandidates(beans);
+
         Class<?> collectionClass = properties.getCollectionClass();
         if (collectionClass != null) {
             Collection<Object> beansCollection = beans.stream()
@@ -66,11 +75,13 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
         if (beans.isEmpty()) {
             return ResolvedBeanData.NOT_RESOLVED;
         }
-        if (beans.size() > 1) {
+
+        ResolvedBeanData candidate = candidatesService.reduceCandidates(beans);
+        if (!candidate.isResolved()) {
             throw new ContainerException("Too many candidates for [%s]. Candidates: %s"
                     .formatted(properties.getRequestedClass(), beans));
         }
-        return beans.get(0);
+        return candidate;
     }
 
     private BeanExtractor[] getBeanSources(String[] beanContextSources) {

@@ -28,6 +28,7 @@ public class JEngineContainer {
                 new ModuleFinderOperation(),
                 new PreloadContextOperation(Constants.Contexts.INFRASTRUCTURE_CONTEXT),
                 new PreloadContextOperation(Constants.Contexts.EXTERNAL_BEANS_CONTEXT),
+                new PresetContextFacadeOperation(),
                 new ContainerMetainfoRegistrarOperation(),
                 new StartingInitializeContextOperation(),
                 new FinishingInitializeContextOperation()
