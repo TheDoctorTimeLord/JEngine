@@ -6,7 +6,6 @@ import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.BeanCreationScope;
 import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
-import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
@@ -14,17 +13,16 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class AbstractBeanScope implements BeanCreationScope {
-    private final BeanFactory beanFactory;
+    protected final BeanFactory beanFactory;
 
     protected AbstractBeanScope(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 
-    protected void runPreConstruct(BeanProcessor beanProcessor, BeanDefinition definition, ContainerContext parent,
-            Logger logger)
+    protected void runPreConstruct(BeanProcessor beanProcessor, BeanDefinition definition, Logger logger)
     {
         try {
-            beanProcessor.preConstructProcess(definition, parent);
+            beanProcessor.preConstructProcess(definition);
         }
         catch (Exception e) {
             logger.error("Exception during preprocessing [%s] by [%s]".formatted(definition.getBeanClass(), beanProcessor), e);
@@ -33,14 +31,14 @@ public abstract class AbstractBeanScope implements BeanCreationScope {
     }
 
     protected ResolvedBeanData constructBean(List<BeanProcessor> beanProcessors, BeanDefinition beanDefinition,
-            ContainerContext parent, Logger logger)
+            Logger logger)
     {
         Object beanValue = createBean(beanDefinition, logger);
         ResolvedBeanData createdBean = new ResolvedBeanData(beanValue, beanDefinition.getBeanClass());
 
         for (BeanProcessor beanProcessor : beanProcessors) {
             try {
-                beanProcessor.constructProcess(createdBean, parent);
+                beanProcessor.constructProcess(createdBean);
             } catch (Exception e) {
                 logger.error("Exception during construct processing [%s] by [%s]"
                         .formatted(beanDefinition.getBeanClass(), beanProcessor), e);
@@ -51,11 +49,10 @@ public abstract class AbstractBeanScope implements BeanCreationScope {
         return createdBean;
     }
 
-    protected void runPostConstruct(BeanProcessor beanProcessor, BeanData createdBean, ContainerContext parent,
-            Logger logger)
+    protected void runPostConstruct(BeanProcessor beanProcessor, BeanData createdBean, Logger logger)
     {
         try {
-            beanProcessor.postConstructProcess(createdBean, parent);
+            beanProcessor.postConstructProcess(createdBean, beanFactory);
         }
         catch (Exception e) {
             logger.error("Exception during postprocessing [%s] by [%s]"
@@ -64,11 +61,10 @@ public abstract class AbstractBeanScope implements BeanCreationScope {
         }
     }
 
-    protected void runPreRemove(BeanPreRemoveProcessor preRemoveProcessor, BeanData createdBean,
-            ContainerContext parent, Logger logger)
+    protected void runPreRemove(BeanPreRemoveProcessor preRemoveProcessor, BeanData createdBean, Logger logger)
     {
         try {
-            preRemoveProcessor.preRemoveProcess(createdBean, parent);
+            preRemoveProcessor.preRemoveProcess(createdBean);
         } catch (Exception e) {
             logger.error("Exception during pre remove [%s] by [%s]"
                     .formatted(createdBean.getBeanBaseClass(), preRemoveProcessor), e);

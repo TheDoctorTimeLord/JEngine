@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer.intstructure.pac_10.R;
+import ru.jengine.beancontainer.intstructure.pac_10.StartModuleWithPostConstructAndPreDestroy;
 import ru.jengine.beancontainer.intstructure.pac4.A;
 import ru.jengine.beancontainer.intstructure.pac4.B;
 import ru.jengine.beancontainer.intstructure.pac4.C;
@@ -159,6 +161,18 @@ public class CreatingBeansTest {
 
         Assert.assertNotNull(actual);
         Assert.assertSame(Q.class, actual.getClass());
+    }
+
+    @Test
+    public void testRunPostConstructAndPreDestroy() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithPostConstructAndPreDestroy.class).build());
+        container.initializeContainerByDefault();
+
+        R actual = container.getBean(R.class);
+
+        container.stop();
+
+        Assert.assertEquals(3, actual.getSpecialMethodsCalledCounter());
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

@@ -16,6 +16,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class DefaultBeanFactory implements BeanFactory {
+    //TODO сейчас при резолве зависимостей инфраструктурных бинов мы не ограничиваем сурсы инфраструктурным контекстом
     private final BeanExtractor beanExtractor;
 
     public DefaultBeanFactory(BeanExtractor beanExtractor) {
@@ -26,17 +27,11 @@ public class DefaultBeanFactory implements BeanFactory {
     public Object buildBean(Class<?> beanClass) {
         try {
             Constructor<?> availableConstructor = findAppropriateConstructor(beanClass);
-            Object[] args = findArgs(availableConstructor);
-            Object builtBean = ReflectionContainerUtils.createObject(availableConstructor, args);
-            return autowire(builtBean);
+            Object[] args = findArguments(availableConstructor);
+            return ReflectionContainerUtils.createObject(availableConstructor, args);
         } catch (Exception ex) {
             throw new ContainerException("Exception while creating bean [" + beanClass + "]", ex);
         }
-    }
-
-    @Override
-    public Object autowire(Object autowiredBean) {
-        return autowiredBean;
     }
 
     private static Constructor<?> findAppropriateConstructor(Class<?> cls) {
@@ -59,11 +54,12 @@ public class DefaultBeanFactory implements BeanFactory {
         throw new ContainerException("[%s] has no available constructor".formatted(cls));
     }
 
-    private Object[] findArgs(Executable parameterOwner) {
-        Object[] result = new Object[parameterOwner.getParameterTypes().length];
-        Annotation[][] parametersAnnotations = parameterOwner.getParameterAnnotations();
+    @Override
+    public Object[] findArguments(Executable parametersOwner) {
+        Object[] result = new Object[parametersOwner.getParameterTypes().length];
+        Annotation[][] parametersAnnotations = parametersOwner.getParameterAnnotations();
         for (int i = 0; i < result.length; i++) {
-            MethodParameter methodParameter = new MethodParameter(parameterOwner, i, parametersAnnotations[i]);
+            MethodParameter methodParameter = new MethodParameter(parametersOwner, i, parametersAnnotations[i]);
             result[i] = resolve(methodParameter);
         }
         return result;

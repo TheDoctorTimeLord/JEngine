@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
-import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
@@ -23,9 +22,8 @@ public class SingletonBeanScope extends AbstractBeanScope {
     private final List<BeanProcessor> beanProcessors;
     private final List<BeanPreRemoveProcessor> preRemoveProcessors;
     private final Map<Class<?>, Object> beans;
-    private final ContainerContext parent;
 
-    public SingletonBeanScope(List<BeanDefinition> beanDefinitions, BeanFactory beanFactory, ContainerContext parent,
+    public SingletonBeanScope(List<BeanDefinition> beanDefinitions, BeanFactory beanFactory,
             List<BeanProcessor> beanProcessors, List<BeanPreRemoveProcessor> preRemoveProcessors)
     {
         super(beanFactory);
@@ -36,7 +34,6 @@ public class SingletonBeanScope extends AbstractBeanScope {
 
         this.beanProcessors = beanProcessors;
         this.preRemoveProcessors = preRemoveProcessors;
-        this.parent = parent;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class SingletonBeanScope extends AbstractBeanScope {
 
         for (BeanProcessor beanProcessor : beanProcessors) {
             for (Object beanDefinition : beanDefinitions) {
-                runPreConstruct(beanProcessor, (BeanDefinition)beanDefinition, parent, LOG);
+                runPreConstruct(beanProcessor, (BeanDefinition)beanDefinition, LOG);
             }
         }
 
@@ -78,7 +75,7 @@ public class SingletonBeanScope extends AbstractBeanScope {
                 if (!(createdBean instanceof ResolvedBeanData resolvedBeanData)) {
                     throw new ContainerException("Scope has beans in incorrect format: " + createdBean);
                 }
-                runPostConstruct(beanProcessor, resolvedBeanData, parent, LOG);
+                runPostConstruct(beanProcessor, resolvedBeanData, LOG);
             }
         }
     }
@@ -89,7 +86,7 @@ public class SingletonBeanScope extends AbstractBeanScope {
             for (Map.Entry<Class<?>, Object> entry : beans.entrySet()) {
                 Object createdBean = entry.getValue();
                 if (createdBean instanceof ResolvedBeanData resolvedBeanData) {
-                    runPreRemove(preRemoveProcessor, resolvedBeanData, parent, LOG);
+                    runPreRemove(preRemoveProcessor, resolvedBeanData, LOG);
                 }
             }
         }
@@ -117,7 +114,7 @@ public class SingletonBeanScope extends AbstractBeanScope {
     private ResolvedBeanData safeCreateBean(Class<?> beanClass) {
         return (ResolvedBeanData) beans.compute(beanClass,
                 (k, v) -> v instanceof BeanDefinition definition
-                        ? constructBean(beanProcessors, definition, parent, LOG)
+                        ? constructBean(beanProcessors, definition, LOG)
                         : v
         );
     }

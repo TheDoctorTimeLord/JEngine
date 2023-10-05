@@ -1,8 +1,7 @@
 package ru.jengine.beancontainer.extentions.infrastrucure;
 
 import ru.jengine.beancontainer.containercontext.BeanData;
-import ru.jengine.beancontainer.containercontext.ContainerContext;
 
 public interface BeanPreRemoveProcessor {
-    void preRemoveProcess(BeanData beanData, ContainerContext context);
+    void preRemoveProcess(BeanData bean);
 }

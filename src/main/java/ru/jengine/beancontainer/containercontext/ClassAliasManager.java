@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class ClassAliasManager {
+    private static final ResolvingProperties[] NO_ALIASED = new ResolvingProperties[0];
     private final Map<Class<?>, Set<Class<?>>> aliases = new HashMap<>();
 
     public void registerAliases(Class<?> aliased) {
@@ -24,7 +25,7 @@ public class ClassAliasManager {
     public ResolvingProperties[] getForAlias(ResolvingProperties properties) {
         Collection<Class<?>> aliased = aliases.get(properties.getRequestedClass());
         if (aliased == null) {
-            return null;
+            return NO_ALIASED;
         }
 
         return aliased.stream()

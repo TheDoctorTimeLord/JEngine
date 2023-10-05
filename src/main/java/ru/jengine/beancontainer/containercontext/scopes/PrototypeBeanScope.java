@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
-import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 
@@ -20,9 +19,8 @@ public class PrototypeBeanScope extends AbstractBeanScope {
 
     private final List<BeanProcessor> beanProcessors;
     private final Map<Class<?>, BeanDefinition> beanDefinitions;
-    private final ContainerContext parent;
 
-    public PrototypeBeanScope(List<BeanDefinition> beanDefinitions, BeanFactory beanFactory, ContainerContext parent,
+    public PrototypeBeanScope(List<BeanDefinition> beanDefinitions, BeanFactory beanFactory,
             List<BeanProcessor> beanProcessors)
     {
         super(beanFactory);
@@ -31,14 +29,13 @@ public class PrototypeBeanScope extends AbstractBeanScope {
                 .collect(Collectors.toMap(BeanDefinition::getBeanClass, Function.identity()));
 
         this.beanProcessors = beanProcessors;
-        this.parent = parent;
     }
 
     @Override
     public void prepareStart() {
         for (BeanProcessor beanProcessor : beanProcessors) {
             for (BeanDefinition definition : beanDefinitions.values()) {
-                runPreConstruct(beanProcessor, definition, parent, LOG);
+                runPreConstruct(beanProcessor, definition, LOG);
             }
         }
     }
@@ -61,10 +58,10 @@ public class PrototypeBeanScope extends AbstractBeanScope {
             return ResolvedBeanData.NOT_RESOLVED;
         }
 
-        ResolvedBeanData createdBean = constructBean(beanProcessors, definition, parent, LOG);
+        ResolvedBeanData createdBean = constructBean(beanProcessors, definition, LOG);
 
         for (BeanProcessor beanProcessor : beanProcessors) {
-            runPostConstruct(beanProcessor, createdBean, parent, LOG);
+            runPostConstruct(beanProcessor, createdBean, LOG);
         }
 
         return createdBean;

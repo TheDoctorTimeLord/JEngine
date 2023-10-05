@@ -20,10 +20,10 @@ public class DefaultBeanCreationScopeResolver implements BeanCreationScopeResolv
             ContainerContext context, List<BeanProcessor> beanProcessors, List<BeanPreRemoveProcessor> preRemoveProcessors)
     {
         if (Constants.BeanScope.SINGLETON.equals(scopeName)) {
-            return new SingletonBeanScope(definitions, factory, context, beanProcessors, preRemoveProcessors);
+            return new SingletonBeanScope(definitions, factory, beanProcessors, preRemoveProcessors);
         }
         if (Constants.BeanScope.PROTOTYPE.equals(scopeName)) {
-            return new PrototypeBeanScope(definitions, factory, context, beanProcessors);
+            return new PrototypeBeanScope(definitions, factory, beanProcessors);
         }
 
         throw new ContainerException("Unknown scope name [%s]".formatted(scopeName));

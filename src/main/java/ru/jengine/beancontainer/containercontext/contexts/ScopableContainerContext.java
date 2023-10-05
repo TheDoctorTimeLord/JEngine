@@ -57,10 +57,8 @@ public class ScopableContainerContext implements ContainerContext {
 
     @Override
     public ResolvedBeanData getBean(ResolvingProperties properties) {
-        ResolvingProperties[] propertiesForResolve = classAliasManager.getForAlias(properties);
-        if (propertiesForResolve == null || propertiesForResolve.length == 0) {
-            propertiesForResolve = new ResolvingProperties[] { properties };
-        }
+        ResolvingProperties[] propertiesOfAliases = classAliasManager.getForAlias(properties);
+        ResolvingProperties[] propertiesForResolve = aggregateResolvingProperties(properties, propertiesOfAliases);
 
         List<ResolvedBeanData> resolvedBeans = beanResolver.resolveBeans(scopes, propertiesForResolve);
         if (resolvedBeans.isEmpty()) {
@@ -70,5 +68,25 @@ public class ScopableContainerContext implements ContainerContext {
             return resolvedBeans.get(0);
         }
         return new ResolvedBeanData(resolvedBeans, List.class, true);
+    }
+
+    private ResolvingProperties[] aggregateResolvingProperties(ResolvingProperties initial, ResolvingProperties[]... aggregating) {
+        int propertiesCount = 0;
+        for (ResolvingProperties[] properties : aggregating) {
+            propertiesCount += properties.length;
+        }
+
+        if (propertiesCount == 0) {
+            return new ResolvingProperties[] { initial };
+        }
+
+        ResolvingProperties[] aggregated = new ResolvingProperties[propertiesCount];
+        int currentPosition = 0;
+        for (ResolvingProperties[] properties : aggregating) {
+            int propertiesLength = properties.length;
+            System.arraycopy(properties, 0, aggregated, currentPosition, propertiesLength);
+            currentPosition += propertiesLength;
+        }
+        return aggregated;
     }
 }
