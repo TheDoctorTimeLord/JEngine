@@ -18,7 +18,7 @@ public class MinOrderReducer implements BeanCandidatesReducer {
     }
 
     @Override
-    public ResolvedBeanData reduce(List<ResolvedBeanData> candidates) { //TODO подумать на счёт действий руками без стрима
+    public ResolvedBeanData reduce(List<ResolvedBeanData> candidates) {
         return candidates.stream()
                 .map(data -> Map.entry(getBeanPriority(data.getBeanBaseClass()), data))
                 .sorted(Comparator.comparingInt(Map.Entry::getKey))

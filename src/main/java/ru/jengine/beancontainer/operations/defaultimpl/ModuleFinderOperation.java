@@ -130,8 +130,7 @@ public class ModuleFinderOperation extends ContainerOperation {
                 .collect(Collectors.toSet());
     }
 
-    //TODO сделать protected для внешней модификации операции
-    private void addExternalSetModules(Map<String, List<Module>> modules, ContainerConfiguration configuration) {
+    protected void addExternalSetModules(Map<String, List<Module>> modules, ContainerConfiguration configuration) {
         Map<String, List<Module>> externalSetModules = configuration.getExternalSetModules();
         ModuleFactory moduleFactory = configuration.getModuleFactory();
 
