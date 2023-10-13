@@ -23,7 +23,12 @@ import ru.jengine.beancontainer.intstructure.pac7.J;
 import ru.jengine.beancontainer.intstructure.pac7.StartModuleWithExistingBeans;
 import ru.jengine.beancontainer.intstructure.pac8.*;
 import ru.jengine.beancontainer.intstructure.pac9.*;
+import ru.jengine.beancontainer.intstructure.pac_11.RemoveCounter;
+import ru.jengine.beancontainer.intstructure.pac_11.StartModuleWithModuleHierarchy;
 import ru.jengine.beancontainer.modules.AnnotationModule;
+import ru.jengine.beancontainer.operations.ContainerOperation;
+import ru.jengine.beancontainer.operations.OperationResult;
+import ru.jengine.beancontainer.operations.special.RemoveContextOperation;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -173,6 +178,28 @@ public class CreatingBeansTest {
         container.stop();
 
         Assert.assertEquals(3, actual.getSpecialMethodsCalledCounter());
+    }
+
+    @Test
+    public void testRemoveContexts() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithModuleHierarchy.class).build());
+        container.initializeContainerByDefault();
+
+        RemoveCounter removeCounter = container.getBean(RemoveCounter.class);
+
+        container.executeOperations(new RemoveContextOperation("module1"));
+
+        List<String> expectedRemovedModules = List.of("module1", "module2", "module3");
+        Assert.assertEquals(expectedRemovedModules, removeCounter.getRemovedContexts());
+        container.executeOperations(new ContainerOperation() {
+            @Override
+            public void apply(OperationResult previouseOperationResult, ContainerState state) {
+                for (String expectedRemovedModule : expectedRemovedModules) {
+                    Assert.assertFalse("ContainerContext [%s] was not removed".formatted(expectedRemovedModule),
+                            state.getContainerContextFacade().hasContext(expectedRemovedModule));
+                }
+            }
+        });
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

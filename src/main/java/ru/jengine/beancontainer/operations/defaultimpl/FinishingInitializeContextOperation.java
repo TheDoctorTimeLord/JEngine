@@ -8,6 +8,6 @@ import ru.jengine.beancontainer.operations.OperationResult;
 public class FinishingInitializeContextOperation extends ContainerOperation {
     @Override
     public void apply(OperationResult previouseOperationResult, ContainerState state) {
-        state.getContainerStatePublisher().publish(new FinishingInitializeContextsPhase(), state);
+        state.getContainerEventDispatcher().publish(new FinishingInitializeContextsPhase(), state);
     }
 }

@@ -4,7 +4,7 @@ import ru.jengine.beancontainer.ContainerState;
 
 import java.util.*;
 
-public class ContainerStatePublisher {
+public class ContainerEventDispatcher {
     private final Map<Class<?>, Set<ContainerListener<?>>> listeners = new HashMap<>();
 
     public <E extends ContainerEvent> void registerListener(ContainerListener<E> eventListener) {
@@ -17,8 +17,13 @@ public class ContainerStatePublisher {
 
     @SuppressWarnings("unchecked")
     public void publish(ContainerEvent event, ContainerState containerState) {
-        for (ContainerListener<?> listener : listeners.getOrDefault(event.getClass(), Collections.emptySet())) {
+        for (ContainerListener<?> listener : getAvailableListeners(event.getClass())) {
             ((ContainerListener<ContainerEvent>)listener).handle(event, containerState);
         }
+    }
+
+    private Collection<ContainerListener<?>> getAvailableListeners(Class<?> eventClass) {
+        Set<ContainerListener<?>> containerListeners = listeners.get(eventClass);
+        return containerListeners != null ? new ArrayList<>(containerListeners) : Collections.emptySet();
     }
 }

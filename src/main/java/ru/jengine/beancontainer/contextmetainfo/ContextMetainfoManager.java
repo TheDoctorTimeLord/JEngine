@@ -5,10 +5,11 @@ import ru.jengine.beancontainer.beanfactory.BeanFactoryWithSources;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade;
+import ru.jengine.beancontainer.events.RemoveContextEvent;
 import ru.jengine.beancontainer.events.StartingInitializeContextsPhase;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.statepublisher.ContainerListener;
-import ru.jengine.beancontainer.statepublisher.ContainerStatePublisher;
+import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -16,15 +17,17 @@ import java.util.stream.Stream;
 public class ContextMetainfoManager {
     private final ContainerConfiguration configuration;
     private final ContainerContextFacade contextFacade;
+    private final ContainerEventDispatcher eventDispatcher;
     private final Map<String, ContextMetainfo> metainfoByName = new HashMap<>();
 
     public ContextMetainfoManager(ContainerConfiguration configuration, ContainerContextFacade contextFacade,
-            ContainerStatePublisher publisher)
+            ContainerEventDispatcher eventDispatcher)
     {
         this.configuration = configuration;
         this.contextFacade = contextFacade;
+        this.eventDispatcher = eventDispatcher;
 
-        publisher.registerListener(new OnInitializeListener());
+        eventDispatcher.registerListener(new OnInitializeListener());
     }
 
     public void registerContextMetainfo(String metainfoName, ContextMetainfo metainfo) {
@@ -33,10 +36,6 @@ public class ContextMetainfoManager {
         }
 
         metainfoByName.put(metainfoName, metainfo);
-    }
-
-    public void unregisterContextMetainfo(String metainfoName) {
-        metainfoByName.remove(metainfoName);
     }
 
     public List<String> loadContainerMetainfo(String metainfoName, String newContextName, ContainerState state) {
@@ -61,6 +60,7 @@ public class ContextMetainfoManager {
         ContainerContext containerContext = configuration.getContainerContextFactory()
                 .build(newContextName, metainfo, beanFactory, state);
 
+        eventDispatcher.registerListener(new OnRemoveContextListener(metainfo, newContextName));
         contextFacade.registerContext(newContextName, containerContext);
 
         List<String> loadedContexts = new ArrayList<>();
@@ -98,6 +98,29 @@ public class ContextMetainfoManager {
             }
 
             contextFacade.constructBeans(loadedContexts);
+        }
+    }
+
+    private static class OnRemoveContextListener implements ContainerListener<RemoveContextEvent> {
+        private final ContextMetainfo contextMetainfo;
+        private final String contextName;
+
+        private OnRemoveContextListener(ContextMetainfo contextMetainfo, String contextName) {
+            this.contextMetainfo = contextMetainfo;
+            this.contextName = contextName;
+        }
+
+        @Override
+        public Class<RemoveContextEvent> getListenedEventClass() {
+            return RemoveContextEvent.class;
+        }
+
+        @Override
+        public void handle(RemoveContextEvent event, ContainerState containerState) {
+            if (contextMetainfo.getBeanSources().contains(event.getContextName())) {
+                containerState.getContainerContextFacade().removeContext(contextName);
+                removeListener(containerState);
+            }
         }
     }
 }

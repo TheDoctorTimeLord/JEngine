@@ -8,7 +8,7 @@ import ru.jengine.beancontainer.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer.operations.ContainerOperation;
 import ru.jengine.beancontainer.operations.OperationsExecutor;
 import ru.jengine.beancontainer.operations.defaultimpl.*;
-import ru.jengine.beancontainer.statepublisher.ContainerStatePublisher;
+import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
 
 import java.util.Collection;
 
@@ -17,10 +17,10 @@ public class JEngineContainer {
 
     public JEngineContainer(ContainerConfiguration configuration) {
         ContainerContextFacade facade = new ContainerContextFacade();
-        ContainerStatePublisher publisher = new ContainerStatePublisher();
-        ContextMetainfoManager metainfoManager = new ContextMetainfoManager(configuration, facade, publisher);
+        ContainerEventDispatcher eventDispatcher = new ContainerEventDispatcher();
+        ContextMetainfoManager metainfoManager = new ContextMetainfoManager(configuration, facade, eventDispatcher);
 
-        this.operationState = new ContainerState(configuration, facade, metainfoManager, publisher);
+        this.operationState = new ContainerState(configuration, facade, metainfoManager, eventDispatcher);
     }
 
     public void initializeContainerByDefault() {
@@ -65,10 +65,6 @@ public class JEngineContainer {
                 .properties(beanClass)
                 .beanContextSource(contextName)
         ).getBeanValue();
-    }
-
-    public <B> B autowire(B bean) {
-        return null; //TODO реализовать оборачивание бина
     }
 
     public void stop() {

@@ -26,5 +26,6 @@ public class PresetContextFacadeOperation extends ContainerOperation {
         BeanCandidatesService candidatesService = (BeanCandidatesService) candidate.getBeanValue();
 
         contextFacade.setBeanCandidatesService(candidatesService);
+        contextFacade.initializeContainerEventPublisher(state);
     }
 }
