@@ -98,6 +98,8 @@ public class ContextMetainfoManager {
             }
 
             contextFacade.constructBeans(loadedContexts);
+
+            removeListener(state);
         }
     }
 

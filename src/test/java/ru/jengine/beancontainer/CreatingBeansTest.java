@@ -1,12 +1,17 @@
 package ru.jengine.beancontainer;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
+
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
-import ru.jengine.beancontainer.intstructure.pac_10.R;
-import ru.jengine.beancontainer.intstructure.pac_10.StartModuleWithPostConstructAndPreDestroy;
 import ru.jengine.beancontainer.intstructure.pac4.A;
 import ru.jengine.beancontainer.intstructure.pac4.B;
 import ru.jengine.beancontainer.intstructure.pac4.C;
@@ -21,20 +26,27 @@ import ru.jengine.beancontainer.intstructure.pac7.H;
 import ru.jengine.beancontainer.intstructure.pac7.I;
 import ru.jengine.beancontainer.intstructure.pac7.J;
 import ru.jengine.beancontainer.intstructure.pac7.StartModuleWithExistingBeans;
-import ru.jengine.beancontainer.intstructure.pac8.*;
-import ru.jengine.beancontainer.intstructure.pac9.*;
+import ru.jengine.beancontainer.intstructure.pac8.Int;
+import ru.jengine.beancontainer.intstructure.pac8.K;
+import ru.jengine.beancontainer.intstructure.pac8.L;
+import ru.jengine.beancontainer.intstructure.pac8.M;
+import ru.jengine.beancontainer.intstructure.pac8.N;
+import ru.jengine.beancontainer.intstructure.pac8.StartModuleWithImplementations;
+import ru.jengine.beancontainer.intstructure.pac9.O;
+import ru.jengine.beancontainer.intstructure.pac9.Ordered;
+import ru.jengine.beancontainer.intstructure.pac9.P;
+import ru.jengine.beancontainer.intstructure.pac9.Q;
+import ru.jengine.beancontainer.intstructure.pac9.StartModuleWithOrdering;
+import ru.jengine.beancontainer.intstructure.pac_10.R;
+import ru.jengine.beancontainer.intstructure.pac_10.StartModuleWithPostConstructAndPreDestroy;
 import ru.jengine.beancontainer.intstructure.pac_11.RemoveCounter;
 import ru.jengine.beancontainer.intstructure.pac_11.StartModuleWithModuleHierarchy;
+import ru.jengine.beancontainer.intstructure.pac_12.StartModuleWithAfterInitializeBeans;
+import ru.jengine.beancontainer.intstructure.pac_12.T;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 import ru.jengine.beancontainer.operations.ContainerOperation;
 import ru.jengine.beancontainer.operations.OperationResult;
 import ru.jengine.beancontainer.operations.special.RemoveContextOperation;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
 
 public class CreatingBeansTest {
     @Test
@@ -200,6 +212,17 @@ public class CreatingBeansTest {
                 }
             }
         });
+    }
+
+    @Test
+    public void testRunAfterInitializeMethod() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithAfterInitializeBeans.class).build());
+        container.initializeContainerByDefault();
+
+        T actual = container.getBean(T.class);
+
+        Assert.assertNotNull(actual);
+        Assert.assertTrue(actual.test());
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

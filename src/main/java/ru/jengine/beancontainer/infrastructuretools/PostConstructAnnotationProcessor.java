@@ -1,29 +1,21 @@
 package ru.jengine.beancontainer.infrastructuretools;
 
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.annotations.PostConstruct;
-import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
-import ru.jengine.beancontainer.beanfactory.BeanFactory;
-import ru.jengine.beancontainer.containercontext.BeanData;
-import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
-
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.PostConstruct;
+import ru.jengine.beancontainer.beanfactory.BeanFactory;
+import ru.jengine.beancontainer.containercontext.BeanData;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessorAdapter;
+
 @Bean(isInfrastructure = true)
-public class PostConstructAnnotationProcessor implements BeanProcessor {
+public class PostConstructAnnotationProcessor extends BeanProcessorAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(PostConstructAnnotationProcessor.class);
-
-    @Override
-    public void preConstructProcess(BeanDefinition beanDefinition) { }
-
-    @Override
-    public Object constructProcess(BeanData bean) {
-        return bean;
-    }
 
     @Override
     public void postConstructProcess(BeanData bean, BeanFactory beanFactory) {

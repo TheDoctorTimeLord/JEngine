@@ -49,6 +49,13 @@ public class ScopableContainerContext implements ContainerContext {
     }
 
     @Override
+    public void afterInitialize() {
+        for (BeanCreationScope scope : scopes) {
+            scope.afterInitialize();
+        }
+    }
+
+    @Override
     public void stop() {
         for (BeanCreationScope scope : scopes) {
             scope.prepareStop();

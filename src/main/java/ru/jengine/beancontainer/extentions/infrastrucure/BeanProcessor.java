@@ -6,6 +6,7 @@ import ru.jengine.beancontainer.containercontext.BeanData;
 
 public interface BeanProcessor {
     void preConstructProcess(BeanDefinition beanDefinition);
-    Object constructProcess(BeanData bean);
+    BeanData constructProcess(BeanData bean);
     void postConstructProcess(BeanData bean, BeanFactory beanFactory);
+    void afterInitialize(BeanData bean);
 }

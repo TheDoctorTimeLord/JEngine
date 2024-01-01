@@ -1,7 +1,7 @@
 package ru.jengine.beancontainer.containercontext;
 
 public class BeanData {
-    protected final Object beanValue;
+    protected Object beanValue;
     protected final Class<?> beanBaseClass;
 
     public BeanData(Object beanValue, Class<?> beanBaseClass) {
