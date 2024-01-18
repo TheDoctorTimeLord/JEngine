@@ -1,11 +1,17 @@
 package ru.jengine.beancontainer.utils;
 
-import ru.jengine.beancontainer.exceptions.ContainerException;
-
-import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import ru.jengine.beancontainer.exceptions.ContainerException;
 
 public class ReflectionContainerUtils {
     public static final List<Class<?>> AVAILABLE_COLLECTIONS = List.of(Collection.class, List.class, Set.class);
@@ -46,7 +52,7 @@ public class ReflectionContainerUtils {
     }
 
     public static Collection<Object> createCollection(Class<?> collectionClass) {
-        if (List.class.isAssignableFrom(collectionClass) || Collection.class.isAssignableFrom(collectionClass)) {
+        if (List.class.isAssignableFrom(collectionClass) || Collection.class.equals(collectionClass)) {
             return new ArrayList<>();
         } else if (Set.class.isAssignableFrom(collectionClass)) {
             return new HashSet<>();

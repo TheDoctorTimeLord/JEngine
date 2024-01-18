@@ -1,16 +1,16 @@
 package ru.jengine.beancontainer;
 
+import java.util.Collection;
+
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
-import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.contextmetainfo.ContextMetainfoManager;
 import ru.jengine.beancontainer.operations.ContainerOperation;
+import ru.jengine.beancontainer.operations.ContextOperationChains;
 import ru.jengine.beancontainer.operations.OperationsExecutor;
-import ru.jengine.beancontainer.operations.defaultimpl.*;
 import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
-
-import java.util.Collection;
 
 public class JEngineContainer {
     private final ContainerState operationState;
@@ -24,15 +24,7 @@ public class JEngineContainer {
     }
 
     public void initializeContainerByDefault() {
-        executeOperations(
-                new ModuleFinderOperation(),
-                new PreloadContextOperation(Constants.Contexts.INFRASTRUCTURE_CONTEXT),
-                new PreloadContextOperation(Constants.Contexts.EXTERNAL_BEANS_CONTEXT),
-                new PresetContextFacadeOperation(),
-                new ContainerMetainfoRegistrarOperation(),
-                new StartingInitializeContextOperation(),
-                new FinishingInitializeContextOperation()
-        );
+        executeOperations(ContextOperationChains.INITIALIZE_CONTAINER);
     }
 
     public void executeOperations(ContainerOperation... operationsChain) {

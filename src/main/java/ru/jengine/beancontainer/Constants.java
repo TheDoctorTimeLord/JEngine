@@ -11,7 +11,7 @@ public interface Constants {
     }
 
     interface Contexts {
-        String DEFAULT_CONTEXT = "default";
+        String DEFAULT_CONTEXT = "game";
         String INFRASTRUCTURE_CONTEXT = "infrastructure";
         String EXTERNAL_BEANS_CONTEXT = "externalBeans";
 

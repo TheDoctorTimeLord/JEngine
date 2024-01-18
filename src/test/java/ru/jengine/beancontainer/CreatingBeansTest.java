@@ -3,7 +3,9 @@ package ru.jengine.beancontainer;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hamcrest.MatcherAssert;
@@ -167,6 +169,25 @@ public class CreatingBeansTest {
         Assert.assertSame(Q.class, actualImplementations.get(0).getClass());
         Assert.assertSame(P.class, actualImplementations.get(1).getClass());
         Assert.assertSame(O.class, actualImplementations.get(2).getClass());
+    }
+
+    @Test
+    public void testGetDifferentCollection() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithOrdering.class).build());
+        container.initializeContainerByDefault();
+
+        try
+        {
+            List<Ordered> list = container.getBean(Ordered.class, List.class);
+            Set<Ordered> set = container.getBean(Ordered.class, Set.class);
+            Collection<Object> collection = container.getBean(Ordered.class, Collection.class);
+
+            //Чтобы исключить оптимизации:
+            boolean res = list.isEmpty() || set.isEmpty() || collection.isEmpty();
+        }
+        catch (ClassCastException e) {
+            Assert.fail("Any collection has incorrect type. " + e.getMessage());
+        }
     }
 
     @Test
