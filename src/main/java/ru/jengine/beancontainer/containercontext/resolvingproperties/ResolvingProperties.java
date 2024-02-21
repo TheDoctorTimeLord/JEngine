@@ -9,7 +9,6 @@ public interface ResolvingProperties {
     @Nullable
     Class<?> getCollectionClass();
 
-    @Nullable
     Annotation[] getAnnotations();
 
     @Nullable

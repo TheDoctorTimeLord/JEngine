@@ -73,7 +73,7 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
                 properties
         );
 
-        beans = candidatesService.transformCandidates(beans);
+        beans = candidatesService.transformCandidates(properties, beans);
 
         Class<?> collectionClass = properties.getCollectionClass();
         if (collectionClass != null) {
@@ -91,7 +91,7 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
             return ResolvedBeanData.NOT_RESOLVED;
         }
 
-        ResolvedBeanData candidate = candidatesService.reduceCandidates(beans);
+        ResolvedBeanData candidate = candidatesService.reduceCandidates(properties, beans);
         if (!candidate.isResolved()) {
             throw new ContainerException("Too many candidates for [%s]. Candidates: %s"
                     .formatted(properties.getRequestedClass(), beans));

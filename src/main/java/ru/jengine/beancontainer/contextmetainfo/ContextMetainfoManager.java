@@ -1,5 +1,11 @@
 package ru.jengine.beancontainer.contextmetainfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import ru.jengine.beancontainer.ContainerState;
 import ru.jengine.beancontainer.beanfactory.BeanFactoryWithSources;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
@@ -8,11 +14,8 @@ import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade
 import ru.jengine.beancontainer.events.RemoveContextEvent;
 import ru.jengine.beancontainer.events.StartingInitializeContextsPhase;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.statepublisher.ContainerListener;
 import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
-
-import java.util.*;
-import java.util.stream.Stream;
+import ru.jengine.beancontainer.statepublisher.ContainerListener;
 
 public class ContextMetainfoManager {
     private final ContainerConfiguration configuration;
@@ -36,6 +39,10 @@ public class ContextMetainfoManager {
         }
 
         metainfoByName.put(metainfoName, metainfo);
+    }
+
+    public List<ContextMetainfo> getRegisteredMetainfos() {
+        return new ArrayList<>(metainfoByName.values());
     }
 
     public List<String> loadContainerMetainfo(String metainfoName, String newContextName, ContainerState state) {

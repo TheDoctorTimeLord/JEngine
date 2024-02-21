@@ -1,8 +1,8 @@
 package ru.jengine.beancontainer.beanfactory;
 
 import ru.jengine.beancontainer.annotations.Inject;
-import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer.exceptions.ContainerException;

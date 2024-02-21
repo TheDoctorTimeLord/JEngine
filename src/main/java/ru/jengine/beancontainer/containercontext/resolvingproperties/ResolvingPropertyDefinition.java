@@ -5,6 +5,8 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 public class ResolvingPropertyDefinition implements ResolvingProperties {
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+
     private final Class<?> requestedClass;
     private Class<?> collectionClass;
     private Annotation[] annotations;
@@ -25,10 +27,9 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
         return collectionClass;
     }
 
-    @Nullable
     @Override
     public Annotation[] getAnnotations() {
-        return annotations;
+        return annotations != null ? annotations : EMPTY_ANNOTATIONS;
     }
 
     @Nullable

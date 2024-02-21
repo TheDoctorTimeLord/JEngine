@@ -1,24 +1,26 @@
 package ru.jengine.beancontainer.infrastructuretools.transformers;
 
-import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.beancontainer.annotations.Order;
-import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
-import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesTransformer;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import ru.jengine.beancontainer.Constants.Extensions.TransformerPriorities;
+import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.Order;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
+import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesTransformer;
+import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 @Bean(isInfrastructure = true)
 public class SortingByOrderTransformer implements BeanCandidatesTransformer {
     @Override
     public int getTransformerPriority() {
-        return 0;
+        return TransformerPriorities.SORTING_BY_ORDER;
     }
 
     @Override
-    public List<ResolvedBeanData> transform(List<ResolvedBeanData> candidates) {
+    public List<ResolvedBeanData> transform(ResolvingProperties properties, List<ResolvedBeanData> candidates) {
         return candidates.stream()
                 .map(data -> Map.entry(getBeanPriority(data.getBeanBaseClass()), data))
                 .sorted(Comparator.comparingInt(Map.Entry::getKey))

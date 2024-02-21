@@ -2,6 +2,7 @@ package ru.jengine.beancontainer.infrastructuretools;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
+import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesReducer;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesTransformer;
 
@@ -25,17 +26,17 @@ public class BeanCandidatesServiceImpl implements BeanCandidatesService {
     }
 
     @Override
-    public List<ResolvedBeanData> transformCandidates(List<ResolvedBeanData> candidates) {
+    public List<ResolvedBeanData> transformCandidates(ResolvingProperties priorities, List<ResolvedBeanData> candidates) {
         for (BeanCandidatesTransformer transformer : candidatesTransformers) {
-            candidates = transformer.transform(candidates);
+            candidates = transformer.transform(priorities, candidates);
         }
         return candidates;
     }
 
     @Override
-    public ResolvedBeanData reduceCandidates(List<ResolvedBeanData> candidates) {
+    public ResolvedBeanData reduceCandidates(ResolvingProperties properties, List<ResolvedBeanData> candidates) {
         for (BeanCandidatesReducer reducer : candidatesReducers) {
-            ResolvedBeanData reduced = reducer.reduce(candidates);
+            ResolvedBeanData reduced = reducer.reduce(properties, candidates);
             if (reduced != null && reduced.isResolved()) {
                 return reduced;
             }

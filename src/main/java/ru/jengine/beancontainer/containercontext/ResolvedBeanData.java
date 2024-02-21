@@ -33,6 +33,17 @@ public class ResolvedBeanData extends BeanData {
                 .formatted(beanValueClass));
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Collection<T> asMultipleBeans(Class<T> beanClass) {
+        if (beanValue instanceof Collection<?> collection) {
+            return (Collection<T>) collection;
+        }
+
+        Class<?> beanValueClass = beanValue != null ? beanValue.getClass() : null;
+        throw new ContainerException(("Bean value [%s] can not be present as some beans. Available collection of beans")
+                .formatted(beanValueClass));
+    }
+
     public boolean isResolved() {
         return this != NOT_RESOLVED;
     }

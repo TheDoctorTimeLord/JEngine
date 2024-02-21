@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AnnotationModuleBase implements Module, Cloneable {
+public abstract class AnnotationModuleBase implements Module {
     private final List<BeanDefinitionReader> beanDefinitionReaders = new ArrayList<>();
     @Nullable
     private final ContainerModule containerModuleAnnotation;
-    private ClassFinder classFinder;
+    protected ClassFinder classFinder;
     private String contextName;
 
     public AnnotationModuleBase() {

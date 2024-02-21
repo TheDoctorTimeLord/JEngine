@@ -18,4 +18,16 @@ public interface Constants {
         String BATTLE_CONTEXT = "battle";
         String JSON_CONVERTER_CONTEXT = "jsonConverter";
     }
+
+    interface Extensions {
+        interface TransformerPriorities {
+            int SORTING_BY_ORDER = 512;
+            int CLASS_EXTRACTOR = 1024;
+        }
+
+        interface ReducerPriorities {
+            int SINGLETON_LIST = Integer.MIN_VALUE;
+            int MIN_ORDER = 65536;
+        }
+    }
 }

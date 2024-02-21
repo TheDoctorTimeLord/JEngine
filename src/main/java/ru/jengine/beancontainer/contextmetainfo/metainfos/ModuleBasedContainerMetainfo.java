@@ -1,10 +1,11 @@
 package ru.jengine.beancontainer.contextmetainfo.metainfos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.contextmetainfo.ContextMetainfo;
 import ru.jengine.beancontainer.modules.Module;
-
-import java.util.List;
 
 public class ModuleBasedContainerMetainfo implements ContextMetainfo {
     private final List<Module> modules;
@@ -32,5 +33,9 @@ public class ModuleBasedContainerMetainfo implements ContextMetainfo {
     @Override
     public boolean needLoadOnContainerInitialize() {
         return modules.stream().anyMatch(Module::needLoadOnContainerInitialize);
+    }
+
+    public List<Module> getModules() {
+        return new ArrayList<>(modules);
     }
 }
