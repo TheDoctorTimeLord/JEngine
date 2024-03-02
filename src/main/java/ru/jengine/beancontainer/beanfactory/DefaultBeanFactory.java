@@ -1,6 +1,8 @@
 package ru.jengine.beancontainer.beanfactory;
 
 import ru.jengine.beancontainer.annotations.Inject;
+import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
+import ru.jengine.beancontainer.beandefinitions.BeanDefinition.BeanProducer;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
@@ -8,15 +10,12 @@ import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPr
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class DefaultBeanFactory implements BeanFactory {
-    //TODO сейчас при резолве зависимостей инфраструктурных бинов мы не ограничиваем сурсы инфраструктурным контекстом
     private final BeanExtractor beanExtractor;
 
     public DefaultBeanFactory(BeanExtractor beanExtractor) {
@@ -24,13 +23,19 @@ public class DefaultBeanFactory implements BeanFactory {
     }
 
     @Override
-    public Object buildBean(Class<?> beanClass) {
+    public Object buildBean(BeanDefinition definition) {
         try {
-            Constructor<?> availableConstructor = findAppropriateConstructor(beanClass);
-            Object[] args = findArguments(availableConstructor);
+            if (definition.getBeanProducer() != null) {
+                BeanProducer beanProducer = definition.getBeanProducer();
+                Object[] args = findArguments(beanProducer.parametersContainer());
+                return beanProducer.producer().apply(args);
+            }
+
+            Constructor<?> availableConstructor = findAppropriateConstructor(definition.getBeanClass());
+            Object[] args = findArguments(new ParametersContainer(availableConstructor));
             return ReflectionContainerUtils.createObject(availableConstructor, args);
         } catch (Exception ex) {
-            throw new ContainerException("Exception while creating bean [" + beanClass + "]", ex);
+            throw new ContainerException("Exception while creating bean [" + definition + "]", ex);
         }
     }
 
@@ -55,17 +60,16 @@ public class DefaultBeanFactory implements BeanFactory {
     }
 
     @Override
-    public Object[] findArguments(Executable parametersOwner) {
-        Object[] result = new Object[parametersOwner.getParameterTypes().length];
-        Annotation[][] parametersAnnotations = parametersOwner.getParameterAnnotations();
+    public Object[] findArguments(ParametersContainer parametersContainer) {
+        Object[] result = new Object[parametersContainer.getParameterTypes().length];
         for (int i = 0; i < result.length; i++) {
-            MethodParameter methodParameter = new MethodParameter(parametersOwner, i, parametersAnnotations[i]);
-            result[i] = resolve(methodParameter);
+            Parameter parameter = new Parameter(parametersContainer, i);
+            result[i] = resolve(parameter);
         }
         return result;
     }
 
-    private Object resolve(MethodParameter parameter) {
+    private Object resolve(Parameter parameter) {
         Class<?> resultType = castToClass(parameter.getParameterType());
         ResolvingPropertyDefinition properties;
 
@@ -84,7 +88,7 @@ public class DefaultBeanFactory implements BeanFactory {
         return extractedBean.isResolved() ? extractedBean.getBeanValue() : null;
     }
 
-    protected void customizeProperties(MethodParameter parameter, ResolvingPropertyDefinition properties) { }
+    protected void customizeProperties(Parameter parameter, ResolvingPropertyDefinition properties) { }
 
     private static Class<?> getCollectionGenericType(Type type) {
         if (type instanceof ParameterizedType parameterizedType) {

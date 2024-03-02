@@ -2,8 +2,10 @@ package ru.jengine.beancontainer.beanfactory;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
+import ru.jengine.beancontainer.Constants.BeanScope;
+import ru.jengine.beancontainer.beandefinitions.JavaClassBeanDefinition;
 import ru.jengine.beancontainer.containercontext.BeanExtractor;
+import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.intstructure.factory.*;
@@ -18,7 +20,8 @@ public class DefaultBeanFactoryTest {
 
     @Test
     public void testCreateBeanWithParameters() {
-        TestedWithParameters actual = (TestedWithParameters) beanFactory.buildBean(TestedWithParameters.class);
+        TestedWithParameters actual = (TestedWithParameters) beanFactory.buildBean(
+                new JavaClassBeanDefinition(TestedWithParameters.class, BeanScope.SINGLETON));
 
         Assert.assertEquals(specialBeanExtractor.a, actual.getA());
         Assert.assertEquals(specialBeanExtractor.b, actual.getB());
@@ -27,19 +30,20 @@ public class DefaultBeanFactoryTest {
 
     @Test
     public void testCreateBeanWithoutInject() {
-        TestedWithoutInject actual = (TestedWithoutInject) beanFactory.buildBean(TestedWithoutInject.class);
+        TestedWithoutInject actual = (TestedWithoutInject) beanFactory.buildBean(
+                new JavaClassBeanDefinition(TestedWithoutInject.class, BeanScope.SINGLETON));
 
         Assert.assertEquals(specialBeanExtractor.a, actual.getA());
     }
 
     @Test
     public void testCreateBeanWithDefaultConstructed() {
-        beanFactory.buildBean(TestedWithDefaultConstructed.class);
+        beanFactory.buildBean(new JavaClassBeanDefinition(TestedWithDefaultConstructed.class, BeanScope.SINGLETON));
     }
 
     @Test(expected = ContainerException.class)
     public void testCreateBeanWithIncorrectInject() {
-        beanFactory.buildBean(TestedWithIncorrectInject.class);
+        beanFactory.buildBean(new JavaClassBeanDefinition(TestedWithIncorrectInject.class, BeanScope.SINGLETON));
     }
 
     private static class SpecialBeanExtractor implements BeanExtractor {

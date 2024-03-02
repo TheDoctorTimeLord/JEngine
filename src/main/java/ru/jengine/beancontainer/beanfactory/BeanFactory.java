@@ -1,9 +1,9 @@
 package ru.jengine.beancontainer.beanfactory;
 
-import java.lang.reflect.Executable;
+import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 
 public interface BeanFactory {
-    Object buildBean(Class<?> beanClass);
+    Object buildBean(BeanDefinition definition);
 
-    Object[] findArguments(Executable parametersOwner);
+    Object[] findArguments(ParametersContainer parametersContainer);
 }

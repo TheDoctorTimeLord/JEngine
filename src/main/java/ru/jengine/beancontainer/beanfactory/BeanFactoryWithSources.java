@@ -12,7 +12,7 @@ public class BeanFactoryWithSources extends DefaultBeanFactory {
     }
 
     @Override
-    protected void customizeProperties(MethodParameter parameter, ResolvingPropertyDefinition properties) {
+    protected void customizeProperties(Parameter parameter, ResolvingPropertyDefinition properties) {
         properties.beanContextSource(sources);
     }
 }

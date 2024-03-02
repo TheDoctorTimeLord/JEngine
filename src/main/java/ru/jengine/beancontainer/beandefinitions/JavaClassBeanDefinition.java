@@ -3,18 +3,17 @@ package ru.jengine.beancontainer.beandefinitions;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;
     private final String scopeName;
-    private final Supplier<Object> beanProducer;
+    private final BeanProducer beanProducer;
 
     public JavaClassBeanDefinition(Class<?> beanClass, String scopeName) {
         this(beanClass, scopeName, null);
     }
 
-    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, @Nullable Supplier<Object> beanProducer) {
+    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, @Nullable BeanProducer beanProducer) {
         this.beanClass = beanClass;
         this.scopeName = scopeName;
         this.beanProducer = beanProducer;
@@ -30,9 +29,8 @@ public class JavaClassBeanDefinition implements BeanDefinition {
         return scopeName;
     }
 
-    @Nullable
     @Override
-    public Supplier<Object> getBeanProducer() {
+    public @Nullable BeanProducer getBeanProducer() {
         return beanProducer;
     }
 

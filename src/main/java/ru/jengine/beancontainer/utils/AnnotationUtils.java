@@ -1,6 +1,5 @@
 package ru.jengine.beancontainer.utils;
 
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.exceptions.ContainerException;
@@ -10,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,12 +19,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnnotationUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(AnnotationUtils.class);
-    public static final List<Class<? extends Annotation>> systemAnnotations = ImmutableList.of(Target.class,
-            Retention.class, Override.class, Documented.class);
+    private AnnotationUtils() {}
 
-    private final static Map<Annotation, List<Annotation>> resolvedAnnotationCache = new ConcurrentHashMap<>();
-    private final static Map<Class<?>, List<Annotation>> allAnnotationByClassCache = new ConcurrentHashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationUtils.class);
+    public static final List<Class<? extends Annotation>> systemAnnotations =
+            List.of(Target.class, Retention.class, Override.class, Documented.class);
+
+    private static final Map<Annotation, List<Annotation>> resolvedAnnotationCache = new ConcurrentHashMap<>();
+    private static final Map<AnnotatedElement, List<Annotation>> allAnnotationByClassCache = new ConcurrentHashMap<>();
 
     public static List<Annotation> resolveNotSystemAnnotation(Annotation annotation) {
         List<Annotation> cached = resolvedAnnotationCache.get(annotation);
@@ -51,7 +53,7 @@ public class AnnotationUtils {
         return result;
     }
 
-    public static List<Annotation> resolveNotSystemAnnotation(Class<?> annotationOwner) {
+    public static List<Annotation> resolveNotSystemAnnotation(AnnotatedElement annotationOwner) {
         List<Annotation> cache = allAnnotationByClassCache.get(annotationOwner);
         if (cache != null) {
             return cache;
@@ -78,7 +80,7 @@ public class AnnotationUtils {
     }
 
     @Nullable
-    public static <T extends Annotation> T getAnnotationSafe(Class<?> owner, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotationSafe(AnnotatedElement owner, Class<T> annotation) {
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
         for (Annotation innerAnnotation : allAnnotations) {
             if (innerAnnotation.annotationType().equals(annotation)) {
@@ -88,7 +90,7 @@ public class AnnotationUtils {
         return null;
     }
 
-    public static <T extends Annotation> T getAnnotation(Class<?> owner, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement owner, Class<T> annotation) {
         T resultAnnotation = getAnnotationSafe(owner, annotation);
 
         if (resultAnnotation == null) {
@@ -98,7 +100,7 @@ public class AnnotationUtils {
         return resultAnnotation;
     }
 
-    public static <T extends Annotation> List<T> getAnnotations(Class<?> owner, Class<T> annotation) {
+    public static <T extends Annotation> List<T> getAnnotations(AnnotatedElement owner, Class<T> annotation) {
         List<T> result = new ArrayList<>();
 
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
@@ -111,7 +113,7 @@ public class AnnotationUtils {
         return result;
     }
 
-    public static boolean isAnnotationPresent(Class<?> owner, Class<?> annotation) {
+    public static boolean isAnnotationPresent(AnnotatedElement owner, Class<?> annotation) {
         List<Annotation> allAnnotations = resolveNotSystemAnnotation(owner);
         for (Annotation innerAnnotation : allAnnotations) {
             if (innerAnnotation.annotationType().equals(annotation)) {

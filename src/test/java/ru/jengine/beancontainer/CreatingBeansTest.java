@@ -28,6 +28,8 @@ import ru.jengine.beancontainer.intstructure.pac_11.StartModuleWithModuleHierarc
 import ru.jengine.beancontainer.intstructure.pac_12.StartModuleWithAfterInitializeBeans;
 import ru.jengine.beancontainer.intstructure.pac_12.T;
 import ru.jengine.beancontainer.intstructure.pac_13.*;
+import ru.jengine.beancontainer.intstructure.pac_14.StartModuleWithBeanProducer;
+import ru.jengine.beancontainer.intstructure.pac_14.Z;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 import ru.jengine.beancontainer.operations.ContainerOperation;
 import ru.jengine.beancontainer.operations.OperationResult;
@@ -245,6 +247,16 @@ public class CreatingBeansTest {
 
         MatcherAssert.assertThat(actual.getAnnotatedClasses(), hasItems(U.class, V.class));
         MatcherAssert.assertThat(actual.getAnnotatedClasses(), not(hasItem(W.class)));
+    }
+
+    @Test
+    public void testBeanProducer() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithBeanProducer.class).build());
+        container.initializeContainerByDefault();
+
+        Z actual = container.getBean(Z.class);
+
+        Assert.assertNotNull(actual.getY());
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

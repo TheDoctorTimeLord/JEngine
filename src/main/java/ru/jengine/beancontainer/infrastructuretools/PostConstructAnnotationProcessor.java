@@ -1,17 +1,17 @@
 package ru.jengine.beancontainer.infrastructuretools;
 
-import java.lang.reflect.Method;
-import java.util.Set;
-
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PostConstruct;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
+import ru.jengine.beancontainer.beanfactory.ParametersContainer;
 import ru.jengine.beancontainer.containercontext.BeanData;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessorAdapter;
+
+import java.lang.reflect.Method;
+import java.util.Set;
 
 @Bean(isInfrastructure = true)
 public class PostConstructAnnotationProcessor extends BeanProcessorAdapter {
@@ -30,7 +30,7 @@ public class PostConstructAnnotationProcessor extends BeanProcessorAdapter {
                 continue;
             }
 
-            Object[] arguments = beanFactory.findArguments(postConstructMethod);
+            Object[] arguments = beanFactory.findArguments(new ParametersContainer(postConstructMethod));
             try {
                 postConstructMethod.setAccessible(true);
                 postConstructMethod.invoke(bean.getBeanValue(), arguments);
