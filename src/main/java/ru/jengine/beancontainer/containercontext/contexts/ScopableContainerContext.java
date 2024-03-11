@@ -9,7 +9,6 @@ import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
 import ru.jengine.utils.CollectionUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ScopableContainerContext implements ContainerContext {
@@ -29,9 +28,10 @@ public class ScopableContainerContext implements ContainerContext {
                 .map(e -> scopeResolver.resolve(e.getKey(), e.getValue(), beanFactory, this, beanProcessors, preRemoveProcessors))
                 .toArray(BeanCreationScope[]::new);
 
-        Arrays.stream(this.scopes)
-                .flatMap(scope -> scope.getBeanClasses().stream())
-                .forEach(classAliasManager::registerAliases);
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            classAliasManager.registerAliases(beanClass);
+        }
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ScopableContainerContext implements ContainerContext {
         return new ResolvedBeanData(resolvedBeans, List.class, true);
     }
 
-    private ResolvingProperties[] aggregateResolvingProperties(ResolvingProperties initial, ResolvingProperties[]... aggregating) {
+    private static ResolvingProperties[] aggregateResolvingProperties(ResolvingProperties initial, ResolvingProperties[]... aggregating) {
         int propertiesCount = 0;
         for (ResolvingProperties[] properties : aggregating) {
             propertiesCount += properties.length;

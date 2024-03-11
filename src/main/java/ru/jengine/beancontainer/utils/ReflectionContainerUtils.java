@@ -1,20 +1,17 @@
 package ru.jengine.beancontainer.utils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import ru.jengine.beancontainer.exceptions.ContainerException;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class ReflectionContainerUtils {
-    public static final List<Class<?>> AVAILABLE_COLLECTIONS = List.of(Collection.class, List.class, Set.class);
+    private static final List<Class<?>> AVAILABLE_COLLECTIONS = List.of(Collection.class, List.class, Set.class);
 
     public static Object createObjectWithDefaultConstructor(Class<?> cls) {
         try {
@@ -42,6 +39,16 @@ public class ReflectionContainerUtils {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             throw new ContainerException("Exception during create object [" + constructor.getDeclaringClass() + "]", e);
         }
+    }
+
+    public static String getAvailableCollectionAsString() {
+        return AVAILABLE_COLLECTIONS.stream()
+                .map(Class::getName)
+                .collect(Collectors.joining(", "));
+    }
+
+    public static List<Class<?>> getAvailableCollections() {
+        return AVAILABLE_COLLECTIONS;
     }
 
     public static boolean isAvailableCollection(@Nullable Class<?> checkedClass) {
@@ -86,5 +93,25 @@ public class ReflectionContainerUtils {
         } else {
             throw new ContainerException("Collection with bean must be List or Set but was [" + collectionClass + "]");
         }
+    }
+
+    public static Class<?> getCollectionGenericType(Type type) {
+        if (type instanceof ParameterizedType parameterizedType) {
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            if (actualTypeArguments.length != 1) {
+                throw new ContainerException("Unknown collection type [%s]".formatted(type));
+            }
+            return castToClass(actualTypeArguments[0]);
+        }
+        throw new ContainerException("Element [%s] type is not generic".formatted(type));
+    }
+
+    public static Class<?> castToClass(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>)type;
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            return castToClass(parameterizedType.getRawType());
+        }
+        throw new ContainerException("Type [" + type + "] is not Class or ParameterizedType");
     }
 }

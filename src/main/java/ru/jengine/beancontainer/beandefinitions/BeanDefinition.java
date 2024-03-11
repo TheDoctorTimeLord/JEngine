@@ -1,6 +1,6 @@
 package ru.jengine.beancontainer.beandefinitions;
 
-import ru.jengine.beancontainer.beanfactory.ParametersContainer;
+import ru.jengine.beancontainer.utils.ParametersContainer;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 
 import javax.annotation.Nullable;
@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 public interface BeanDefinition {
     Class<?> getBeanClass();
     String getScopeName();
+    boolean isShared();
     @Nullable
     BeanProducer getBeanProducer();
 

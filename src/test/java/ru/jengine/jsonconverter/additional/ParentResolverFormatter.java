@@ -1,13 +1,14 @@
 package ru.jengine.jsonconverter.additional;
 
-import java.util.Set;
-
+import com.google.gson.JsonObject;
+import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.jsonconverter.formatting.FormatterContext;
 import ru.jengine.jsonconverter.formatting.JsonFormatter;
 
-import com.google.gson.JsonObject;
+import java.util.Set;
 
-public class ParentResolverFormatter implements JsonFormatter {
+@Shared
+public class ParentResolverFormatter implements JsonFormatter<FormatterContext> {
     @Override
     public int getPriority() {
         return 0;

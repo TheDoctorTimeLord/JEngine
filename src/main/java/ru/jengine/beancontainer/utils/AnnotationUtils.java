@@ -122,4 +122,15 @@ public class AnnotationUtils {
         }
         return false;
     }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static <A extends Annotation> A extractAnnotation(Annotation[] annotations, Class<A> annotationClass) {
+        for (Annotation annotation : annotations) {
+            if (annotationClass.equals(annotation.annotationType())) {
+                return (A) annotation;
+            }
+        }
+        return null;
+    }
 }

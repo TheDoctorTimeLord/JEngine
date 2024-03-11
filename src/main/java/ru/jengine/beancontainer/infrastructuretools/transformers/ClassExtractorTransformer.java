@@ -15,11 +15,9 @@ import ru.jengine.beancontainer.modules.AnnotationModule;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
-import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Bean(isInfrastructure = true)
@@ -38,20 +36,18 @@ public class ClassExtractorTransformer implements BeanCandidatesTransformer, Con
 
     @Override
     public List<ResolvedBeanData> transform(ResolvingProperties properties, List<ResolvedBeanData> candidates) {
-        ClassesWith classesWith = extractClassesWithAnnotation(properties);
+        ClassesWith classesWith = AnnotationUtils.extractAnnotation(properties.getAnnotations(), ClassesWith.class);
         if (classesWith == null) {
             return candidates;
         }
 
         if (!ReflectionContainerUtils.isAvailableCollection(properties.getCollectionClass())) {
-            throw new ContainerException("Annotation ClassesWith can be used with %s collections only"
-                    .formatted(ReflectionContainerUtils.AVAILABLE_COLLECTIONS.stream()
-                            .map(Class::getName)
-                            .collect(Collectors.joining(", "))));
+            throw new ContainerException("Annotation ClassesWith can be used with [%s] collections only"
+                    .formatted(ReflectionContainerUtils.getAvailableCollectionAsString()));
         }
 
         if (!Class.class.equals(properties.getRequestedClass())) {
-            throw new ContainerException("Collection annotated ClassesWith must contain java.lang.Class only");
+            throw new ContainerException("Collection annotated ClassesWith must contains java.lang.Class only");
         }
 
         if (contextMetainfoManager == null) {
@@ -78,15 +74,5 @@ public class ClassExtractorTransformer implements BeanCandidatesTransformer, Con
                 .distinct()
                 .map(clazz -> new ResolvedBeanData(clazz, clazz))
                 .toList();
-    }
-
-    @Nullable
-    private static ClassesWith extractClassesWithAnnotation(ResolvingProperties properties) {
-        for (Annotation annotation : properties.getAnnotations()) {
-            if (ClassesWith.class.equals(annotation.annotationType())) {
-                return (ClassesWith) annotation;
-            }
-        }
-        return null;
     }
 }

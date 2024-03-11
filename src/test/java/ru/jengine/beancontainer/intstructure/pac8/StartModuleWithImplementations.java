@@ -6,6 +6,6 @@ import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 
 @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)
-@PackageScan("ru.jengine.beancontainer.intstructure.pac8")
+@PackageScan("ru.jengine.beancontainer.intstructure.pac8.")
 public class StartModuleWithImplementations extends AnnotationModule {
 }

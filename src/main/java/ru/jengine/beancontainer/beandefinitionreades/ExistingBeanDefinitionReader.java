@@ -20,6 +20,7 @@ public class ExistingBeanDefinitionReader implements BeanDefinitionReader {
                 .map(bean -> (BeanDefinition) new JavaClassBeanDefinition(
                         bean.getClass(),
                         Constants.BeanScope.SINGLETON,
+                        false,
                         new BeanProducer(() -> bean)
                 ))
                 .toList();

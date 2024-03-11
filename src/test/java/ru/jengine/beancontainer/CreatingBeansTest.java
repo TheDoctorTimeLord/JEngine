@@ -5,6 +5,18 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer.intstructure.pac10.R;
+import ru.jengine.beancontainer.intstructure.pac10.StartModuleWithPostConstructAndPreDestroy;
+import ru.jengine.beancontainer.intstructure.pac11.RemoveCounter;
+import ru.jengine.beancontainer.intstructure.pac11.StartModuleWithModuleHierarchy;
+import ru.jengine.beancontainer.intstructure.pac12.StartModuleWithAfterInitializeBeans;
+import ru.jengine.beancontainer.intstructure.pac12.T;
+import ru.jengine.beancontainer.intstructure.pac13.*;
+import ru.jengine.beancontainer.intstructure.pac14.StartModuleWithBeanProducer;
+import ru.jengine.beancontainer.intstructure.pac14.Z;
+import ru.jengine.beancontainer.intstructure.pac15.*;
+import ru.jengine.beancontainer.intstructure.pac16.AE;
+import ru.jengine.beancontainer.intstructure.pac16.AF;
 import ru.jengine.beancontainer.intstructure.pac4.A;
 import ru.jengine.beancontainer.intstructure.pac4.B;
 import ru.jengine.beancontainer.intstructure.pac4.C;
@@ -21,15 +33,6 @@ import ru.jengine.beancontainer.intstructure.pac7.J;
 import ru.jengine.beancontainer.intstructure.pac7.StartModuleWithExistingBeans;
 import ru.jengine.beancontainer.intstructure.pac8.*;
 import ru.jengine.beancontainer.intstructure.pac9.*;
-import ru.jengine.beancontainer.intstructure.pac_10.R;
-import ru.jengine.beancontainer.intstructure.pac_10.StartModuleWithPostConstructAndPreDestroy;
-import ru.jengine.beancontainer.intstructure.pac_11.RemoveCounter;
-import ru.jengine.beancontainer.intstructure.pac_11.StartModuleWithModuleHierarchy;
-import ru.jengine.beancontainer.intstructure.pac_12.StartModuleWithAfterInitializeBeans;
-import ru.jengine.beancontainer.intstructure.pac_12.T;
-import ru.jengine.beancontainer.intstructure.pac_13.*;
-import ru.jengine.beancontainer.intstructure.pac_14.StartModuleWithBeanProducer;
-import ru.jengine.beancontainer.intstructure.pac_14.Z;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 import ru.jengine.beancontainer.operations.ContainerOperation;
 import ru.jengine.beancontainer.operations.OperationResult;
@@ -257,6 +260,33 @@ public class CreatingBeansTest {
         Z actual = container.getBean(Z.class);
 
         Assert.assertNotNull(actual.getY());
+    }
+
+    @Test
+    public void testSharedBeans() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithSharedBeans.class).build());
+        container.initializeContainerByDefault();
+
+        AA actual = container.getBean(AA.class);
+        List<Class<?>> sharedBeans = actual.getAvailableShared().stream()
+                .map(Object::getClass)
+                .collect(Collectors.toList());
+        MatcherAssert.assertThat(sharedBeans, hasItem(AB.class));
+        MatcherAssert.assertThat(sharedBeans, hasItem(AE.class));
+        MatcherAssert.assertThat(sharedBeans, hasItem(AF.class));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AC.class)));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AD.class)));
+
+        container.executeOperations(new RemoveContextOperation("1"));
+
+        sharedBeans = actual.getAvailableShared().stream()
+                .map(Object::getClass)
+                .collect(Collectors.toList());
+        MatcherAssert.assertThat(sharedBeans, hasItem(AB.class));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AE.class)));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AF.class)));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AC.class)));
+        MatcherAssert.assertThat(sharedBeans, not(hasItem(AD.class)));
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

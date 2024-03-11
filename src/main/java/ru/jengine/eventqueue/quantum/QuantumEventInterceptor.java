@@ -1,12 +1,14 @@
 package ru.jengine.eventqueue.quantum;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
+import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.eventqueue.EventInterceptor;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Shared
 public class QuantumEventInterceptor implements EventInterceptor, QuantumEventPoolRegistrar {
     private final List<QuantaEventPool> quantaEventPools = new CopyOnWriteArrayList<>();
 

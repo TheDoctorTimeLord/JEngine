@@ -1,8 +1,6 @@
 package ru.jengine.jsonconverter.formatting;
 
-import java.util.List;
-import java.util.Map.Entry;
-
+import com.google.gson.*;
 import ru.jengine.jsonconverter.JsonConverterConstants;
 import ru.jengine.jsonconverter.exceptions.JsonConverterException;
 import ru.jengine.jsonconverter.exceptions.JsonLoaderException;
@@ -12,11 +10,8 @@ import ru.jengine.jsonconverter.linking.LinkExtractorManager;
 import ru.jengine.jsonconverter.resources.JsonLoader;
 import ru.jengine.jsonconverter.resources.ResourceMetadata;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class FormatterContext {
     private final JsonLoader jsonLoader;

@@ -14,6 +14,9 @@ public interface ResolvingProperties {
     @Nullable
     String[] getBeanContextSources();
 
+    @Nullable
+    Class<? extends Annotation> getExpectedAnnotation();
+
     static ResolvingPropertyDefinition properties(Class<?> requestedClass) {
         return new ResolvingPropertyDefinition(requestedClass);
     }

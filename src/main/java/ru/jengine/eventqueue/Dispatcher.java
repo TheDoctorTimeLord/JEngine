@@ -1,14 +1,8 @@
 package ru.jengine.eventqueue;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PreDestroy;
+import ru.jengine.beancontainer.annotations.SharedBeansProvider;
 import ru.jengine.eventqueue.asyncdispatcher.AsyncDispatcher;
 import ru.jengine.eventqueue.asyncdispatcher.AsyncDispatcherImpl;
 import ru.jengine.eventqueue.asyncdispatcher.StubAsyncDispatcher;
@@ -23,17 +17,24 @@ import ru.jengine.eventqueue.eventpool.EventPoolHandler;
 import ru.jengine.eventqueue.eventpool.EventPoolProvider;
 import ru.jengine.eventqueue.exceptions.EventQueueException;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 @Bean
 public class Dispatcher implements EventPoolProvider, PollableEventHandlerRegistrar, EventRegistrar,
         SynchronousEventHandler, EventPoolHandlersManager
 {
     private final Map<String, EventPool> eventPoolByCode = new ConcurrentHashMap<>();
-    private final Map<String, EventPoolHandler> eventPoolHandlers;
-    private final List<EventInterceptor> interceptors;
-    private final AsyncDispatcher asyncDispatcher;
-    private final EventHandlingContext mainEventHandlingContext;
+    private Map<String, EventPoolHandler> eventPoolHandlers;
+    private List<EventInterceptor> interceptors;
+    private AsyncDispatcher asyncDispatcher;
+    private EventHandlingContext mainEventHandlingContext;
 
-    public Dispatcher(List<EventInterceptor> interceptors, List<EventPoolHandler> eventPoolHandlers,
+    @SharedBeansProvider
+    private void initializeDispatcher(List<EventInterceptor> interceptors, List<EventPoolHandler> eventPoolHandlers,
                       List<PreHandler<?>> commonPreHandlers)
     {
         this.interceptors = interceptors;
@@ -47,8 +48,8 @@ public class Dispatcher implements EventPoolProvider, PollableEventHandlerRegist
 
         ConcurrentHashMap<String, AsyncEventPoolHandler> asyncEventPoolHandlers =
                 new ConcurrentHashMap<>(eventPoolHandlers.stream()
-                        .filter(handler -> handler instanceof AsyncEventPoolHandler)
-                        .collect(Collectors.toMap(EventPoolHandler::getEventPoolCode, handler -> (AsyncEventPoolHandler)handler)));
+                        .filter(AsyncEventPoolHandler.class::isInstance)
+                        .collect(Collectors.toMap(EventPoolHandler::getEventPoolCode, AsyncEventPoolHandler.class::cast)));
 
         this.asyncDispatcher = asyncEventPoolHandlers.isEmpty()
                 ? new StubAsyncDispatcher()

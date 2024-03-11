@@ -39,8 +39,12 @@ public class DefaultModuleFactory implements ModuleFactory {
 
     private static ClassFinder scanPackage(String packageToScan, ContainerConfiguration configuration) {
         ClassFinder classFinder = configuration.getClassFinderFactory().get();
-        classFinder.scan(packageToScan);
+        classFinder.scan(fixPackageToScan(packageToScan));
         return classFinder;
+    }
+
+    private static String fixPackageToScan(String packageToScan) {
+        return packageToScan.endsWith(".") ? packageToScan : packageToScan + ".";
     }
 
     private Module createModule(Class<?> moduleClass, ModuleContext moduleContext) {

@@ -1,12 +1,11 @@
 package ru.jengine.jsonconverter.formatting;
 
-import java.util.Set;
-
+import com.google.gson.JsonObject;
 import ru.jengine.utils.serviceclasses.HasPriority;
 
-import com.google.gson.JsonObject;
+import java.util.Set;
 
-public interface JsonFormatter extends HasPriority {
+public interface JsonFormatter<C extends FormatterContext> extends HasPriority {
     Set<String> getRequiredFields();
-    boolean formatJson(JsonObject json, FormatterContext context);
+    boolean formatJson(JsonObject json, C context);
 }

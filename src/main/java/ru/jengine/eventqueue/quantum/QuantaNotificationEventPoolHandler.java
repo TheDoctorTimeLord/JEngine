@@ -1,12 +1,14 @@
 package ru.jengine.eventqueue.quantum;
 
-import java.util.Collections;
-
 import ru.jengine.beancontainer.Constants;
+import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.eventqueue.EventProcessor;
 import ru.jengine.eventqueue.event.Event;
 import ru.jengine.eventqueue.event.PostHandler;
 
+import java.util.Collections;
+
+@Shared
 public final class QuantaNotificationEventPoolHandler extends QuantumEventPoolHandler { //TODO починить события квантования
 
     public QuantaNotificationEventPoolHandler(QuantumEventPoolRegistrar quantumEventPoolRegistrar) {

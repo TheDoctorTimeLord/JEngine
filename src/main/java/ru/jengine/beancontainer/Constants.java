@@ -21,8 +21,9 @@ public interface Constants {
 
     interface Extensions {
         interface TransformerPriorities {
-            int SORTING_BY_ORDER = 512;
-            int CLASS_EXTRACTOR = 1024;
+            int SORTING_BY_ORDER = 1024;
+            int CLASS_EXTRACTOR = 128;
+            int BEANS_WITH_ANNOTATION = 129;
         }
 
         interface ReducerPriorities {

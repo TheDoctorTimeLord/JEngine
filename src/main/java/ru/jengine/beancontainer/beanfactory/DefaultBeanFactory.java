@@ -8,12 +8,15 @@ import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.beancontainer.utils.Parameter;
+import ru.jengine.beancontainer.utils.ParametersContainer;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
+
+import static ru.jengine.beancontainer.utils.ReflectionContainerUtils.castToClass;
+import static ru.jengine.beancontainer.utils.ReflectionContainerUtils.getCollectionGenericType;
 
 public class DefaultBeanFactory implements BeanFactory {
     private final BeanExtractor beanExtractor;
@@ -89,26 +92,6 @@ public class DefaultBeanFactory implements BeanFactory {
     }
 
     protected void customizeProperties(Parameter parameter, ResolvingPropertyDefinition properties) { }
-
-    private static Class<?> getCollectionGenericType(Type type) {
-        if (type instanceof ParameterizedType parameterizedType) {
-            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            if (actualTypeArguments.length != 1) {
-                throw new ContainerException("Unknown collection type [%s]".formatted(type));
-            }
-            return castToClass(actualTypeArguments[0]);
-        }
-        throw new ContainerException("Element [%s] type is not generic".formatted(type));
-    }
-
-    private static Class<?> castToClass(Type type) {
-        if (type instanceof Class) {
-            return (Class<?>)type;
-        } else if (type instanceof ParameterizedType) {
-            return castToClass(((ParameterizedType) type).getRawType());
-        }
-        throw new ContainerException("Type [" + type + "] is not Class or ParameterizedType");
-    }
 
     protected BeanExtractor getBeanExtractor() {
         return beanExtractor;

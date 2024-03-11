@@ -1,15 +1,16 @@
 package ru.jengine.jsonconverter.additional;
 
+import com.google.gson.JsonObject;
+import ru.jengine.beancontainer.annotations.Shared;
+import ru.jengine.jsonconverter.formatting.FormatterContext;
+import ru.jengine.jsonconverter.formatting.JsonFormatter;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import ru.jengine.jsonconverter.formatting.FormatterContext;
-import ru.jengine.jsonconverter.formatting.JsonFormatter;
-
-import com.google.gson.JsonObject;
-
-public class CustomFormatter implements JsonFormatter {
+@Shared
+public class CustomFormatter implements JsonFormatter<FormatterContext> {
     @Override
     public int getPriority() {
         return 100;

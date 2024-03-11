@@ -1,15 +1,15 @@
 package ru.jengine.beancontainer.beandefinitionreades;
 
-import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
-import ru.jengine.beancontainer.classfinders.ClassFinder;
 import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.Shared;
+import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beandefinitions.JavaClassBeanDefinition;
+import ru.jengine.beancontainer.classfinders.ClassFinder;
 import ru.jengine.beancontainer.utils.AnnotationUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
     private final ClassFinder classFinder;
@@ -30,7 +30,11 @@ public class ClassPathBeanDefinitionReader implements BeanDefinitionReader {
         return beanClasses.stream()
                 .map(cls -> Map.entry(cls, AnnotationUtils.getAnnotation(cls, Bean.class)))
                 .filter(entry -> findInfrastructureBeans == entry.getValue().isInfrastructure())
-                .map(entry -> new JavaClassBeanDefinition(entry.getKey(), entry.getValue().scopeName()))
-                .collect(Collectors.toList());
+                .map(entry -> (BeanDefinition)new JavaClassBeanDefinition(
+                        entry.getKey(),
+                        entry.getValue().scopeName(),
+                        AnnotationUtils.isAnnotationPresent(entry.getKey(), Shared.class)
+                ))
+                .toList();
     }
 }

@@ -7,15 +7,20 @@ import java.util.Objects;
 public class JavaClassBeanDefinition implements BeanDefinition {
     private final Class<?> beanClass;
     private final String scopeName;
+    private final boolean isShared;
     private final BeanProducer beanProducer;
 
     public JavaClassBeanDefinition(Class<?> beanClass, String scopeName) {
-        this(beanClass, scopeName, null);
+        this(beanClass, scopeName, false, null);
     }
 
-    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, @Nullable BeanProducer beanProducer) {
+    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, boolean isShared) {
+        this(beanClass, scopeName, isShared, null);
+    }
+    public JavaClassBeanDefinition(Class<?> beanClass, String scopeName, boolean isShared, @Nullable BeanProducer beanProducer) {
         this.beanClass = beanClass;
         this.scopeName = scopeName;
+        this.isShared = isShared;
         this.beanProducer = beanProducer;
     }
 
@@ -27,6 +32,11 @@ public class JavaClassBeanDefinition implements BeanDefinition {
     @Override
     public String getScopeName() {
         return scopeName;
+    }
+
+    @Override
+    public boolean isShared() {
+        return isShared;
     }
 
     @Override

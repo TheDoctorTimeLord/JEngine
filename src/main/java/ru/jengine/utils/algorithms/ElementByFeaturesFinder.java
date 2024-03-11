@@ -1,15 +1,14 @@
 package ru.jengine.utils.algorithms;
 
+import com.google.common.base.Objects;
+
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import javax.annotation.Nullable;
-
-import com.google.common.base.Objects;
 
 public class ElementByFeaturesFinder<Classified, Feature, Element> {
     private static final Comparator<Object> DEFAULT_COMPARATOR = (o1, o2) -> 0;
@@ -50,6 +49,11 @@ public class ElementByFeaturesFinder<Classified, Feature, Element> {
         this.featuresFromClassifiedExtractor = featuresFromClassifiedExtractor;
         this.elementSelector = elementSelector;
         this.elementSorter = elementSorter;
+    }
+
+    public void clear() {
+        commonElements.clear();
+        conditionedElements.clear();
     }
 
     public void addElement(Element element) {

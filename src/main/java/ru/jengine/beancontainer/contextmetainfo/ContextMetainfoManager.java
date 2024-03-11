@@ -1,21 +1,19 @@
 package ru.jengine.beancontainer.contextmetainfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import ru.jengine.beancontainer.ContainerState;
 import ru.jengine.beancontainer.beanfactory.BeanFactoryWithSources;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.contexts.ContainerContextFacade;
+import ru.jengine.beancontainer.events.LoadedContextMetainfoEvent;
 import ru.jengine.beancontainer.events.RemoveContextEvent;
 import ru.jengine.beancontainer.events.StartingInitializeContextsPhase;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
 import ru.jengine.beancontainer.statepublisher.ContainerListener;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 public class ContextMetainfoManager {
     private final ContainerConfiguration configuration;
@@ -69,6 +67,7 @@ public class ContextMetainfoManager {
 
         eventDispatcher.registerListener(new OnRemoveContextListener(metainfo, newContextName));
         contextFacade.registerContext(newContextName, containerContext);
+        eventDispatcher.publish(new LoadedContextMetainfoEvent(newContextName, metainfo, containerContext), state);
 
         List<String> loadedContexts = new ArrayList<>();
         for (String beanSource : beanSources) {
@@ -126,7 +125,9 @@ public class ContextMetainfoManager {
 
         @Override
         public void handle(RemoveContextEvent event, ContainerState containerState) {
-            if (contextMetainfo.getBeanSources().contains(event.getContextName())) {
+            String removedContextName = event.contextName();
+            //Если удалённый контекст есть у нас в зависимостях, то инициируем своё удаление
+            if (contextMetainfo.getBeanSources().contains(removedContextName)) {
                 containerState.getContainerContextFacade().removeContext(contextName);
                 removeListener(containerState);
             }

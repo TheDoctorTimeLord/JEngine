@@ -18,7 +18,7 @@ public class ClassPathScanner implements ClassFinder {
     @Override
     public void scan(String scanningPackage) {
         reflections = new Reflections(ConfigurationBuilder
-                .build(scanningPackage)
+                .build(scanningPackage) //TODO исправить баг с чтением путей (читает по подстроке от последней папки)
                 .setScanners(new TypeAnnotationsScannerExtensions(), new SubTypesScanner())
         );
     }

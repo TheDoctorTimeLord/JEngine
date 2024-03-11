@@ -11,6 +11,7 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
     private Class<?> collectionClass;
     private Annotation[] annotations;
     private String[] beanContextSource;
+    private Class<? extends Annotation> expectedAnnotation;
 
     ResolvingPropertyDefinition(Class<?> requestedClass) {
         this.requestedClass = requestedClass;
@@ -38,6 +39,12 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
         return beanContextSource;
     }
 
+    @Nullable
+    @Override
+    public Class<? extends Annotation> getExpectedAnnotation() {
+        return expectedAnnotation;
+    }
+
     public ResolvingPropertyDefinition collectionClass(Class<?> collectionClass) {
         this.collectionClass = collectionClass;
         return this;
@@ -45,6 +52,11 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
 
     public ResolvingPropertyDefinition annotated(Annotation[] annotations) {
         this.annotations = annotations;
+        return this;
+    }
+
+    public ResolvingPropertyDefinition expectedAnnotation(Class<? extends Annotation> annotationClass) {
+        this.expectedAnnotation = annotationClass;
         return this;
     }
 
@@ -56,6 +68,7 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
     public ResolvingPropertyDefinition fill(ResolvingProperties other) {
         return collectionClass(other.getCollectionClass())
                 .annotated(other.getAnnotations())
+                .expectedAnnotation(other.getExpectedAnnotation())
                 .beanContextSource(other.getBeanContextSources());
     }
 
@@ -65,6 +78,7 @@ public class ResolvingPropertyDefinition implements ResolvingProperties {
                 "requestedClass=" + requestedClass +
                 ", collectionClass=" + collectionClass +
                 ", annotations=" + Arrays.toString(annotations) +
+                ", expectedAnnotation=" + expectedAnnotation +
                 ", beanContextSource=" + Arrays.toString(beanContextSource) +
                 '}';
     }

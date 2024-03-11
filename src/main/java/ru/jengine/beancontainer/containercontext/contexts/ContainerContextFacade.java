@@ -7,6 +7,7 @@ import ru.jengine.beancontainer.containercontext.BeanResolver;
 import ru.jengine.beancontainer.containercontext.ContainerContext;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
+import ru.jengine.beancontainer.events.RegisterContextEvent;
 import ru.jengine.beancontainer.events.RemoveContextEvent;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.infrastructuretools.BeanCandidatesService;
@@ -37,13 +38,16 @@ public class ContainerContextFacade implements BeanExtractor, Stoppable {
         }
 
         containedContexts.put(contextName, context);
+        if (eventPublisher != null) {
+            eventPublisher.publish(new RegisterContextEvent(contextName, context));
+        }
     }
 
     public void removeContext(String contextName) {
         ContainerContext removedContext = containedContexts.remove(contextName);
         if (removedContext != null) {
             removedContext.stop();
-            eventPublisher.publish(new RemoveContextEvent(contextName));
+            eventPublisher.publish(new RemoveContextEvent(contextName, removedContext));
         }
     }
 

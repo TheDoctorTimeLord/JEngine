@@ -1,14 +1,7 @@
 package ru.jengine.beancontainer.containercontext.scopes;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beanfactory.BeanFactory;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
@@ -16,6 +9,12 @@ import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPr
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanPreRemoveProcessor;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanProcessor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SingletonBeanScope extends AbstractBeanScope {
     private static final Logger LOG = LoggerFactory.getLogger(SingletonBeanScope.class);

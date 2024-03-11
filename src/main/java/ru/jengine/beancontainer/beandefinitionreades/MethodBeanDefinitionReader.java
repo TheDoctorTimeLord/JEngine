@@ -2,6 +2,7 @@ package ru.jengine.beancontainer.beandefinitionreades;
 
 import org.reflections.ReflectionUtils;
 import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition.BeanProducer;
 import ru.jengine.beancontainer.beandefinitions.JavaClassBeanDefinition;
@@ -26,6 +27,7 @@ public class MethodBeanDefinitionReader implements BeanDefinitionReader {
                 .map(method -> (BeanDefinition)new JavaClassBeanDefinition(
                         method.getReturnType(),
                         AnnotationUtils.getAnnotation(method, Bean.class).scopeName(),
+                        AnnotationUtils.isAnnotationPresent(method, Shared.class),
                         new BeanProducer(method, module)
                 ))
                 .toList();

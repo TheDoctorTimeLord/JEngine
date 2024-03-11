@@ -1,10 +1,8 @@
 package ru.jengine.jsonconverter;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
+import com.google.gson.*;
 import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.SharedBeansProvider;
 import ru.jengine.jsonconverter.exceptions.JsonConverterException;
 import ru.jengine.jsonconverter.exceptions.JsonLoaderException;
 import ru.jengine.jsonconverter.exceptions.ResourceLoadingException;
@@ -16,42 +14,44 @@ import ru.jengine.jsonconverter.serializeprocess.JsonConverterDeserializer;
 import ru.jengine.jsonconverter.serializeprocess.JsonConverterSerializer;
 import ru.jengine.utils.HierarchyWalkingUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSyntaxException;
+import javax.annotation.Nullable;
+import java.util.List;
 
 @Bean
 public class JsonConverterImpl implements JsonConverter {
-    private final Gson gson;
     private final JsonParser jsonParser;
     private final JsonLoader jsonLoader;
     private final JsonFormatterManager jsonFormatterManager;
+    private final GsonBuilderConfigurer gsonBuilderConfigurer;
+    private Gson gson;
 
     public JsonConverterImpl(JsonLoader jsonLoader, JsonFormatterManager jsonFormatterManager, JsonParser jsonParser,
-            @Nullable GsonBuilderConfigurer gsonBuilderConfigurer, List<JsonConverterSerializer<?>> serializers,
-            List<JsonConverterDeserializer<?>> deserializers)
+            @Nullable GsonBuilderConfigurer gsonBuilderConfigurer)
     {
         this.jsonLoader = jsonLoader;
         this.jsonFormatterManager = jsonFormatterManager;
         this.jsonParser = jsonParser;
+        this.gsonBuilderConfigurer = gsonBuilderConfigurer == null ? gsonBuilder -> {} : gsonBuilderConfigurer;
+    }
+
+    @SharedBeansProvider
+    private void configureGson(List<JsonConverterSerializer<?>> serializers,
+            List<JsonConverterDeserializer<?>> deserializers)
+    {
         this.gson = prepareGson(
-                gsonBuilderConfigurer != null ? gsonBuilderConfigurer : gsonBuilder -> {},
                 serializers,
                 deserializers
         );
     }
 
-    private static Gson prepareGson(GsonBuilderConfigurer configurer, List<JsonConverterSerializer<?>> serializers,
+    private Gson prepareGson(List<JsonConverterSerializer<?>> serializers,
             List<JsonConverterDeserializer<?>> deserializers)
     {
         GsonBuilder builder = new GsonBuilder();
 
         addSerializers(builder, serializers);
         addDeserializers(builder, deserializers);
-        configurer.configure(builder);
+        gsonBuilderConfigurer.configure(builder);
 
         return builder.create();
     }
