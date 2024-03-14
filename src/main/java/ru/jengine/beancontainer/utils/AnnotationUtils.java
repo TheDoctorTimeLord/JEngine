@@ -3,19 +3,16 @@ package ru.jengine.beancontainer.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.exceptions.ContainerException;
+import ru.jengine.utils.ReflectionUtils;
 
 import javax.annotation.Nullable;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnnotationUtils {
@@ -59,14 +56,19 @@ public class AnnotationUtils {
             return cache;
         }
 
-        List<Annotation> result = Stream.of(annotationOwner.getAnnotations())
-                .map(AnnotationUtils::resolveNotSystemAnnotation)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        Stream<Annotation> declaredOnElement = Stream.of(annotationOwner.getAnnotations())
+                .flatMap(annotation -> resolveNotSystemAnnotation(annotation).stream());
 
-        allAnnotationByClassCache.put(annotationOwner, result);
+        Stream<Annotation> declaredOnSuperclass = annotationOwner instanceof Class<?> cls
+                ? ReflectionUtils.walkBySuperclasses(cls.getSuperclass())
+                        .flatMap(c -> Stream.of(c.getAnnotations()))
+                        .filter(annotation -> annotation.annotationType().isAnnotationPresent(Inherited.class))
+                        .flatMap(annotation -> resolveNotSystemAnnotation(annotation).stream())
+                : Stream.of();
 
-        return result;
+        List<Annotation> allAnnotations = Stream.concat(declaredOnElement, declaredOnSuperclass).toList();
+        allAnnotationByClassCache.put(annotationOwner, allAnnotations);
+        return allAnnotations;
     }
 
     public static List<Annotation> resolveNotSystemAnnotation(String annotationName) {

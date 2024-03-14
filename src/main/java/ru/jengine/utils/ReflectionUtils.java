@@ -7,7 +7,7 @@ public class ReflectionUtils {
     public static final Predicate<Class<?>> IS_CLASS_PREDICATE =
             cls -> !cls.isAnnotation() && !cls.isInterface() && !cls.isEnum() && !cls.isRecord();
 
-    public static boolean hasInterface(Class<?> cls, Class<?> presentInterface) {
-        return Stream.of(cls.getInterfaces()).anyMatch(presentInterface::isAssignableFrom);
+    public static Stream<Class<?>> walkBySuperclasses(Class<?> child) {
+        return Stream.iterate(child, cls -> cls.getSuperclass() != null, Class::getSuperclass);
     }
 }
