@@ -2,7 +2,6 @@ package ru.jengine.eventqueue;
 
 import ru.jengine.beancontainer.annotations.Bean;
 import ru.jengine.beancontainer.annotations.PreDestroy;
-import ru.jengine.beancontainer.annotations.SharedBeansProvider;
 import ru.jengine.eventqueue.asyncdispatcher.AsyncDispatcher;
 import ru.jengine.eventqueue.asyncdispatcher.AsyncDispatcherImpl;
 import ru.jengine.eventqueue.asyncdispatcher.StubAsyncDispatcher;
@@ -28,13 +27,12 @@ public class Dispatcher implements EventPoolProvider, PollableEventHandlerRegist
         SynchronousEventHandler, EventPoolHandlersManager
 {
     private final Map<String, EventPool> eventPoolByCode = new ConcurrentHashMap<>();
-    private Map<String, EventPoolHandler> eventPoolHandlers;
-    private List<EventInterceptor> interceptors;
-    private AsyncDispatcher asyncDispatcher;
-    private EventHandlingContext mainEventHandlingContext;
+    private final Map<String, EventPoolHandler> eventPoolHandlers;
+    private final List<EventInterceptor> interceptors;
+    private final AsyncDispatcher asyncDispatcher;
+    private final EventHandlingContext mainEventHandlingContext;
 
-    @SharedBeansProvider
-    private void initializeDispatcher(List<EventInterceptor> interceptors, List<EventPoolHandler> eventPoolHandlers,
+    public Dispatcher(List<EventInterceptor> interceptors, List<EventPoolHandler> eventPoolHandlers,
                       List<PreHandler<?>> commonPreHandlers)
     {
         this.interceptors = interceptors;
