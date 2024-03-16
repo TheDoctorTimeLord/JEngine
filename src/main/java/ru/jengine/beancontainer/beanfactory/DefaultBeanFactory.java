@@ -88,7 +88,22 @@ public class DefaultBeanFactory implements BeanFactory {
         properties.annotated(parameter.getParameterAnnotations());
         customizeProperties(parameter, properties);
         ResolvedBeanData extractedBean = getBeanExtractor().getBean(properties);
-        return extractedBean.isResolved() ? extractedBean.getBeanValue() : null;
+        return handleResolvedBean(parameter, extractedBean);
+    }
+
+    protected Object handleResolvedBean(Parameter parameter, ResolvedBeanData bean) {
+        if (bean.isResolved()) {
+            return bean.getBeanValue();
+        }
+
+        if (parameter.isParameterAnnotated(javax.annotation.Nullable.class)
+            || parameter.isParameterAnnotated(org.jetbrains.annotations.Nullable.class))
+        {
+            return null;
+        }
+
+        throw new ContainerException("Argument with type [%s] on position [%d] is not resolved"
+                .formatted(parameter.getParameterType(), parameter.getParameterPosition()));
     }
 
     protected void customizeProperties(Parameter parameter, ResolvingPropertyDefinition properties) { }
