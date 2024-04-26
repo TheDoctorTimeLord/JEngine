@@ -1,17 +1,18 @@
 package ru.jengine.jsonconverter.linking;
 
-import java.util.List;
+import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.beancontainer.annotations.SharedBeansProvider;
+import ru.jengine.jsonconverter.resources.ResourceMetadata;
 
 import javax.annotation.Nullable;
-
-import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.jsonconverter.resources.ResourceMetadata;
+import java.util.List;
 
 @Bean
 public class LinkExtractorManager {
-    private final List<LinkExtractor> extractors;
+    private List<LinkExtractor> extractors = List.of();
 
-    public LinkExtractorManager(List<LinkExtractor> extractors) {
+    @SharedBeansProvider
+    private void provideLinkExtractors(List<LinkExtractor> extractors) {
         this.extractors = extractors;
     }
 

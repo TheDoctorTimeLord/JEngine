@@ -1,13 +1,14 @@
 package ru.jengine.jsonconverter.additional;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.jetbrains.annotations.Nullable;
-
+import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.jsonconverter.linking.LinkExtractor;
 import ru.jengine.jsonconverter.resources.ResourceMetadata;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Shared
 public class LinkExtractorImpl implements LinkExtractor {
     private static final Pattern LINK_PATTERN = Pattern.compile("(\\w+):(\\w+)(:(\\w+))?");
 

@@ -88,7 +88,7 @@ public class JsonConverterImpl implements JsonConverter {
     @Override
     public <T> T convertFromJson(ResourceMetadata resource, Class<T> convertTo) {
         try {
-            return convertFromJson(jsonLoader.getJson(resource), convertTo, jsonLoader.hasInCache(resource));
+            return convertFromJson(jsonLoader.getJson(resource), convertTo, !jsonLoader.hasInCache(resource));
         }
         catch (JsonLoaderException | ResourceLoadingException e) {
             throw new JsonConverterException("Resource can not be loaded [%s]".formatted(resource), e);

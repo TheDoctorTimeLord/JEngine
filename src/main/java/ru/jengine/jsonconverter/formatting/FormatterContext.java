@@ -46,7 +46,7 @@ public class FormatterContext {
             jsonLoader.addResourceToCache(metadata, linkedJson);
         }
 
-        jsonLinker.link(json, field, linkedJson);
+        jsonLinker.link(json, field, linkedJson.deepCopy());
 
         return linkedJson;
     }
@@ -65,7 +65,7 @@ public class FormatterContext {
             JsonElement jsonElement = entry.getValue();
 
             if (!json.has(parentField)) {
-                json.add(parentField, jsonElement);
+                json.add(parentField, jsonElement.deepCopy());
             }
         }
     }
@@ -84,16 +84,32 @@ public class FormatterContext {
                 .toList();
     }
 
+    public void ifType(JsonObject json, String expectedType, Runnable handler) {
+        String type = asString(json, JsonConverterConstants.TYPE);
+        if (expectedType.equals(type)) {
+            json.remove(JsonConverterConstants.TYPE);
+            handler.run();
+        }
+    }
+
     public static JsonPrimitive asPrimitive(JsonObject json, String field) {
-        JsonElement value = json.get(field);
-        if (value == null || !value.isJsonPrimitive()) {
+        return asPrimitive(json, field, false);
+    }
+
+    public static JsonPrimitive asPrimitive(JsonObject json, String field, boolean remove) {
+        JsonElement element = remove ? json.remove(field) : json.get(field);
+        if (element == null || !element.isJsonPrimitive()) {
             throw new JsonConverterException("Field [%s] must be primitive in [%s]".formatted(field, json));
         }
-        return value.getAsJsonPrimitive();
+        return element.getAsJsonPrimitive();
     }
 
     public static String asString(JsonObject json, String field) {
-        JsonPrimitive primitive = asPrimitive(json, field);
+        return asString(json, field, false);
+    }
+
+    public static String asString(JsonObject json, String field, boolean remove) {
+        JsonPrimitive primitive = asPrimitive(json, field, remove);
         if (!primitive.isString()) {
             throw new JsonConverterException("Field [%s] must be string in [%s]".formatted(field, json));
         }
@@ -124,7 +140,7 @@ public class FormatterContext {
     }
 
     public static Class<?> classPath(JsonObject json) throws JsonParseException {
-        JsonPrimitive classPathPrimitive = asPrimitive(json, JsonConverterConstants.CLASS_PATH_FIELD);
+        JsonPrimitive classPathPrimitive = asPrimitive(json, JsonConverterConstants.CLASS_PATH_FIELD, true);
         if (!classPathPrimitive.isString()) {
             throw new JsonConverterException("Class path is incorrect. ClassPath [%s] in [%s]"
                     .formatted(classPathPrimitive, json));
@@ -138,5 +154,9 @@ public class FormatterContext {
         catch (ClassNotFoundException e) {
             throw new JsonConverterException("Class path is incorrect [%s]".formatted(classPathStr), e);
         }
+    }
+
+    public static void setClassPath(JsonObject json, Class<?> cls) {
+        json.addProperty(JsonConverterConstants.CLASS_PATH_FIELD, cls.getName());
     }
 }

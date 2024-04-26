@@ -1,17 +1,17 @@
 package ru.jengine.jsonconverter.resources;
 
+import com.google.gson.JsonElement;
+import ru.jengine.beancontainer.annotations.Bean;
+import ru.jengine.jsonconverter.exceptions.JsonLoaderException;
+import ru.jengine.jsonconverter.exceptions.ResourceLoadingException;
+import ru.jengine.jsonconverter.resources.ResourceLoader.CacheChangeType;
+import ru.jengine.utils.CollectionUtils;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import ru.jengine.beancontainer.annotations.Bean;
-import ru.jengine.jsonconverter.exceptions.JsonLoaderException;
-import ru.jengine.jsonconverter.exceptions.ResourceLoadingException;
-import ru.jengine.utils.CollectionUtils;
-
-import com.google.gson.JsonElement;
 
 @Bean
 public class JsonLoaderImpl implements JsonLoader {
@@ -23,6 +23,12 @@ public class JsonLoaderImpl implements JsonLoader {
     public JsonLoaderImpl(ResourceLoader resourceLoader, JsonParser jsonParser) {
         this.resourceLoader = resourceLoader;
         this.jsonParser = jsonParser;
+
+        resourceLoader.addCacheListener(((metadata, changeType) -> {
+            if (CacheChangeType.REPLACE.equals(changeType) || CacheChangeType.DELETE.equals(changeType)) {
+                jsonCache.remove(metadata);
+            }
+        }));
     }
 
     @Override
@@ -46,7 +52,7 @@ public class JsonLoaderImpl implements JsonLoader {
             throw new JsonLoaderException("Resource by metadata [%s] is not found".formatted(metadata));
         }
 
-        String json = resourceLoader.getResource(metadata);
+        String json = resourceLoader.getResource(currentMetadata);
         JsonElement parsedJson = jsonParser.parseJson(json);
 
         while (!pathInnerJson.isEmpty() && parsedJson.isJsonObject()) {

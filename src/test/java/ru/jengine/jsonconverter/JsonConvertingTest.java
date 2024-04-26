@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JsonConvertingTest {
-
+    private static final ResourceMetadata PATH_TOKEN = new ResourceMetadata("ns", null, "path");
     private static JsonConverter jsonConverter;
     private static ResourceLoader resourceLoader;
 
@@ -36,46 +36,40 @@ public class JsonConvertingTest {
 
     @Test
     public void testApplyParentAttributes() {
-        resourceLoader.addResourceToCache(
-                new ResourceMetadata("ns", null, "path"), "{\"a\": 2, \"c\": 3}"
-        );
+        resourceLoader.addResourceToCache(PATH_TOKEN, "{\"a\": 2, \"c\": 3}");
 
-        A a = jsonConverter.convertFromJson(
+        A actual = jsonConverter.convertFromJson(
                 "{\"parent\": \"ns:path\", \"a\": 5}",
                 A.class
         );
-        assertThat(a.a, is(5));
-        assertThat(a.b, nullValue());
-        assertThat(a.c, is(3));
+        assertThat(actual.a, is(5));
+        assertThat(actual.b, nullValue());
+        assertThat(actual.c, is(3));
     }
 
     @Test
     public void testFindLinkedAttributes() {
-        resourceLoader.addResourceToCache(
-                new ResourceMetadata("ns", null, "path"), "{\"a\": 2, \"c\": 3}"
-        );
+        resourceLoader.addResourceToCache(PATH_TOKEN, "{\"a\": 2, \"c\": 3}");
 
-        A a = jsonConverter.convertFromJson(
+        A actual = jsonConverter.convertFromJson(
                 "{\"a\": 5, \"b\": \"ns:path\"}",
                 A.class
         );
-        assertThat(a.a, is(5));
-        assertThat(a.b.a, is(2));
-        assertThat(a.b.c, is(3));
+        assertThat(actual.a, is(5));
+        assertThat(actual.b.a, is(2));
+        assertThat(actual.b.c, is(3));
     }
 
     @Test
     public void testCreateByInterface() {
-        resourceLoader.addResourceToCache(
-                new ResourceMetadata("ns", null, "path"), "{\"a\": 2, \"c\": 3}"
-        );
+        resourceLoader.addResourceToCache(PATH_TOKEN, "{\"a\": 2, \"c\": 3}");
 
-        C c = jsonConverter.convertFromJson(
+        C actual = jsonConverter.convertFromJson(
                 "{\"a\": 5}",
                 C.class
         );
-        assertThat(c, instanceOf(D.class));
-        assertThat(((D)c).a, is(5));
+        assertThat(actual, instanceOf(D.class));
+        assertThat(((D)actual).a, is(5));
     }
 
     @Test
@@ -99,6 +93,44 @@ public class JsonConvertingTest {
         JsonObject innerB = castedResult.getAsJsonObject("b");
         assertThat(innerB.get("a").getAsInt(), is(3));
         assertThat(innerB.get("c").getAsInt(), is(4));
+    }
+
+    @Test
+    public void testHierarchyFormatting() {
+        resourceLoader.addResourceToCache(PATH_TOKEN, "true");
+
+        E actual = jsonConverter.convertFromJson(
+                """
+                     {
+                         "check": "ns:path",
+                         "child1": {
+                             "check": "ns:path",
+                             "child1": {
+                                 "check": "ns:path"
+                             }
+                         },
+                         "child2": {
+                             "check": "ns:path"
+                         }
+                     }""",
+                E.class
+        );
+
+        assertThat(actual.getCheck(), is(true));
+        assertThat(actual.getChild1(), notNullValue());
+        assertThat(actual.getChild2(), notNullValue());
+
+        assertThat(actual.getChild1().getCheck(), is(true));
+        assertThat(actual.getChild1().getChild1(), notNullValue());
+        assertThat(actual.getChild1().getChild2(), nullValue());
+
+        assertThat(actual.getChild1().getChild1().getCheck(), is(true));
+        assertThat(actual.getChild1().getChild1().getChild1(), nullValue());
+        assertThat(actual.getChild1().getChild1().getChild2(), nullValue());
+
+        assertThat(actual.getChild2().getCheck(), is(true));
+        assertThat(actual.getChild2().getChild1(), nullValue());
+        assertThat(actual.getChild2().getChild2(), nullValue());
     }
 
     @ContainerModule(contextName = Contexts.JSON_CONVERTER_CONTEXT)
