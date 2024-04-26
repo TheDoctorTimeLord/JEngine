@@ -20,12 +20,13 @@ public class DefaultModuleFactory implements ModuleFactory {
         return createModule(moduleClass, context);
     }
 
-    private static ModuleContext createModuleContext(Class<?> moduleClass, ContainerConfiguration configuration) {
+    private ModuleContext createModuleContext(Class<?> moduleClass, ContainerConfiguration configuration) {
         ClassFinder classFinder = extractClassFinderFromModule(moduleClass, configuration);
         return new ModuleContext(classFinder, moduleClass);
     }
 
-    private static ClassFinder extractClassFinderFromModule(Class<?> moduleClass, ContainerConfiguration configuration) {
+    @Override
+    public ClassFinder extractClassFinderFromModule(Class<?> moduleClass, ContainerConfiguration configuration) {
         if (AnnotationUtils.isAnnotationPresent(moduleClass, PackageScan.class)) {
             String packageToScan = AnnotationUtils.getAnnotation(moduleClass, PackageScan.class).value();
             return scanPackage(packageToScan, configuration);

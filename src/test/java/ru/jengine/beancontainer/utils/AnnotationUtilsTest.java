@@ -25,6 +25,11 @@ public class AnnotationUtilsTest {
         MatcherAssert.assertThat(actual, not(hasItem(OnPresented2.class)));
     }
 
+    @Test
+    public void testFunctionalInterfaceResolveWithoutExceptions() {
+        AnnotationUtils.resolveNotSystemAnnotation("java.lang.FunctionalInterface");
+    }
+
     @OnClass1
     @OnClass2
     private static class Start extends Superclass {}

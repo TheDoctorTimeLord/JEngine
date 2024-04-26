@@ -137,7 +137,7 @@ public class ModuleFinderOperation extends ContainerOperation {
         externalSetModules.values().stream()
                 .flatMap(Collection::stream)
                 .forEach(module -> moduleFactory.configureModule(module, new ModuleContext(
-                        configuration.getClassFinderFactory().get(),
+                        moduleFactory.extractClassFinderFromModule(module.getClass(), configuration),
                         module.getClass()
                 )));
 
