@@ -31,9 +31,9 @@ public class BeanFactoryWithSources extends DefaultBeanFactory {
         } catch (ContainerException e) {
             Api apiAnnotation = AnnotationUtils.extractAnnotation(parameter.getContainer().getContainerAnnotations(), Api.class);
             if (apiAnnotation != null) {
-                String errorMessage = findAppropriateMessage(apiAnnotation.value(), parameter.getParameterPosition());
-                if (errorMessage != null) {
-                    throw new ContainerException(errorMessage, e);
+                String resolution = findAppropriateResolution(apiAnnotation.value(), parameter.getParameterPosition());
+                if (resolution != null) {
+                    throw new ContainerException(e.getMessage() + "\nResolution: " + resolution);
                 }
             }
             throw e;
@@ -41,7 +41,7 @@ public class BeanFactoryWithSources extends DefaultBeanFactory {
     }
 
     @Nullable
-    private static String findAppropriateMessage(ApiElement[] value, int parameterPosition) {
+    private static String findAppropriateResolution(ApiElement[] value, int parameterPosition) {
         for (ApiElement element : value) {
             if (element.index() == parameterPosition) {
                 return element.message();

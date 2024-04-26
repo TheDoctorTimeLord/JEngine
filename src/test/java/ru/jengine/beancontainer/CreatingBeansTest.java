@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
+import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.intstructure.pac10.R;
 import ru.jengine.beancontainer.intstructure.pac10.StartModuleWithPostConstructAndPreDestroy;
 import ru.jengine.beancontainer.intstructure.pac11.RemoveCounter;
@@ -17,6 +18,8 @@ import ru.jengine.beancontainer.intstructure.pac14.Z;
 import ru.jengine.beancontainer.intstructure.pac15.*;
 import ru.jengine.beancontainer.intstructure.pac16.AE;
 import ru.jengine.beancontainer.intstructure.pac16.AF;
+import ru.jengine.beancontainer.intstructure.pac17.EmptyParameter;
+import ru.jengine.beancontainer.intstructure.pac17.StartModuleWithApiAnnotation;
 import ru.jengine.beancontainer.intstructure.pac4.A;
 import ru.jengine.beancontainer.intstructure.pac4.B;
 import ru.jengine.beancontainer.intstructure.pac4.C;
@@ -287,6 +290,25 @@ public class CreatingBeansTest {
         MatcherAssert.assertThat(sharedBeans, not(hasItem(AF.class)));
         MatcherAssert.assertThat(sharedBeans, not(hasItem(AC.class)));
         MatcherAssert.assertThat(sharedBeans, not(hasItem(AD.class)));
+    }
+
+    @Test
+    public void testAbsentValueForApiParameter() {
+        JEngineContainer container = new JEngineContainer(ContainerConfiguration.builder(StartModuleWithApiAnnotation.class).build());
+        try {
+            container.initializeContainerByDefault();
+            Assert.fail("Expected error with message [%s]".formatted(EmptyParameter.API_MESSAGE));
+        } catch (ContainerException e) {
+            Throwable current = e;
+            while (current != null) {
+                if (current.getMessage().contains(EmptyParameter.API_MESSAGE)) {
+                    return;
+                }
+                current = current.getCause();
+            }
+            Assert.fail("Expected error message [%s] but was received [%s]"
+                    .formatted(EmptyParameter.API_MESSAGE, e.getMessage()));
+        }
     }
 
     @ContainerModule(contextName = Constants.Contexts.DEFAULT_CONTEXT)

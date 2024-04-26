@@ -18,7 +18,11 @@ public class Parameter {
     }
 
     public Annotation[] getParameterAnnotations() {
-        return parametersContainer.getAnnotations()[getParameterPosition()];
+        return parametersContainer.getParametersAnnotations()[getParameterPosition()];
+    }
+
+    public ParametersContainer getContainer() {
+        return parametersContainer;
     }
 
     public Type getParameterType() {
@@ -30,11 +34,6 @@ public class Parameter {
     }
 
     public boolean isParameterAnnotated(Class<? extends Annotation> annotation) {
-        for (Annotation parameterAnnotation : getParameterAnnotations()) {
-            if (parameterAnnotation.annotationType().equals(annotation)) {
-                return true;
-            }
-        }
-        return false;
+        return AnnotationUtils.extractAnnotation(getParameterAnnotations(), annotation) != null;
     }
 }

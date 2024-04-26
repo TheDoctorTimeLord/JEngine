@@ -8,10 +8,7 @@ import ru.jengine.utils.ReflectionUtils;
 import javax.annotation.Nullable;
 import java.lang.annotation.*;
 import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -134,5 +131,15 @@ public class AnnotationUtils {
             }
         }
         return null;
+    }
+
+    public static boolean isAnnotationsPresent(AnnotatedElement owner, Class<Annotation>... annotations) {
+        Set<Class<Annotation>> annotationsSet = Set.of(annotations);
+        for (Annotation annotation : owner.getAnnotations()) {
+            if (annotationsSet.contains(annotation.annotationType())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

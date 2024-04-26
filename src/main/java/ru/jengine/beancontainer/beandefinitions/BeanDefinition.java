@@ -20,7 +20,7 @@ public interface BeanDefinition {
 
     record BeanProducer(ParametersContainer parametersContainer, Function<Object[], Object> producer) {
         public BeanProducer(Supplier<Object> producer) {
-            this(new ParametersContainer(new Class<?>[0], new Type[0], new Annotation[0][0]), args -> producer.get());
+            this(new ParametersContainer(new Class<?>[0], new Type[0], new Annotation[0][0], new Annotation[0]), args -> producer.get());
         }
 
         public BeanProducer(Method executable, Object executableOwner) {
