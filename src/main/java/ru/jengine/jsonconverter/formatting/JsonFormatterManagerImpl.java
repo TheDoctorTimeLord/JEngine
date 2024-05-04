@@ -17,9 +17,9 @@ public class JsonFormatterManagerImpl implements JsonFormatterManager {
     private final JsonLoader jsonLoader;
     private final JsonLinker jsonLinker;
 
-    private FormatterContext formatterContext;
+    private FormatterContextBuilder<FormatterContext> formatterContextBuilder;
 
-    private final ElementByFeaturesFinder<JsonObject, String, JsonFormatter<?>> formatters =
+    private final ElementByFeaturesFinder<JsonObject, String, JsonFormatter<FormatterContext>> formatters =
             new ElementByFeaturesFinder<>(
                     JsonFormatter::getRequiredFields,
                     JsonObject::keySet,
@@ -29,33 +29,37 @@ public class JsonFormatterManagerImpl implements JsonFormatterManager {
     public JsonFormatterManagerImpl(JsonLoader jsonLoader, JsonLinker jsonLinker) {
         this.jsonLoader = jsonLoader;
         this.jsonLinker = jsonLinker;
-        this.formatterContext = new FormatterContext(jsonLoader, jsonLinker, this);
+        this.formatterContextBuilder = new SingletonFormatterContextBuilder();
     }
 
     @SharedBeansProvider
+    @SuppressWarnings("unchecked")
     private void provideFormatters(List<JsonFormatter<?>> formatters) {
         this.formatters.clear();
         for (JsonFormatter<?> formatter : formatters) {
-            this.formatters.addElement(formatter);
+            this.formatters.addElement((JsonFormatter<FormatterContext>) formatter);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void registerFormatter(JsonFormatter<?> formatter) {
-        this.formatters.addElement(formatter);
+        this.formatters.addElement((JsonFormatter<FormatterContext>) formatter);
     }
 
+    @SuppressWarnings("unchecked")
     public void removeFormatter(JsonFormatter<?> formatter) {
-        this.formatters.removeElement(formatter);
+        this.formatters.removeElement((JsonFormatter<FormatterContext>) formatter);
     }
 
-    public void prepareContexts(JsonFormatterContextBuilder formatterContextBuilder)
+    @SuppressWarnings("unchecked")
+    public <C extends FormatterContext> void setFormatterContextStrategy(FormatterContextBuilder<C> strategy)
     {
-        this.formatterContext = formatterContextBuilder.build(jsonLoader, jsonLinker, this);
+        this.formatterContextBuilder = (FormatterContextBuilder<FormatterContext>) strategy;
     }
 
     @Override
     public boolean formatJson(JsonObject json) {
-        //Проходим BFS по всем объектам дерева и собираем стек обратного прохода для dформатирования
+        //Проходим BFS по всем объектам дерева и собираем стек обратного прохода для форматирования
         List<JsonObject> objectHierarchy = new ArrayList<>();
         objectHierarchy.add(json);
         int currentElement = 0;
@@ -86,19 +90,9 @@ public class JsonFormatterManagerImpl implements JsonFormatterManager {
 
     public boolean useFormatters(JsonObject json) {
         boolean canBeCached = true;
-        for (JsonFormatter<?> formatter : formatters.findAvailableElements(json)) {
-            canBeCached = formatter.formatJson(json, getContext()) && canBeCached;
+        for (JsonFormatter<FormatterContext> formatter : formatters.findAvailableElements(json)) {
+            canBeCached = formatter.formatJson(json, formatterContextBuilder.getContext(jsonLoader, jsonLinker, this)) && canBeCached;
         }
         return canBeCached;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <C extends FormatterContext> C getContext() {
-        return (C)formatterContext;
-    }
-
-    @FunctionalInterface
-    public interface JsonFormatterContextBuilder {
-        FormatterContext build(JsonLoader jsonLoader, JsonLinker jsonLinker, JsonFormatterManager jsonFormatterManager);
     }
 }

@@ -133,6 +133,16 @@ public class JsonConvertingTest {
         assertThat(actual.getChild2().getChild2(), nullValue());
     }
 
+    @Test
+    public void testConvertingTransient() {
+        F actual = jsonConverter.convertFromJson("""
+                {"notTransientField": 5, "transientField": 5}""",
+                F.class);
+
+        assertThat(actual.getTransientField(), is(0));
+        assertThat(actual.getNotTransientField(), is(5));
+    }
+
     @ContainerModule(contextName = Contexts.JSON_CONVERTER_CONTEXT)
     @Import({ CustomFormatter.class, ParentResolverFormatter.class, LinkExtractorImpl.class, CDeserializer.class})
     @EnableJsonConverter

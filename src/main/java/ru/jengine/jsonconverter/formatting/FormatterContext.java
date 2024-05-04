@@ -92,6 +92,10 @@ public class FormatterContext {
         }
     }
 
+    public void format(JsonElement json) {
+        jsonFormatterManager.formatJson(json);
+    }
+
     public static JsonPrimitive asPrimitive(JsonObject json, String field) {
         return asPrimitive(json, field, false);
     }
