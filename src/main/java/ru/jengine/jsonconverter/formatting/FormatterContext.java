@@ -51,7 +51,7 @@ public class FormatterContext {
         return linkedJson;
     }
 
-    public void parent(JsonObject json, String field) {
+    public JsonObject parent(JsonObject json, String field) {
         JsonElement linkedJson = link(json, field);
         if (!linkedJson.isJsonObject()) {
             throw new JsonConverterException("Resolved parent is not object. Parent: [%s], field [%s] in json [%s]"
@@ -60,14 +60,7 @@ public class FormatterContext {
 
         json.remove(field);
 
-        for (Entry<String, JsonElement> entry : linkedJson.getAsJsonObject().entrySet()) {
-            String parentField = entry.getKey();
-            JsonElement jsonElement = entry.getValue();
-
-            if (!json.has(parentField)) {
-                json.add(parentField, jsonElement.deepCopy());
-            }
-        }
+        return linkedJson.getAsJsonObject().deepCopy();
     }
 
     public List<String> fieldsWithLink(JsonObject json) {
