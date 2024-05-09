@@ -7,7 +7,7 @@ import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition.BeanProducer;
 import ru.jengine.beancontainer.beandefinitions.JavaClassBeanDefinition;
 import ru.jengine.beancontainer.modules.Module;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.util.List;

@@ -6,7 +6,7 @@ import ru.jengine.beancontainer.containercontext.BeanExtractor;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingPropertyDefinition;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.Parameter;
 
 import javax.annotation.Nullable;

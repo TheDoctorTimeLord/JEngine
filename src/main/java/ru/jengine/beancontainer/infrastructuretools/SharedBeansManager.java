@@ -15,7 +15,7 @@ import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.infrastrucure.ContainerStateProvidable;
 import ru.jengine.beancontainer.statepublisher.ContainerEventDispatcher;
 import ru.jengine.beancontainer.statepublisher.ContainerListener;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.MethodMeta;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 

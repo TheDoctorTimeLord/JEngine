@@ -10,7 +10,7 @@ import ru.jengine.beancontainer.annotations.Order;
 import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesTransformer;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 
 @Bean(isInfrastructure = true)
 public class SortingByOrderTransformer implements BeanCandidatesTransformer {

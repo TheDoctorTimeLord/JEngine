@@ -7,7 +7,7 @@ import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.extentions.infrastrucure.BeanCandidatesTransformer;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
 import java.lang.annotation.Annotation;

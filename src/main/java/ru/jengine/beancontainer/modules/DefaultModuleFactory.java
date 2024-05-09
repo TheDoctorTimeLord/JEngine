@@ -7,7 +7,7 @@ import ru.jengine.beancontainer.classfinders.CompositeClassFinder;
 import ru.jengine.beancontainer.classfinders.EmptyClassFinder;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 
 import java.util.stream.Collectors;

@@ -5,7 +5,7 @@ import ru.jengine.beancontainer.annotations.Import;
 import ru.jengine.beancontainer.annotations.Shared;
 import ru.jengine.beancontainer.beandefinitions.BeanDefinition;
 import ru.jengine.beancontainer.beandefinitions.JavaClassBeanDefinition;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 
 import java.util.List;
 import java.util.stream.Stream;

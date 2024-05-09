@@ -1,5 +1,7 @@
 package ru.jengine.beancontainer.utils;
 
+import ru.jengine.utils.AnnotationUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 

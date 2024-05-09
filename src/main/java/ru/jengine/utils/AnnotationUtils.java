@@ -1,9 +1,8 @@
-package ru.jengine.beancontainer.utils;
+package ru.jengine.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.jengine.beancontainer.exceptions.ContainerException;
-import ru.jengine.utils.ReflectionUtils;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.*;
@@ -68,12 +67,12 @@ public class AnnotationUtils {
         return allAnnotations;
     }
 
-    public static List<Annotation> resolveNotSystemAnnotation(String annotationName) {
+    public static List<Annotation> resolveNotSystemAnnotation(String className) {
         try {
-            return resolveNotSystemAnnotation(Class.forName(annotationName));
+            return resolveNotSystemAnnotation(Class.forName(className));
         }
         catch (ClassNotFoundException e) {
-            LOG.error("Annotation [%s] is not found".formatted(annotationName), e);
+            LOG.error("Class [%s] is not found".formatted(className), e);
             return new ArrayList<>();
         }
     }

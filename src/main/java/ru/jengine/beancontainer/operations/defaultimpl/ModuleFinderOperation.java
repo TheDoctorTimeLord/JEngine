@@ -13,7 +13,7 @@ import ru.jengine.beancontainer.modules.ModuleFactory;
 import ru.jengine.beancontainer.operations.ContainerOperation;
 import ru.jengine.beancontainer.operations.OperationResult;
 import ru.jengine.beancontainer.operations.ResultConstants;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 import ru.jengine.beancontainer.utils.ReflectionContainerUtils;
 import ru.jengine.utils.CollectionUtils;
 import ru.jengine.utils.ReflectionUtils;

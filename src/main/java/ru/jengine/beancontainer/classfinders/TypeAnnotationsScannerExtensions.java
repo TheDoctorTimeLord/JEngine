@@ -1,9 +1,7 @@
 package ru.jengine.beancontainer.classfinders;
 
 import org.reflections.scanners.TypeAnnotationsScanner;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
-
-import java.util.List;
+import ru.jengine.utils.AnnotationUtils;
 
 public class TypeAnnotationsScannerExtensions extends TypeAnnotationsScanner {
     public static final String NAME = "TypeAnnotationsScannerExtensions";
@@ -15,9 +13,8 @@ public class TypeAnnotationsScannerExtensions extends TypeAnnotationsScanner {
         //TODO подумать, как не конвертировать классы в аннотации
         //Добавляем аннотации аннотаций к явным аннотациям
         final String className = getMetadataAdapter().getClassName(cls);
-        ((List<String>)getMetadataAdapter().getClassAnnotationNames(cls)).stream()
-                .map(AnnotationUtils::resolveNotSystemAnnotation)
-                .flatMap(annotations -> annotations.stream().map(annotation -> annotation.annotationType().getName()))
+        AnnotationUtils.resolveNotSystemAnnotation(className).stream()
+                .map(annotation -> annotation.annotationType().getName())
                 .forEach(annotation -> getStore().put(annotation, className));
     }
 }

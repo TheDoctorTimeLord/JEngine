@@ -5,7 +5,7 @@ import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.ImportModule;
 import ru.jengine.beancontainer.beandefinitionreades.BeanDefinitionReader;
 import ru.jengine.beancontainer.classfinders.ClassFinder;
-import ru.jengine.beancontainer.utils.AnnotationUtils;
+import ru.jengine.utils.AnnotationUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

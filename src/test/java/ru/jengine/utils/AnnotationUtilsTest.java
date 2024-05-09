@@ -1,7 +1,8 @@
-package ru.jengine.beancontainer.utils;
+package ru.jengine.utils;
 
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
+import ru.jengine.utils.AnnotationUtils;
 
 import java.lang.annotation.*;
 import java.util.List;
