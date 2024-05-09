@@ -9,6 +9,7 @@ import ru.jengine.beancontainer.containercontext.ResolvedBeanData;
 import ru.jengine.beancontainer.containercontext.resolvingproperties.ResolvingProperties;
 import ru.jengine.beancontainer.exceptions.ContainerException;
 import ru.jengine.beancontainer.intstructure.factory.*;
+import ru.jengine.infrastructure.beancontainer.factory.*;
 
 import java.util.Map;
 

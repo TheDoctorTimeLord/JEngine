@@ -12,6 +12,7 @@ import ru.jengine.beancontainer.annotations.ContainerModule;
 import ru.jengine.beancontainer.annotations.Import;
 import ru.jengine.beancontainer.configuration.ContainerConfiguration;
 import ru.jengine.beancontainer.modules.AnnotationModule;
+import ru.jengine.infrastructure.jsonconverter.*;
 import ru.jengine.jsonconverter.additional.*;
 import ru.jengine.jsonconverter.modules.EnableJsonConverterWithStandardTools;
 import ru.jengine.jsonconverter.resources.ResourceLoader;
