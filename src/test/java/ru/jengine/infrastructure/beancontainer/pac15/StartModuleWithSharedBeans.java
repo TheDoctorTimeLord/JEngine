@@ -9,6 +9,6 @@ import ru.jengine.beancontainer.modules.AnnotationModule;
 
 @ContainerModule(contextName = Contexts.DEFAULT_CONTEXT)
 @ImportModule(AnotherModule.class)
-@PackageScan("ru.jengine.beancontainer.intstructure.pac15")
+@PackageScan("ru.jengine.infrastructure.beancontainer.pac15")
 public class StartModuleWithSharedBeans extends AnnotationModule {
 }

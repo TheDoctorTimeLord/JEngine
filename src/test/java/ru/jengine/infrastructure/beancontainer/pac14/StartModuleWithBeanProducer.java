@@ -7,7 +7,7 @@ import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 
 @ContainerModule(contextName = Contexts.DEFAULT_CONTEXT)
-@PackageScan("ru.jengine.beancontainer.intstructure.pac14.")
+@PackageScan("ru.jengine.infrastructure.beancontainer.pac14.")
 public class StartModuleWithBeanProducer extends AnnotationModule {
     @Bean
     public Z produce(Y y) {

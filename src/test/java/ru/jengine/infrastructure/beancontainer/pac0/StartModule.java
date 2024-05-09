@@ -5,6 +5,6 @@ import ru.jengine.beancontainer.annotations.PackageScan;
 import ru.jengine.beancontainer.modules.AnnotationModule;
 
 @ContainerModule(contextName = "1")
-@PackageScan("ru.jengine.beancontainer.intstructure.pac1.")
+@PackageScan("ru.jengine.infrastructure.beancontainer.pac1.")
 public class StartModule extends AnnotationModule {
 }
